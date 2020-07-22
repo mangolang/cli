@@ -36,11 +36,9 @@ Docker
 
 To use the Mango Docker image, you will need Docker installed.
 
-TODO: this image is not available yet
-
 We can then start Mango in a Docker container, mounting your code directory so it can be compiled::
 
-    docker run --rm -it --name mango --mount type=bind,src=/YOUR/CODE/PATH,dst=/code mangocode/mango:latest -- mango --help
+    docker run --rm -it --name mango --mount type=bind,src=/YOUR/CODE/PATH,dst=/code mangocode/mango:latest mango --help
 
 Or a short version without name, auto-delete and version::
 

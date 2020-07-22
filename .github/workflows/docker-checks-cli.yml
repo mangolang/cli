@@ -1,0 +1,26 @@
+
+# Build a Docker image that builds and checks the Rust library,
+# which can also be used as CLI access point.
+
+name: 'Check Mango CLI'
+
+on:
+  push:
+  pull_request:
+  release:
+    types:
+      - published
+
+jobs:
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Tests, clippy, rustfmt and build
+        run: |
+          docker build -t mango .
+      - name: Run the image
+        run: |
+          docker run -it mango mango --help | grep 'Compile the code'
