@@ -12,12 +12,12 @@
     :target: https://opensource.org/licenses/Apache-2.0
 
 
-Mango
+Mango CLI
 ===============================
 
-A programming language to help you make large software projects reliable, for browsers and servers.
+This is the command-line interface for Mango, a programming language to help you make large software projects reliable, for browsers and servers.
 
-This is the compiler 'frontend', which does the parsing and type checking. It produces IR_, to be compiled_, to WebAssembly or interpreted_.
+This tool is the main entrypoint for interacting with Mango, even though the actual code is largely divided over different repositories, like frontend_, IR_, to be compiled_, to WebAssembly or interpreted_.
 
 https://mangocode.org/
 
@@ -26,18 +26,39 @@ Status
 
 This project is still in early development stage. It is not ready to use, not even experimentally.
 
-There are hundreds of pages of design notes, but the plan still lacks coherence, so is unpublished.
-
 How to use
 -------------------------------
 
-The compiler is written in Rust. You can test and compile the library with Docker:
+There are two main ways to use the CLI [note: not finished], Docker and self-compiled. Because Mango is in early development, there are no pre-compiled binaries yet.
 
-    docker build .
+Docker
+...............................
 
-Or run the cargo commands from the Dockerfile yourself.
+To use the Mango Docker image, you will need Docker installed.
 
-This compiles to native code, with WebAssembly to be added later (#34).
+TODO: this image is not available yet
+
+We can then start Mango in a Docker container, mounting your code directory so it can be compiled::
+
+    docker run --rm -it --name mango --mount type=bind,src=/YOUR/CODE/PATH,dst=/code mangocode/mango:latest -- mango --help
+
+Or a short version without name, auto-delete and version::
+
+    docker run -it -v"/YOUR/CODE/PATH":/code mangocode/mango mango --help
+
+Self-compiled
+...............................
+
+Compiling and running the code should be easy.
+
+* `Install Rust`_.
+* Download and compile Mango:
+
+    cargo install mango
+
+* Run the compiler at `$HOME/.cargo/bin/mango --help`.
+
+If you want to access the executable more easily, either move `mango` to e.g. `/usr/local/bin` (for all users), or add `$HOME/.cargo/bin` to your `PATH` (just for you).
 
 Links
 -------------------------------
@@ -49,6 +70,8 @@ Links
 .. _Official website: https://mangocode.org/
 .. _`Documentation`: https://docs.mangocode.org/
 .. _`Code of conduct and contributing`: https://github.com/mangolang/mango
+.. _frontend: https://github.com/mangolang/compiler
 .. _IR: https://github.com/mangolang/mango_ir
 .. _compiled: https://github.com/mangolang/wasm
 .. _interpreted: https://github.com/mangolang/interpreter
+.. _Install Rust: https://rustup.rs/
