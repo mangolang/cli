@@ -2,13 +2,14 @@ use ::structopt::StructOpt;
 
 #[derive(StructOpt)]
 pub struct CompileCmd {
-    #[structopt(subcommand)]  // Note that we mark a field as a subcommand
-    target: Target
+    #[structopt(subcommand)]
+    pub target: Target
 }
 
-// subsubcommand!
 #[derive(StructOpt)]
 pub enum Target {
+    #[structopt(about = "Do all the compile checks, then exit")]
+    Check {},
     #[structopt(about = "Mango intermediary representation (for debugging)")]
     IR {
         #[structopt(

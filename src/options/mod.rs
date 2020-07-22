@@ -1,16 +1,17 @@
 use ::structopt::StructOpt;
 
-mod compile;
+pub mod compile;
 
 #[derive(StructOpt)]
-pub struct Mango {
+#[structopt(about = "Warning: all Mango CLI options are subject to change!")]
+pub struct MangoArgs {
 
     #[structopt(
         short = "v",
         long,
         help = "Show verbose information for debugging."
     )]
-    verbose: bool,
+    pub verbose: bool,
 
     #[structopt(
         conflicts_with = "verbose",
@@ -18,13 +19,14 @@ pub struct Mango {
         long = "quiet",
         help = "Only show the most important output."
     )]
-    quiet: bool,
+    pub quiet: bool,
 
     #[structopt(subcommand)]
-    cmd: Command
+    pub cmd: Command
 }
 
 #[derive(StructOpt)]
-enum Command {
+pub enum Command {
+    #[structopt(about = "Compile the code in the current directory to one of various formats")]
     Compile(compile::CompileCmd),
 }
