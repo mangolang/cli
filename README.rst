@@ -1,5 +1,5 @@
 
-.. image:: https://github.com/mangolang/cli/workflows/Check%20Mango%20CLI/badge.svg?branch=master
+.. image:: https://github.com/mangolang/cli/workflows/Test%20&%20deploy%20Mango%20CLI/badge.svg
     :target: https://github.com/mangolang/cli/actions
 
 .. image:: https://deps.rs/repo/github/mangolang/cli/status.svg
