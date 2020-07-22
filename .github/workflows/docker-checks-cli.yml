@@ -2,7 +2,7 @@
 # Build a Docker image that builds and checks the Rust library,
 # which can also be used as CLI access point.
 
-name: 'Check Mango CLI'
+name: 'Test & deploy Mango CLI'
 
 on:
   push:
@@ -13,7 +13,7 @@ on:
 
 jobs:
   checks:
-    name: Checks
+    name: Compile and test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,4 +23,19 @@ jobs:
           docker build -t mango .
       - name: Run the image
         run: |
-          docker run -it mango mango --help | grep 'Compile the code'
+          docker run mango mango --help | grep 'Compile the code'
+  push_to_registry:
+    name: Push image to DockerHub
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged && github.ref == 'refs/heads/master'
+    needs: checks
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v1
+        with:
+          username: mangocode
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+          repository: mangocode/mango
+          #tag_with_ref: false  # todo or true?
