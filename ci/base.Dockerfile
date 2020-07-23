@@ -3,6 +3,7 @@
 # Only intended for use in the Mango project itself, to make other images build faster.
 # https://hub.docker.com/r/mangocode/mango_daily_base
 
+# Note: this version should match `executable.Dockerfile`
 FROM rust:1.44
 
 ENV RUST_BACKTRACE=1

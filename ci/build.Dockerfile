@@ -1,6 +1,7 @@
 
-# This image builds the Mango CLI.
+# This image builds the Mango CLI with all dependencies.
 # It is used as an intermediary image during build pipeline; subsequent images will use it to do further checks.
+# For the releasable version, see `executable.Dockerfile`
 
 FROM mangocode/mango_daily_base:latest
 
