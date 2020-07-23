@@ -2,5 +2,7 @@
 
 source 'ci/shared.sh'
 
-docker build -t 'mango_cli_build' -f  'ci/build.Dockerfile' .
-
+(
+    set -x
+    docker build -t 'mango_cli_build' -f  'ci/build.Dockerfile' .
+)

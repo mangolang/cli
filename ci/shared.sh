@@ -23,7 +23,10 @@ then
         printf '* and the build will be much slower than it should be.                    *\n' 1>&2
         printf '***************************************************************************\n' 1>&2
 
-        docker build -t 'mangocode/mango_daily_base' -f  'ci/base.Dockerfile' .
+        (
+            set -x
+            docker build -t 'mangocode/mango_daily_base' -f  'ci/base.Dockerfile' .
+        )
     fi
 
     printf 'setup completed\n'
