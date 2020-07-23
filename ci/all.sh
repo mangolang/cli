@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 
-printf '== step: build =='
-bash 'ci/build.sh'
+printf '== step: build ==\n'
+source 'ci/build.sh'
 
-printf '== step: test =='
-bash 'ci/test.sh'
+printf '== step: test ==\n'
+source 'ci/test.sh'
 
-printf '== step: lint =='
-bash 'ci/lint.sh'
+printf '== step: lint ==\n'
+source 'ci/lint.sh'
 
-printf '== step: style =='
-bash 'ci/style.sh'
+printf '== step: style ==\n'
+source 'ci/style.sh'
 
-printf '== step: executable =='
-bash 'ci/executable.sh'
+printf '== step: executable ==\n'
+source 'ci/executable.sh'
+
+printf 'done\n'
 

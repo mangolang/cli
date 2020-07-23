@@ -6,7 +6,7 @@
 FROM mangocode/mango_daily_base:latest
 
 # Now add the actual code
-COPY Cargo.toml Cargo.toml
+COPY rustfmt.toml Cargo.toml Cargo.lock ./
 COPY src src
 
 # This makes sure things are rebuilt
