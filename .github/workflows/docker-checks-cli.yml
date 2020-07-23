@@ -38,4 +38,5 @@ jobs:
           username: mangocode
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
           repository: mangocode/mango
+          tags: latest
           #tag_with_ref: false  # todo or true?
