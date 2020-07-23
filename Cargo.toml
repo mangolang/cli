@@ -31,3 +31,4 @@ opt-level = 'z'
 
 [profile.dev.package."*"]
 opt-level = 3
+debug = false
