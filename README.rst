@@ -44,6 +44,12 @@ Or a short version without name, auto-delete and version::
 
     docker run -it -v"/YOUR/CODE/PATH":/code mangocode/mango mango --help
 
+To build the Docker image locally, including running tests, run::
+
+    bash ci/all.sh
+
+The image is now available as `mangocode/mango`.
+
 Self-compiled
 ...............................
 
