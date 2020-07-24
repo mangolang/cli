@@ -4,6 +4,6 @@ source 'ci/shared.sh'
 
 (
     set -x
-    docker run --rm -it 'mango_cli_build'\
+    docker run --rm 'mango_cli_build'\
         cargo --offline test --release --all-targets --all-features --all
 )
