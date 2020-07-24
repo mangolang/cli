@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 
 printf '== step: build ==\n'
-source 'ci/build.sh'
+source "${BASH_SOURCE%/*}/build.sh"
 
 printf '== step: test ==\n'
-source 'ci/test.sh'
+source "${BASH_SOURCE%/*}/test.sh"
 
 printf '== step: lint ==\n'
-source 'ci/lint.sh'
+source "${BASH_SOURCE%/*}/lint.sh"
 
 printf '== step: style ==\n'
-source 'ci/style.sh'
+source "${BASH_SOURCE%/*}/style.sh"
 
 printf '== step: executable ==\n'
-source 'ci/executable.sh'
+source "${BASH_SOURCE%/*}/executable.sh"
 
 printf 'done\n'
 

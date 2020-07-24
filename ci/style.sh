@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source 'ci/shared.sh'
+source "${BASH_SOURCE%/*}/shared.sh"
 
 (
     set -x
