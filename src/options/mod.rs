@@ -5,12 +5,7 @@ pub mod compile;
 #[derive(StructOpt)]
 #[structopt(about = "Warning: all Mango CLI options are subject to change!")]
 pub struct MangoArgs {
-
-    #[structopt(
-        short = "v",
-        long,
-        help = "Show verbose information for debugging."
-    )]
+    #[structopt(short = "v", long, help = "Show verbose information for debugging.")]
     pub verbose: bool,
 
     #[structopt(
@@ -22,7 +17,7 @@ pub struct MangoArgs {
     pub quiet: bool,
 
     #[structopt(subcommand)]
-    pub cmd: Command
+    pub cmd: Command,
 }
 
 #[derive(StructOpt)]

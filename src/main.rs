@@ -1,6 +1,6 @@
 mod options;
 
-use options::{MangoArgs, Command, compile};
+use options::{compile, Command, MangoArgs};
 
 #[paw::main]
 fn main(args: MangoArgs) {
@@ -9,7 +9,7 @@ fn main(args: MangoArgs) {
             compile::Target::Check {} => {
                 println!("Checking code...");
                 todo!()
-            },
+            }
             compile::Target::IR { json, packed } => {
                 match (json, packed) {
                     (true, true) => println!("Creating json & packed IR..."),
@@ -18,10 +18,8 @@ fn main(args: MangoArgs) {
                     (false, false) => println!("Creating packed IR..."),
                 }
                 todo!()
-            },
-            _ => {
-                eprintln!("This operation is not supported yet")
             }
+            _ => eprintln!("This operation is not supported yet"),
         },
     }
 }
