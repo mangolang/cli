@@ -2,7 +2,7 @@
 # This builds a base image containing the pre-compiled dependencies.
 # It is automatically built every day so that subsequent builds are fast.
 
-name: 'Test & deploy Mango CLI'
+name: 'Daily Mango base image'
 
 on:
   schedule:
