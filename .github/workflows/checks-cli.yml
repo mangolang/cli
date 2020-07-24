@@ -26,10 +26,13 @@ jobs:
       - name: Lint
         run: |
           ci/lint.sh
-#      - name: Style
-#        continue-on-error: true
-#        run: |
-#          ci/style.sh
+      - name: Style
+        continue-on-error: true
+        run: |
+          ci/style.sh
+      - name: Documentation
+        run: |
+          ci/docs.sh
       - name: Executable
         run: |
           ci/executable.sh

@@ -1,18 +1,15 @@
 
-# This builds a base image containing the pre-compiled dependencies.
-# It is automatically built every day so that subsequent builds are fast.
+# This checks that thare are no known issues with the current dependency versions.
 
-name: 'Daily Mango base image'
+name: 'Check dependency status'
 
 on:
   schedule:
-    - cron: '0 0 * * 0'
-
-#TODO @mark: should only build if it does not exist
+    - cron: '0 4 * * 0'
 
 jobs:
   push_to_registry:
-    name: Daily base image
+    name: Dependency inspection
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

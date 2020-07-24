@@ -1,0 +1,27 @@
+
+# This builds a base image containing the pre-compiled dependencies.
+# It is automatically built every day so that subsequent builds are fast.
+
+name: 'Daily Mango base image'
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'
+
+#TODO @mark: should only build if it does not exist
+
+jobs:
+  push_to_registry:
+    name: Daily base image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Push to DockerHub
+        uses: docker/build-push-action@v1
+        dockerfile: ci/base.Dockerfile
+        with:
+          username: mangocode
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+          repository: mangocode/mango_daily_base
+          tags: latest
