@@ -4,6 +4,10 @@ use options::{compile, Command, MangoArgs};
 
 #[paw::main]
 fn main(args: MangoArgs) {
+    cli(args)
+}
+
+pub fn cli(args: MangoArgs) {
     match args.cmd {
         Command::Compile(compile) => match compile.target {
             compile::Target::Check {} => {
@@ -23,4 +27,15 @@ fn main(args: MangoArgs) {
         },
     };
     eprintln!("not implemented!")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn compile_ir() {
+        let args = MangoArgs::from_iter(&["mango", "compile", "ir"]);
+        cli(args)
+    }
 }

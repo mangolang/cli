@@ -25,5 +25,5 @@ fi
     cargo +"$NIGHTLY_VERSION" install grcov
     cargo +"$NIGHTLY_VERSION" --offline test --all-targets --all-features
     mkdir -p '/coverage'
-    cp -r 'target/debug/deps/' '/coverage'
+    cp -r 'target/debug/deps' '/coverage'
 )
