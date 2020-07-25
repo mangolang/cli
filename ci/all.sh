@@ -12,6 +12,9 @@ source "${BASH_SOURCE%/*}/lint.sh"
 printf '== step: style ==\n'
 source "${BASH_SOURCE%/*}/style.sh"
 
+printf '== step: dependencies ==\n'
+source "${BASH_SOURCE%/*}/deps.sh"
+
 printf '== step: documentation ==\n'
 source "${BASH_SOURCE%/*}/docs.sh"
 

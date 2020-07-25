@@ -4,6 +4,10 @@
 
 name: 'Test & deploy Mango CLI'
 
+#TODO @mark: split into a loose and strict version
+#TODO @mark: loose means the code runs, and other checks are non-blocking suggestions
+#TODO @mark: strict means the code passes all/most checks, required for merge to master
+
 on:
   push:
   release:

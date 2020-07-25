@@ -10,6 +10,11 @@ ENV RUST_BACKTRACE=1
 
 RUN rustup component add rustfmt
 RUN rustup component add clippy
+RUN cargo install cargo-outdated
+RUN cargo install cargo-audit
+RUN cargo install cargo-deny
+RUN cargo install cargo-tree
+RUN cargo install cargo-udeps
 
 WORKDIR /mango
 
@@ -25,6 +30,9 @@ RUN cargo build --bin mango
 # Build the code (release mode)
 # Note: sharing dependencies between dev/release does not work yet - https://stackoverflow.com/q/59511731
 RUN cargo build --bin mango --release
+
+# Store dependencies overview in the image
+RUN cargo --offline tree --all-features | tee dependencies.txt
 
 # Remove Cargo.toml file, to prevent other images from forgetting to re-add it.
 RUN rm -f Cargo.toml
