@@ -37,11 +37,9 @@ RUN cargo build --bin mango
 RUN cargo build --bin mango --release
 #TODO: use --out-dir if it stabilizes
 
-# Add special build scripts.
-COPY ci/image/cargo_for_coverage.sh cargo_for_coverage.sh
-
 # Build the code with special flags for code coverage.
-RUN ./cargo_for_coverage.sh build && rm -f cargo_for_coverage.sh
+COPY ci/image/cargo_for_coverage.sh cargo_for_coverage.sh
+RUN ./cargo_for_coverage.sh build
 
 # Miscellaneous other files
 COPY ci/image/run_tests_with_miri.sh run_tests_with_miri.sh

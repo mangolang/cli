@@ -25,7 +25,7 @@ then
         printf '* and the build will be much slower than it should be.                    *\n' 1>&2
         printf '***************************************************************************\n' 1>&2
 
-        source "${BASH_SOURCE%/*}/make/daily.sh"
+        source "${BASH_SOURCE%/*}/make/base.sh"
     fi
 
     # Make a debug-mode image for further CI steps.

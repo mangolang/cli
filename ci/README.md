@@ -52,6 +52,7 @@
         * Full documentation.
         * Performance results, flamegraph.
         * Test coverage.
+        * Mutation testing.
         * Source code and git hash.
         * Dependency tree.
         * Binary size breakdown.

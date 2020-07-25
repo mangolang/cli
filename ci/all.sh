@@ -17,7 +17,7 @@ function STEP() {
 }
 
 # Note: this must be the first step
-STEP 'make/daily.sh' 'build - dependencies'
+STEP 'make/base.sh' 'build - dependencies'
 
 STEP 'make/debug.sh' 'build - ci image'
 
@@ -41,11 +41,12 @@ STEP 'deps/usage.sh' 'dependencies - unused'
 
 STEP 'make/docs.sh' 'documentation'
 
+STEP 'make/dist_image.sh' 'release - image (distributable)'
+
 STEP 'release/dependencies.sh' 'release - dependencies'
 
 STEP 'release/exe_size.sh' 'release - executable size'
 
-STEP 'release/dist_image.sh' 'release - image (distributable)'
 
 printf '== cleanup ==\n'
 # Untag the docker images so next run cannot accidentally rely on old versions.

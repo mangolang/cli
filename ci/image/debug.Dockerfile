@@ -17,3 +17,11 @@ RUN cargo build --bin mango
 
 # Build the code (release mode)
 RUN cargo build --bin mango --release
+
+# Build the code with special flags for code coverage.
+COPY ci/image/cargo_for_coverage.sh cargo_for_coverage.sh
+RUN ./cargo_for_coverage.sh build
+
+# Miscellaneous other files
+COPY ci/image/run_tests_with_miri.sh run_tests_with_miri.sh
+COPY deny.toml deny.toml
