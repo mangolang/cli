@@ -6,4 +6,4 @@ source "${BASH_SOURCE%/*}/../shared.sh"
 
 mkdir -p "$RELEASE_PATH/coverage"
 docker run --rm --mount type=bind,src="$RELEASE_PATH/coverage",dst='/coverage' 'mango_ci:latest' \
-    bash 'cargo_for_coverage.sh'
+    bash 'cargo_for_coverage.sh' run

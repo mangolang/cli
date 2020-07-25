@@ -5,7 +5,7 @@
 
 # Note: this version should match `executable.Dockerfile`
 # Note: also update nightly version, installed later in image
-FROM rust:1.44
+FROM ekidd/rust-musl-builder:1.44.1
 
 ENV RUST_BACKTRACE=1
 

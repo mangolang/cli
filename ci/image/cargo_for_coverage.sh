@@ -18,14 +18,18 @@ fi
 
 # shellcheck disable=SC2034
 (
-    set -x
+    set -eEu -x
+    RUSTC_WRAPPER=""
     CARGO_TARGET_DIR="target/coverage"
     CARGO_INCREMENTAL=0
     RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort -Zmacro-backtrace"
     cargo +"$NIGHTLY_VERSION" install grcov
+    cargo +"$NIGHTLY_VERSION" --offline build --verbose --tests --all-targets --all-features
     if [ "$1" = 'run' ]; then
         cargo +"$NIGHTLY_VERSION" --offline test --all-targets --all-features
         mkdir -p '/coverage'
+        find . -name '*.gc*'  #TODO @mark: TEMPORARY! REMOVE THIS!
+        find /coverage  #TODO @mark: TEMPORARY! REMOVE THIS!
         grcov 'target/debug/' -s . -t html --llvm --branch --ignore-not-existing -o '/coverage'
         #cp -r 'target/debug/deps' '/coverage'
     fi
