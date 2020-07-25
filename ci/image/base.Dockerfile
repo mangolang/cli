@@ -17,7 +17,7 @@ RUN cargo install cargo-deny
 RUN cargo install cargo-tree
 RUN cargo install cargo-udeps
 
-# Nightly is needed for grcov and miri
+# Nightly is needed for grcov and miri.
 ENV NIGHTLY_VERSION=nightly-2020-07-18
 RUN rustup toolchain install $NIGHTLY_VERSION
 
@@ -29,21 +29,27 @@ COPY Cargo.lock .
 RUN mkdir src && \
     printf 'fn main() { println!("placeholder for compiling dependencies") }' > src/main.rs
 
-# Build the code (development mode)
+# Build the code (development mode).
 RUN cargo build --bin mango
 
-# Build the code (release mode)
+# Build the code (release mode).
 # Note: sharing dependencies between dev/release does not work yet - https://stackoverflow.com/q/59511731
 RUN cargo build --bin mango --release
-#TODO: use --out-dir if it ever stabilizes
+#TODO: use --out-dir if it stabilizes
 
-# Build the code with special flags for code coverage
+# Add special build scripts.
 COPY ci/image/cargo_for_coverage.sh cargo_for_coverage.sh
+
+# Build the code with special flags for code coverage.
 RUN ./cargo_for_coverage.sh build && rm -f cargo_for_coverage.sh
+
+# Miscellaneous other files
+COPY ci/image/run_tests_with_miri.sh run_tests_with_miri.sh
+COPY deny.toml deny.toml
 
 # Remove Cargo.toml file, to prevent other images from forgetting to re-add it.
 RUN rm -f Cargo.toml
 
-# NOTE!
-# Make sure to `touch src/main.rs` after copying source, so that everything is recompiled
+## NOTE!
+## Make sure to `touch src/main.rs` after copying source, so that everything is recompiled
 

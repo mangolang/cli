@@ -8,6 +8,7 @@
 !Cargo.toml
 !Cargo.lock
 !rustfmt.toml
+!deny.toml
 !.cargo/
 !src/
 !README.rst

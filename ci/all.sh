@@ -12,6 +12,9 @@ source "${BASH_SOURCE%/*}/pipeline/lint.sh"
 printf '== step: style ==\n'
 source "${BASH_SOURCE%/*}/pipeline/style.sh"
 
+printf '== step: test (miri) ==\n'
+source "${BASH_SOURCE%/*}/pipeline/test_miri.sh"
+
 printf '== step: dependencies ==\n'
 source "${BASH_SOURCE%/*}/pipeline/deps.sh"
 
@@ -21,7 +24,7 @@ source "${BASH_SOURCE%/*}/pipeline/docs.sh"
 #TODO @mark: add a performance step? https://github.com/mverleg/rust_template/blob/master/ci/check_performance.sh
 
 printf '== step: executable ==\n'
-source "${BASH_SOURCE%/*}/executable.sh"
+source "${BASH_SOURCE%/*}/pipeline/dist_image.sh"
 
 printf '== done ==\n'
 
