@@ -12,7 +12,7 @@ function STEP() {
         printf "STEP script '%s' does not exist at '%s'\n" "$1" "$pth" 1>&2
         return 1
     fi
-    printf '== step: %s (%s) ==\n' "$2" "$pth"
+    printf '== step: %s (%s) ==\n' "$2" "$pth" 1>&2
     source "$pth"
 }
 

@@ -16,6 +16,7 @@ RUN cargo install cargo-audit
 RUN cargo install cargo-deny
 RUN cargo install cargo-tree
 RUN cargo install cargo-udeps
+RUN cargo install cargo-bloat
 
 # Nightly is needed for grcov and miri.
 ENV NIGHTLY_VERSION=nightly-2020-07-18
