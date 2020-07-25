@@ -23,6 +23,8 @@
         * Unit tests.
         * Lint (clippy).
         * Style (rustfmt).
+* `Deploy`: Deploy an environment for manual testing.
+    * _This is a plan for the future._
 * `Stable`: The code can be merged to master.
     * The quick checks from `Basic`.
     * Integration tests.
@@ -43,7 +45,7 @@
     * The code compiles on multiple platforms.
     * Artifacts are generated:
         * Readme, license.
-        * Docker image containing executable.
+        * Read-only docker image containing executable.
         * _Maybe? executable for some platforms._
         * Full documentation.
         * Performance results, flamegraph.
