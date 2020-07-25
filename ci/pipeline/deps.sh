@@ -6,12 +6,6 @@ source "${BASH_SOURCE%/*}/shared.sh"
 
 (
     set -x
-    docker run --rm 'mango_cli_build' cargo --offline outdated --exit-code 1
-    docker run --rm 'mango_cli_build' cargo --offline audit --deny-warnings
-    docker run --rm 'mango_cli_build' cargo --offline deny init
-    docker run --rm 'mango_cli_build' cargo --offline deny check licenses
-    docker run --rm 'mango_cli_build' cargo --offline deny check bans
-    docker run --rm 'mango_cli_build' cargo --offline deny check advisories
 
     #TODO @mark: store these reports somewhere
     # This does not check anything, just puts the dependencies in the log:
