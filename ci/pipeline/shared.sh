@@ -39,5 +39,15 @@ then
         )
     }
 
+    # Create / clean release directory
+    CRATE_NAME="$(grep -h -m1 '^name\s*=\s*"[^"]*"' Cargo.toml | sed 's/^name\s*=\s*"\([^"]*\)".*/\1/g')"
+    CRATE_VERSION="$(grep -h -m1 '^version\s*=\s*"[^"]*"' Cargo.toml | sed 's/^version\s*=\s*"\([^"]*\)".*/\1/g')"
+    GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD | sed 's/_/-/g')"
+    if [ "$GIT_BRANCH" = "master" ]; then RELEASE_NAME="${CRATE_NAME}-${CRATE_VERSION}"; else RELEASE_NAME="${CRATE_NAME}-${GIT_BRANCH}-${CRATE_VERSION}"; fi
+    RELEASE_PATH="target/$RELEASE_NAME"
+    printf 'release name: %s\n' "$RELEASE_NAME"
+    CHECK mkdir -p "$RELEASE_PATH"
+    CHECK rm -rf "$RELEASE_PATH/*"
+
     printf 'setup completed\n'
 fi
