@@ -25,7 +25,7 @@ then
 
         (
             set -x
-            docker build -t 'mangocode/mango_daily_base' -f  'ci/base.Dockerfile' .
+            docker build -t 'mangocode/mango_daily_base' -f  'ci/image/base.Dockerfile' .
         )
     fi
 

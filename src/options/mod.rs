@@ -7,6 +7,7 @@ pub mod compile;
     //author = "Mango programming language CLI",
     after_help = "Mango documentation: https://docs.mangocode.org/\nWarning: all Mango CLI options are subject to change!"
 )]
+#[rustfmt::skip]
 pub struct MangoArgs {
     #[structopt(
         short = "v",

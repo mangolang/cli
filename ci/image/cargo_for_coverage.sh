@@ -13,7 +13,7 @@ fi
     set -x
     CARGO_TARGET_DIR="target/nightly"
     CARGO_INCREMENTAL=0
-    RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort"
+    RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort -Zmacro-backtrace"
     RUSTDOCFLAGS="-Cpanic=abort"
     cargo +nightly --offline "$1" --all-targets --all-features "${@:2}"
 )

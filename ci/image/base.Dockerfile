@@ -4,6 +4,7 @@
 # https://hub.docker.com/r/mangocode/mango_daily_base
 
 # Note: this version should match `executable.Dockerfile`
+# Note: also update nightly version, installed later in image
 FROM rust:1.44
 
 ENV RUST_BACKTRACE=1
@@ -15,7 +16,11 @@ RUN cargo install cargo-audit
 RUN cargo install cargo-deny
 RUN cargo install cargo-tree
 RUN cargo install cargo-udeps
-RUN cargo install grcov
+
+RUN rustup toolchain install nightly
+RUN rustup toolchain list
+
+RUN cargo +nightly install grcov
 
 WORKDIR /mango
 
@@ -34,8 +39,8 @@ RUN cargo build --bin mango --release
 #TODO: use --out-dir if it ever stabilizes
 
 # Build the code with special flags for code coverage
-COPY ci/cargo_for_coverage.sh cargo_for_coverage.sh
-RUN ./build_for_coverage.sh && rm -f cargo_for_coverage.sh
+COPY ci/image/cargo_for_coverage.sh cargo_for_coverage.sh
+RUN ./cargo_for_coverage.sh build && rm -f cargo_for_coverage.sh
 
 # Remove Cargo.toml file, to prevent other images from forgetting to re-add it.
 RUN rm -f Cargo.toml
