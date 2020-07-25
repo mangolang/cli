@@ -17,10 +17,9 @@ RUN cargo install cargo-deny
 RUN cargo install cargo-tree
 RUN cargo install cargo-udeps
 
-RUN rustup toolchain install nightly
-RUN rustup toolchain list
-
-RUN cargo +nightly install grcov
+# Nightly is needed for grcov and miri
+ENV NIGHTLY_VERSION=nightly-2020-07-18
+RUN rustup toolchain install $NIGHTLY_VERSION
 
 WORKDIR /mango
 

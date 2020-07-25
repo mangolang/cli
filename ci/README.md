@@ -27,6 +27,7 @@
     * _This is a plan for the future._
 * `Stable`: The code can be merged to master.
     * The quick checks from `Basic`.
+    * Run tests with miri.
     * Integration tests.
     * Fuzzing tests.
     * _Maybe? performance test._
@@ -47,6 +48,7 @@
         * Readme, license.
         * Read-only docker image containing executable.
         * _Maybe? executable for some platforms._
+        * Release notes.
         * Full documentation.
         * Performance results, flamegraph.
         * Test coverage.

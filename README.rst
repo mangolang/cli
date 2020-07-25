@@ -60,7 +60,7 @@ Compiling and running the code should be easy.
 
     cargo install mango
 
-* Run the compiler at `$HOME/.cargo/bin/mango --help`.
+* Run Mango at `$HOME/.cargo/bin/mango --help`.
 
 If you want to access the executable more easily, either move `mango` to e.g. `/usr/local/bin` (for all users), or add `$HOME/.cargo/bin` to your `PATH` (just for you).
 
