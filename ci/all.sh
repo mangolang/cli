@@ -25,3 +25,4 @@ source "${BASH_SOURCE%/*}/executable.sh"
 
 printf '== done ==\n'
 
+#TODO @mark: integration tests

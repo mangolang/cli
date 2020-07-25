@@ -11,7 +11,7 @@ then
 
     if [[ ! -d '.git' ]] || [[ ! -f 'Cargo.toml' ]]
     then
-        printf 'must run from the project root' 1>&2
+        printf 'must run from the project root\n' 1>&2
         exit 1
     fi
 
