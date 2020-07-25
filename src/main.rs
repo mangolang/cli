@@ -21,5 +21,6 @@ fn main(args: MangoArgs) {
             }
             _ => eprintln!("This operation is not supported yet"),
         },
-    }
+    };
+    eprintln!("not implemented!")
 }

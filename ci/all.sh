@@ -35,7 +35,7 @@ STEP 'deps/versions.sh' 'dependencies - versions'
 
 STEP 'deps/audit.sh' 'dependencies - audit'
 
-STEP 'deps/license.sh' 'dependencies - license'
+#STEP 'deps/license.sh' 'dependencies - license'
 
 STEP 'deps/usage.sh' 'dependencies - unused'
 
@@ -46,6 +46,8 @@ STEP 'release/dist_image.sh' 'release - image (distributable)'
 STEP 'release/dependencies.sh' 'release - dependencies'
 
 STEP 'release/exe_info.sh' 'release - executable info'
+
+STEP 'release/static_files.sh' 'release - readme, license, etc'
 
 
 printf '== cleanup ==\n'

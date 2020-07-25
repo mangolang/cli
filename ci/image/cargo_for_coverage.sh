@@ -24,4 +24,6 @@ fi
     RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort -Zmacro-backtrace"
     cargo +"$NIGHTLY_VERSION" install grcov
     cargo +"$NIGHTLY_VERSION" --offline test --all-targets --all-features
+    mkdir -p '/coverage'
+    cp -r 'target/debug/deps/' '/coverage'
 )

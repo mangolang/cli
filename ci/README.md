@@ -46,7 +46,7 @@
     * The code compiles on multiple platforms.
     * Artifacts are generated:
         * Readme, license.
-        * Read-only docker image containing executable.
+        * Docker image of executable (read-only-able).
         * _Maybe? executable for some platforms._
         * Release notes.
         * Full documentation.
