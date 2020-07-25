@@ -4,10 +4,6 @@
 
 source "${BASH_SOURCE%/*}/../shared.sh"
 
-(
-    set -x
-    docker run --rm 'mango_cli_build'\
-        cargo --offline test --all-targets --all-features
-)
+CHECK cargo --offline test --all-targets --all-features
 
 #TODO: maybe this should be split into `unit`, `example`, `doc` and `integration`, but that seems inconvenient to achieve currently

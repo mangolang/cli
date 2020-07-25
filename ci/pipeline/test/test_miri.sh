@@ -4,8 +4,4 @@
 
 source "${BASH_SOURCE%/*}/../shared.sh"
 
-(
-    set -x
-    docker run --rm 'mango_cli_build'\
-        ./run_tests_with_miri.sh
-)
+CHECK ./run_tests_with_miri.sh

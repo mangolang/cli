@@ -11,6 +11,6 @@ source "${BASH_SOURCE%/*}/../shared.sh"
     export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort"
     export RUSTDOCFLAGS="-Cpanic=abort"
     set -x
-    docker run --rm 'mango_cli_build'\
-        cargo --offline test --release --all-targets --all-features --all
+    exit 1 #TODO @mark: this is all wrong, should run in the imge
+    CHECK cargo --offline test --release --all-targets --all-features --all
 )

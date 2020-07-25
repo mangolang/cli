@@ -2,8 +2,5 @@
 
 source "${BASH_SOURCE%/*}/../shared.sh"
 
-(
-    set -x
-    docker run --rm 'mango_cli_build' cargo --offline outdated --exit-code 1
-    docker run --rm 'mango_cli_build' cargo --offline deny check bans
-)
+CHECK cargo --offline outdated --exit-code 1
+CHECK cargo --offline deny check bans

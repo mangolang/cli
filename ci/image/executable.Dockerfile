@@ -3,7 +3,7 @@
 # This is the image to interact with as a user of Mango.
 # https://hub.docker.com/r/mangocode/mango
 
-FROM mango_cli_build
+FROM mango_ci
 
 # Second stage image to decrease size
 # Note: this version should match `base.Dockerfile`
