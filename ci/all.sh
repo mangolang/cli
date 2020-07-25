@@ -41,7 +41,7 @@ STEP 'deps/usage.sh' 'dependencies - unused'
 
 STEP 'make/docs.sh' 'documentation'
 
-STEP 'make/dist_image.sh' 'release - image (distributable)'
+STEP 'release/dist_image.sh' 'release - image (distributable)'
 
 STEP 'release/dependencies.sh' 'release - dependencies'
 
