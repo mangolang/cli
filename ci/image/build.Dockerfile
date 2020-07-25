@@ -17,6 +17,3 @@ RUN cargo build --bin mango
 
 # Build the code (release mode)
 RUN cargo build --bin mango --release
-
-# Store dependencies overview in the image
-RUN cargo --offline tree --all-features | tee dependencies.txt

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "${BASH_SOURCE%/*}/shared.sh"
+source "${BASH_SOURCE%/*}/../shared.sh"
 
 # Compute code coverage. Note that, unfortunately, code must be recompiled with different flags
 # than would be used for normal testing.
