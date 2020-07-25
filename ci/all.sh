@@ -1,44 +1,51 @@
 #!/usr/bin/env bash
 
+set -eEu
+
+function STEP() {
+    if [ $# -lt 2 ]; then
+        printf "STEP expects 2 arguments: name and script\n" 1>&2
+        return 1
+    fi
+    pth="${BASH_SOURCE%/*}/pipeline/$1"
+    if [ ! -f "$pth" ]; then
+        printf "STEP script '%s' does not exist at '%s'\n" "$1" "$pth" 1>&2
+        return 1
+    fi
+    printf '== step: %s (%s) ==\n' "$2" "$pth"
+    source "$pth"
+}
+
 # Note: this must be the first step
-printf '== step: build ==\n'
-source "${BASH_SOURCE%/*}/pipeline/build.sh"
+STEP 'make/daily.sh' 'build - dependencies'
 
-printf '== step: test ==\n'
-source "${BASH_SOURCE%/*}/pipeline/test/test.sh"
+STEP 'make/debug.sh' 'build - ci image'
 
-printf '== step: lint ==\n'
-source "${BASH_SOURCE%/*}/pipeline/test/lint.sh"
+STEP 'test/test.sh' 'test'
 
-printf '== step: style ==\n'
-source "${BASH_SOURCE%/*}/pipeline/test/style.sh"
+STEP 'test/lint.sh' 'lint'
 
-printf '== step: test (miri) ==\n'
-source "${BASH_SOURCE%/*}/pipeline/test/test_miri.sh"
+STEP 'test/style.sh' 'style'
 
-printf '== step: dependencies - versions ==\n'
-source "${BASH_SOURCE%/*}/pipeline/deps/versions.sh"
+STEP 'test/test_miri.sh' 'test (miri)'
 
-printf '== step: dependencies - audit ==\n'
-source "${BASH_SOURCE%/*}/pipeline/deps/audit.sh"
+STEP 'test/cov.sh' 'coverage'
 
-printf '== step: dependencies - license ==\n'
-source "${BASH_SOURCE%/*}/pipeline/deps/license.sh"
+STEP 'deps/versions.sh' 'dependencies - versions'
 
-printf '== step: dependencies - unused ==\n'
-source "${BASH_SOURCE%/*}/pipeline/deps/unused.sh"
+STEP 'deps/audit.sh' 'dependencies - audit'
 
-printf '== step: documentation ==\n'
-source "${BASH_SOURCE%/*}/pipeline/docs.sh"
+STEP 'deps/license.sh' 'dependencies - license'
 
-printf '== step: release - dependencies ==\n'
-source "${BASH_SOURCE%/*}/pipeline/release/dependencies.sh"
+STEP 'deps/usage.sh' 'dependencies - unused'
 
-printf '== step: release - executable size ==\n'
-source "${BASH_SOURCE%/*}/pipeline/release/exe_size.sh"
+STEP 'make/docs.sh' 'documentation'
 
-printf '== step: release - image (distributable) ==\n'
-source "${BASH_SOURCE%/*}/pipeline/release/dist_image.sh"
+STEP 'release/dependencies.sh' 'release - dependencies'
+
+STEP 'release/exe_size.sh' 'release - executable size'
+
+STEP 'release/dist_image.sh' 'release - image (distributable)'
 
 printf '== cleanup ==\n'
 # Untag the docker images so next run cannot accidentally rely on old versions.
