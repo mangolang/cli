@@ -45,7 +45,7 @@ STEP 'make/dist_image.sh' 'release - image (distributable)'
 
 STEP 'release/dependencies.sh' 'release - dependencies'
 
-STEP 'release/exe_size.sh' 'release - executable size'
+STEP 'release/exe_info.sh' 'release - executable info'
 
 
 printf '== cleanup ==\n'

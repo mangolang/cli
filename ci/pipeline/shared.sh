@@ -46,8 +46,9 @@ then
     if [ "$GIT_BRANCH" = "master" ]; then RELEASE_NAME="${CRATE_NAME}-${CRATE_VERSION}"; else RELEASE_NAME="${CRATE_NAME}-${GIT_BRANCH}-${CRATE_VERSION}"; fi
     RELEASE_PATH="target/$RELEASE_NAME"
     printf 'release name: %s\n' "$RELEASE_NAME"
+    echo "DELETING: ${RELEASE_PATH:?}/*"  #TODO @mark: TEMPORARY! REMOVE THIS!
+    rm -rf "${RELEASE_PATH:?}"
     mkdir -p "$RELEASE_PATH"
-    rm -rf "${RELEASE_PATH:?}/*"
 
     printf 'setup completed\n'
 fi
