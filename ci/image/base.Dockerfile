@@ -31,23 +31,19 @@ RUN mkdir src && \
     printf 'fn main() { println!("placeholder for compiling dependencies") }' > src/main.rs
 
 # Build the code (development mode).
-RUN cargo build --bin mango
+RUN cargo build --tests --bin mango
 
 # Build the code (release mode).
 # Note: sharing dependencies between dev/release does not work yet - https://stackoverflow.com/q/59511731
-RUN cargo build --bin mango --release
+RUN cargo build --tests --bin mango --release
 #TODO: use --out-dir if it stabilizes
 
 # Build the code with special flags for code coverage.
 COPY ci/image/cargo_for_coverage.sh cargo_for_coverage.sh
 RUN ./cargo_for_coverage.sh build
 
-# Miscellaneous other files
-COPY ci/image/run_tests_with_miri.sh run_tests_with_miri.sh
-COPY deny.toml deny.toml
-
 # Remove Cargo.toml file, to prevent other images from forgetting to re-add it.
-RUN rm -f Cargo.toml
+RUN rm -f cargo_for_coverage.sh Cargo.toml
 
 ## NOTE!
 ## Make sure to `touch src/main.rs` after copying source, so that everything is recompiled

@@ -1,6 +1,6 @@
-mod options;
+use options::{Command, compile, MangoArgs};
 
-use options::{compile, Command, MangoArgs};
+mod options;
 
 #[paw::main]
 fn main(args: MangoArgs) {
@@ -20,18 +20,26 @@ pub fn cli(args: MangoArgs) {
                     (true, false) => println!("Creating json IR..."),
                     (false, true) => println!("Creating packed IR..."),
                     (false, false) => println!("Creating packed IR..."),
-                }
-                todo!()
+                };
+                eprintln!("This operation is not supported yet");
             }
             _ => eprintln!("This operation is not supported yet"),
         },
     };
-    eprintln!("not implemented!")
 }
 
 #[cfg(test)]
 mod tests {
+    use ::structopt::StructOpt;
+    use ::structopt::clap::App;
+
     use super::*;
+
+    #[test]
+    fn show_help() {
+        let args = MangoArgs::from_iter_safe(&["mango", "-h"]);
+        let args = MangoArgs::from_iter_safe(&["mango", "--help"]);
+    }
 
     #[test]
     fn compile_ir() {

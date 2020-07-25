@@ -4,8 +4,8 @@
 # This uses grcov and is described in
 # https://github.com/mozilla/grcov#example-how-to-generate-gcda-files-for-a-rust-project
 
-if [ $# -lt 1 ]; then
-    printf "provide a cargo command as argument, e.g. '$0 test'\n" 1>&2
+if [[ $# -lt 1 || ( "$1" != 'build' && "$1" != 'run' ) ]]; then
+    printf "provide argument 'build' or 'run'\n" 1>&2
     exit 1
 fi
 if [[ ! -v NIGHTLY_VERSION ]]; then
@@ -23,7 +23,10 @@ fi
     CARGO_INCREMENTAL=0
     RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort -Zmacro-backtrace"
     cargo +"$NIGHTLY_VERSION" install grcov
-    cargo +"$NIGHTLY_VERSION" --offline test --all-targets --all-features
-    mkdir -p '/coverage'
-    cp -r 'target/debug/deps' '/coverage'
+    if [ "$1" = 'run' ]; then
+        cargo +"$NIGHTLY_VERSION" --offline test --all-targets --all-features
+        mkdir -p '/coverage'
+        grcov 'target/debug/' -s . -t html --llvm --branch --ignore-not-existing -o '/coverage'
+        #cp -r 'target/debug/deps' '/coverage'
+    fi
 )
