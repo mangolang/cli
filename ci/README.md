@@ -3,10 +3,14 @@
 
 ## Principles
 
-* 
+* As much automatic validation as possible.
+* Different levels of automated testing for different actions, to balance stability and bottleneck prevention.
 * Operations should run inside containers as much as possible.
-* Steps should be individual files in commonly available languages (preferably Bash, possibly Python or Rust).
-* Code 
+* Steps should be individual files in commonly available languages (preferably Bash, possibly Python or Rust). Because:
+    * It is easy to run locally.
+    * Not tightly coupled to any CI tool.
+    * Readable by more people.
+* No hard guidelines for code coverage or performance, but both should not be sacrificed lightly.
 
 ## Pipelines
 
@@ -22,11 +26,12 @@
 * `Stable`: The code can be merged to master.
     * The quick checks from `Basic`.
     * Integration tests.
-    * _Maybe? benchmarks._
+    * Fuzzing tests.
+    * _Maybe? performance test._
     * Documentation builds (no warning).
     * Manual testing (if testable changes).
     * Code review (if reviewer can be found).
-* `Dependency`:
+* `Dependency`: Non-Mango code is safe and compatible.
     * For each dependency:
         * Up-to-date.
         * No known vulnerabilities.
@@ -48,4 +53,5 @@
         * Binary size breakdown.
         * Semver verification.
         * Overview of code marked 'unsafe'.
+    * Can be triggered manually, even if not intending to release.
 
