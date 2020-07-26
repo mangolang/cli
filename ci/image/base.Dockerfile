@@ -14,7 +14,6 @@ RUN cargo install cargo-outdated
 RUN cargo install cargo-audit
 RUN cargo install cargo-deny
 RUN cargo install cargo-tree
-RUN cargo install cargo-udeps
 RUN cargo install cargo-bloat
 
 WORKDIR /mango

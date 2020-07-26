@@ -1,4 +1,7 @@
-use options::{compile, Command, MangoArgs};
+#[allow(unused_imports)]
+use ::mangolib;
+
+use crate::options::{Command, MangoArgs, compile::Target};
 
 mod options;
 
@@ -10,11 +13,11 @@ fn main(args: MangoArgs) {
 pub fn cli(args: MangoArgs) {
     match args.cmd {
         Command::Compile(compile) => match compile.target {
-            compile::Target::Check {} => {
+            Target::Check {} => {
                 println!("Checking code...");
                 todo!()
             }
-            compile::Target::IR { json, packed } => {
+            Target::IR { json, packed } => {
                 match (json, packed) {
                     (true, true) => println!("Creating json & packed IR..."),
                     (true, false) => println!("Creating json IR..."),

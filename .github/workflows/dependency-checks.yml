@@ -18,15 +18,15 @@ jobs:
         uses: actions/checkout@v2
       - name: Build (stable)
         run: ci/pipeline/make/debug.sh
-      - name: Dependency versions
-        continue-on-error: true  # allow indirect dependencies to be outdated
-        run: ci/pipeline/deps/versions_deep.sh
+#      - name: Dependency versions
+#        continue-on-error: true  # allow indirect dependencies to be outdated
+#        run: ci/pipeline/deps/versions_deep.sh
       - name: Dependency versions
         run: ci/pipeline/deps/versions_direct.sh
       - name: Audit dependecies
         run: ci/pipeline/deps/audit.sh
-      - name: Dependency licenses
-        continue-on-error: true  #TODO @mark: enable when passed
-        run: ci/pipeline/deps/license.sh
+#      - name: Dependency licenses
+#        continue-on-error: true  #TODO @mark: enable when passed
+#        run: ci/pipeline/deps/license.sh
       - name: Unused dependencies
         run: ci/pipeline/deps/usage.sh

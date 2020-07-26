@@ -17,7 +17,7 @@ then
 
     # If necessary, build the daily pre-compiled-dependencies image.
     # Ideally this should be downloaded instead of built.
-    if ! docker pull 'mangocode/mango_daily_base:stable' > /dev/null
+    if ! docker pull 'mangocode/mango_daily_base:stable' > /dev/null || ! docker pull 'mangocode/mango_daily_base:nightly' > /dev/null
     then
         printf '***************************************************************************\n' 1>&2
         printf '* Could not find base Docker image "mangocode/mango_daily_base:stable" !         *\n' 1>&2

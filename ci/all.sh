@@ -27,7 +27,8 @@ STEP 'test/lint.sh' 'lint'
 
 STEP 'test/style.sh' 'style'
 
-STEP 'test/test_miri.sh' 'test (miri)'
+#TODO @mark: turn on
+#STEP 'test/test_miri.sh' 'test (miri)'
 
 STEP 'test/cov.sh' 'coverage'
 
