@@ -14,33 +14,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Build
+      - name: Build for CI
         run: ci/pipeline/make/debug.sh
-      - name: Test
-        continue-on-error: true
-        run: ci/pipeline/test/test.sh
-      - name: Lint
-        continue-on-error: true
-        run: ci/pipeline/test/lint.sh
-      - name: Style
-        continue-on-error: true
-        run: ci/pipeline/test/style.sh
+      - name: Optimized image
+        run: ci/pipeline/release/dist_image.sh
+      - name: Binary (linux)
+        run: ci/pipeline/release/dist_exe.sh
+      - name: Executable info
+        run: ci/pipeline/release/exe_info.sh
+      - name: Static files
+        run: ci/pipeline/release/static_files.sh
       - name: Documentation
-        continue-on-error: true
         run: ci/pipeline/make/docs.sh
-
-#  push_to_registry:
-#    name: Push to DockerHub
-#    runs-on: ubuntu-latest
-#    if: (github.event.push || github.event.pull_request.merged) && github.ref == 'refs/heads/master'
-#    needs: checks
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v2
-#      - name: Push to Docker Hub
-#        uses: docker/build-push-action@v1.0
-#        with:
-#          username: mangocode
-#          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-#          repository: mangocode/mango
-#          tags: latest
+      - name: Push to DockerHub
+        uses: docker/build-push-action@v1.0
+        with:
+          username: mangocode
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+          repository: mangocode/mango
+          tags: latest
+      - name: Upload the artifacts
+        uses: skx/github-action-publish-binaries@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: 'example-*'

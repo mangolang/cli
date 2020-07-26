@@ -24,6 +24,7 @@ STEP 'make/debug.sh' 'build - ci image'
 STEP 'test/test.sh' 'test'
 
 STEP 'test/lint.sh' 'lint'
+STEP 'test/lint.sh' 'lint'
 
 STEP 'test/style.sh' 'style'
 
@@ -43,6 +44,8 @@ STEP 'deps/audit.sh' 'dependencies - audit'
 #STEP 'deps/usage.sh' 'dependencies - unused'
 
 STEP 'make/docs.sh' 'documentation'
+
+STEP 'release/api_help.sh' 'api help'
 
 STEP 'release/dist_image.sh' 'release - image (distributable)'
 
