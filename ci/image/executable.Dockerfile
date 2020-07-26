@@ -27,5 +27,4 @@ COPY --from=build /mango/mango_exe /mango
 
 #TODO @mark: maybe printf does not work in 'scratch'
 #CMD printf "Welcome to the Mango docker image!\nTo use, add 'mango' after your docker run command\n"
-CMD ["/mango"]
 ENTRYPOINT ["/mango"]
