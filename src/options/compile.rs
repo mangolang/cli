@@ -1,21 +1,18 @@
 use ::structopt::StructOpt;
 
-#[derive(StructOpt)]
+#[derive(StructOpt, Debug)]
 pub struct CompileCmd {
     #[structopt(subcommand)]
-    pub target: Target
+    pub target: Target,
 }
 
-#[derive(StructOpt)]
+#[derive(StructOpt, Debug)]
 pub enum Target {
     #[structopt(about = "Do all the compile checks, then exit")]
     Check {},
     #[structopt(about = "Mango intermediary representation (for debugging)")]
     IR {
-        #[structopt(
-            long = "json",
-            help = "Dump as pretty-printed json for easy human inspection"
-        )]
+        #[structopt(long = "json", help = "Dump as pretty-printed json for easy human inspection")]
         json: bool,
         #[structopt(
             long = "packed",

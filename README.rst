@@ -38,11 +38,17 @@ To use the Mango Docker image, you will need Docker installed.
 
 We can then start Mango in a Docker container, mounting your code directory so it can be compiled::
 
-    docker run --rm -it --name mango --mount type=bind,src=/YOUR/CODE/PATH,dst=/code mangocode/mango:latest mango --help
+    docker run --rm -it --name mango --read-only --tmpfs /tmp --mount type=bind,src=/YOUR/CODE/PATH,dst=/code mangocode/mango:latest --help
 
-Or a short version without name, auto-delete and version::
+Or a short version without name, auto-delete, read-only and version::
 
-    docker run -it -v"/YOUR/CODE/PATH":/code mangocode/mango mango --help
+    docker run -it -v"/YOUR/CODE/PATH":/code mangocode/mango --help
+
+To build the Docker image locally, including running tests, run::
+
+    bash ci/all.sh
+
+The image is now available as `mangocode/mango`.
 
 Self-compiled
 ...............................
@@ -54,7 +60,7 @@ Compiling and running the code should be easy.
 
     cargo install mango
 
-* Run the compiler at `$HOME/.cargo/bin/mango --help`.
+* Run Mango at `$HOME/.cargo/bin/mango --help`.
 
 If you want to access the executable more easily, either move `mango` to e.g. `/usr/local/bin` (for all users), or add `$HOME/.cargo/bin` to your `PATH` (just for you).
 

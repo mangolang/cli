@@ -18,6 +18,7 @@ name = "mango"
 path = "src/main.rs"
 
 [dependencies]
+#mangolib = { path = "../compiler" }
 mangolib = "0.5.0"
 structopt = { version = "^0.3.15" , features = [ "paw" ] }
 paw = "^1.0.0"
@@ -31,3 +32,4 @@ opt-level = 'z'
 
 [profile.dev.package."*"]
 opt-level = 3
+debug = false
