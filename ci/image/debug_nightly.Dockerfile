@@ -3,7 +3,7 @@
 # * Only debug mode.
 # * Also useful for non-musl checks.
 
-FROM mangocode/mango_nightly_base:latest
+FROM mangocode/mango_daily_base:nightly
 
 # Now add the actual code
 COPY rustfmt.toml Cargo.toml Cargo.lock ./

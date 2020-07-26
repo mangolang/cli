@@ -12,16 +12,24 @@ on:
 
 jobs:
   push_to_registry:
-    name: Daily base image
+    name: Daily stable image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Push to DockerHub
+      - name: Push to DockerHub (stable)
         uses: docker/build-push-action@v1
         dockerfile: ci/image/base.Dockerfile
         with:
           username: mangocode
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
           repository: mangocode/mango_daily_base
-          tags: latest
+          tags: stable
+      - name: Push to DockerHub (nightly)
+        uses: docker/build-push-action@v1
+        dockerfile: ci/image/base_nightly.Dockerfile
+        with:
+          username: mangocode
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+          repository: mangocode/mango_daily_base
+          tags: nigthly

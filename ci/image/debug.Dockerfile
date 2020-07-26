@@ -3,7 +3,7 @@
 # It is used as an intermediary image during build pipeline; subsequent images will use it to do further checks.
 # For the releasable version, see `executable.Dockerfile`
 
-FROM mangocode/mango_daily_base:latest
+FROM mangocode/mango_daily_base:stable
 
 # Now add the actual code
 COPY --chown=rust rustfmt.toml Cargo.toml Cargo.lock ./
