@@ -21,8 +21,6 @@ fi
     if [ "$1" = 'run' ]; then
         cargo --offline test --all-targets --all-features
         mkdir -p '/coverage'
-        find . -name '*.gc*'  #TODO @mark: TEMPORARY! REMOVE THIS!
-        find /coverage  #TODO @mark: TEMPORARY! REMOVE THIS!
         grcov 'target/debug/' -s . -t html --llvm --branch --ignore-not-existing -o '/coverage'
         #cp -r 'target/debug/deps' '/coverage'
     fi

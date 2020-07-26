@@ -57,6 +57,8 @@ STEP 'release/exe_info.sh' 'release - executable info'
 
 STEP 'release/static_files.sh' 'release - readme, license, etc'
 
+STEP 'release/package.sh' 'release - package'
+rm "./${RELEASE_NAME}.zip"
 
 printf '== cleanup ==\n'
 # Untag the docker images so next run cannot accidentally rely on old versions.

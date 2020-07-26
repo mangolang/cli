@@ -24,11 +24,16 @@ jobs:
         run: ci/pipeline/release/exe_info.sh
       - name: Static files
         run: ci/pipeline/release/static_files.sh
+      - name: Cli api help
+        run: ci/pipeline/release/api_help.sh
       - name: Documentation
         run: ci/pipeline/make/docs.sh
+      - name: Package
+        run: ci/pipeline/release/package.sh
       - name: Push to DockerHub
-        uses: docker/build-push-action@v1.0
+        uses: docker/build-push-action@v1
         with:
+          dockerfile: ci/image/executable.Dockerfile
           username: mangocode
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
           repository: mangocode/mango
@@ -38,4 +43,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: 'example-*'
+          args: 'mango-*.zip'

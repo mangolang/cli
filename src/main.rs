@@ -36,9 +36,6 @@ pub fn cli(args: MangoArgs) {
             }
             _ => eprintln!("This operation is not supported yet"),
         },
-        _ => {
-            eprintln!("Not implemented");
-        }
     };
 }
 

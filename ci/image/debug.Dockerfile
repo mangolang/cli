@@ -8,7 +8,6 @@ FROM mangocode/mango_daily_base:stable
 # Now add the actual code
 COPY --chown=rust rustfmt.toml Cargo.toml Cargo.lock ./
 COPY --chown=rust src src
-RUN ls -als  #TODO @mark: TEMPORARY! REMOVE THIS!
 
 # This makes sure things are rebuilt
 RUN touch src/main.rs
