@@ -1,0 +1,46 @@
+
+# Check that the code compiles. Also checks tests and style, but non-blocking.
+
+name: 'Create a release'
+
+on:
+  push:  #TODO @mark: TEMPORARY! REMOVE THIS!
+  workflow_dispatch:
+
+jobs:
+  github:
+    name: Compile and test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build
+        run: ci/pipeline/make/debug.sh
+      - name: Test
+        continue-on-error: true
+        run: ci/pipeline/test/test.sh
+      - name: Lint
+        continue-on-error: true
+        run: ci/pipeline/test/lint.sh
+      - name: Style
+        continue-on-error: true
+        run: ci/pipeline/test/style.sh
+      - name: Documentation
+        continue-on-error: true
+        run: ci/pipeline/make/docs.sh
+
+#  push_to_registry:
+#    name: Push to DockerHub
+#    runs-on: ubuntu-latest
+#    if: (github.event.push || github.event.pull_request.merged) && github.ref == 'refs/heads/master'
+#    needs: checks
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v2
+#      - name: Push to Docker Hub
+#        uses: docker/build-push-action@v1.0
+#        with:
+#          username: mangocode
+#          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+#          repository: mangocode/mango
+#          tags: latest

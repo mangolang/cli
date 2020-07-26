@@ -7,7 +7,6 @@ name: 'Daily Mango base image'
 on:
   schedule:
     - cron: '0 3 * * 0'
-  push:  #TODO @mark: TEMPORARY! REMOVE THIS!
   workflow_dispatch:
 
 #TODO @mark: should only build if it does not exist
@@ -45,4 +44,4 @@ jobs:
           username: mangocode
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
           repository: mangocode/mango_daily_base
-          tags: nigthly
+          tags: nightly
