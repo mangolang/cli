@@ -34,8 +34,8 @@ RUN rustup component add miri
 RUN cargo install grcov
 
 # Add the files needed to compile dependencies.
-COPY --chown=rust Cargo.toml .
-COPY --chown=rust Cargo.lock .
+COPY Cargo.toml .
+COPY Cargo.lock .
 RUN mkdir -p src && \
     printf 'fn main() { println!("placeholder for compiling nightly dependencies") }' > src/main.rs
 
@@ -43,7 +43,7 @@ RUN mkdir -p src && \
 RUN cargo build --tests --bin mango
 
 # Build the code with special flags for code coverage.
-COPY --chown=rust ci/image/cargo_for_coverage.sh cargo_for_coverage.sh
+COPY ci/image/cargo_for_coverage.sh cargo_for_coverage.sh
 RUN ./cargo_for_coverage.sh build
 
 # Remove Cargo.toml file, to prevent other images from forgetting to re-add it.

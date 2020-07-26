@@ -6,14 +6,8 @@ name: 'Check dependency status'
 on:
   schedule:
     - cron: '0 4 * * 0'
+  push:  #TODO @mark: TEMPORARY! REMOVE THIS!
   workflow_dispatch:
-#    inputs:
-#      logLevel:
-#        description: 'Log level'
-#        required: true
-#        default: 'warning'
-#      tags:
-#        description: 'Test scenario tags'
 
 jobs:
   check_dependencies:
@@ -22,14 +16,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Build
+      - name: Build (stable)
         run: ci/pipeline/make/debug.sh
       - name: Dependency versions
-        run: ci/pipeline/make/versions.sh
+        continue-on-error: true  # allow indirect dependencies to be outdated
+        run: ci/pipeline/deps/versions_deep.sh
+      - name: Dependency versions
+        run: ci/pipeline/deps/versions_direct.sh
       - name: Audit dependecies
-        run: ci/pipeline/make/audit.sh
+        run: ci/pipeline/deps/audit.sh
       - name: Dependency licenses
         continue-on-error: true  #TODO @mark: enable when passed
-        run: ci/pipeline/make/license.sh
+        run: ci/pipeline/deps/license.sh
       - name: Unused dependencies
-        run: ci/pipeline/make/unused.sh
+        run: ci/pipeline/deps/usage.sh

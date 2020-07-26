@@ -7,6 +7,7 @@ name: 'Daily Mango base image'
 on:
   schedule:
     - cron: '0 3 * * 0'
+  workflow_dispatch:
 
 #TODO @mark: should only build if it does not exist
 

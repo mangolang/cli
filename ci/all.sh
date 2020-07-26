@@ -31,7 +31,8 @@ STEP 'test/test_miri.sh' 'test (miri)'
 
 STEP 'test/cov.sh' 'coverage'
 
-STEP 'deps/versions.sh' 'dependencies - versions'
+STEP 'deps/versions_direct.sh' 'dependencies - versions'
+#TODO: do something with indirect dependencies, version_deep
 
 STEP 'deps/audit.sh' 'dependencies - audit'
 
