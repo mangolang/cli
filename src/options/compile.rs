@@ -1,12 +1,12 @@
 use ::structopt::StructOpt;
 
-#[derive(StructOpt)]
+#[derive(StructOpt, Debug)]
 pub struct CompileCmd {
     #[structopt(subcommand)]
     pub target: Target,
 }
 
-#[derive(StructOpt)]
+#[derive(StructOpt, Debug)]
 pub enum Target {
     #[structopt(about = "Do all the compile checks, then exit")]
     Check {},

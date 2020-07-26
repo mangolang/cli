@@ -17,7 +17,7 @@ function STEP() {
 }
 
 # Note: this must be the first step
-STEP 'make/base.sh' 'build - dependencies'
+STEP 'make/base.sh' 'build - dependencies image'
 
 STEP 'make/debug.sh' 'build - ci image'
 
@@ -42,6 +42,8 @@ STEP 'deps/usage.sh' 'dependencies - unused'
 STEP 'make/docs.sh' 'documentation'
 
 STEP 'release/dist_image.sh' 'release - image (distributable)'
+
+STEP 'release/dist_exe.sh' 'release - executable (linux)'
 
 STEP 'release/dependencies.sh' 'release - dependencies'
 

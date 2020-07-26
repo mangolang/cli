@@ -1,4 +1,4 @@
-use options::{Command, compile, MangoArgs};
+use options::{compile, Command, MangoArgs};
 
 mod options;
 
@@ -30,15 +30,21 @@ pub fn cli(args: MangoArgs) {
 
 #[cfg(test)]
 mod tests {
+    use ::structopt::clap::ErrorKind;
     use ::structopt::StructOpt;
-    use ::structopt::clap::App;
 
     use super::*;
 
     #[test]
     fn show_help() {
-        let args = MangoArgs::from_iter_safe(&["mango", "-h"]);
-        let args = MangoArgs::from_iter_safe(&["mango", "--help"]);
+        assert_eq!(
+            ErrorKind::HelpDisplayed,
+            MangoArgs::from_iter_safe(&["mango", "-h"]).unwrap_err().kind
+        );
+        assert_eq!(
+            ErrorKind::HelpDisplayed,
+            MangoArgs::from_iter_safe(&["mango", "--help"]).unwrap_err().kind
+        );
     }
 
     #[test]
