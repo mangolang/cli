@@ -2,6 +2,7 @@
 # Nightly version of `base.Dockerfile`.
 # * Only debug mode.
 # * Also useful for non-musl checks.
+# Based on https://github.com/rust-lang/docker-rust-nightly/blob/master/buster/Dockerfile
 
 # Nightly is needed for grcov and miri.
 FROM buildpack-deps:buster
@@ -9,13 +10,16 @@ FROM buildpack-deps:buster
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH \
-    RUST_BACKTRACE=1
+    RUST_BACKTRACE=1 \
+    RUSTC_WRAPPER="" \
+    CARGO_INCREMENTAL=0 \
+    RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort -Zmacro-backtrace"
 
 RUN set -eux; \
     url="https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init"; \
     wget "$url"; \
     chmod +x rustup-init; \
-    ./rustup-init -y --no-modify-path --default-toolchain nightly; \
+    ./rustup-init -y --no-modify-path --default-toolchain nightly-2020-07-12; \
     rm rustup-init; \
     chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
     rustup --version; \
@@ -24,8 +28,9 @@ RUN set -eux; \
 
 WORKDIR /mango
 
-RUN cargo +nightly install xargo
-RUN rustup +nightly component add miri
+RUN cargo install xargo
+RUN rustup component add miri
+RUN cargo install grcov
 
 # Add the files needed to compile dependencies.
 COPY --chown=rust Cargo.toml .

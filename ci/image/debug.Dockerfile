@@ -14,10 +14,10 @@ RUN ls -als  #TODO @mark: TEMPORARY! REMOVE THIS!
 RUN touch src/main.rs
 
 # Build the code (debug mode)
-RUN cargo build --bin mango
+RUN cargo build --all-targets --all-features --bin mango
 
 # Build the code (release mode)
-RUN cargo build --bin mango --release
+RUN cargo build --all-targets --all-features --bin mango --release
 
 # Miscellaneous other files
 COPY --chown=rust deny.toml ./

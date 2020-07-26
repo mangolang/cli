@@ -4,4 +4,4 @@
 
 source "${BASH_SOURCE%/*}/../shared.sh"
 
-CHECK_NIGHTLY cargo +nightly --offline miri test --all-targets --all-features
+CHECK_NIGHTLY cargo --offline miri test --all-targets --all-features

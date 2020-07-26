@@ -2,4 +2,4 @@
 
 source "${BASH_SOURCE%/*}/../shared.sh"
 
-CHECK cargo +nightly udeps --all-targets
+CHECK_NIGHTLY cargo udeps --all-targets

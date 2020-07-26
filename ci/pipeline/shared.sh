@@ -31,20 +31,6 @@ then
     # Make a debug-mode image for further CI steps.
     source "${BASH_SOURCE%/*}/make/debug.sh"
 
-    # Create a function to run steps inside the image.
-    function CHECK() {
-        (
-            printf "[@mango_ci] $*\n" 1>&2
-            docker run --rm 'mango_ci:latest' "$@"
-        )
-    }
-    function CHECK_NIGHTLY() {
-        (
-            printf "[@mango_ci] $*\n" 1>&2
-            docker run --rm 'mango_ci_nightly:latest' "$@"
-        )
-    }
-
     # Create / clean release directory (this is outside the Docker image)
     CRATE_NAME="$(grep -h -m1 '^name\s*=\s*"[^"]*"' Cargo.toml | sed 's/^name\s*=\s*"\([^"]*\)".*/\1/g')"
     CRATE_VERSION="$(grep -h -m1 '^version\s*=\s*"[^"]*"' Cargo.toml | sed 's/^version\s*=\s*"\([^"]*\)".*/\1/g')"
@@ -54,6 +40,20 @@ then
     RELEASE_PATH="$(pwd)/target/$RELEASE_NAME"
     rm -rf "${RELEASE_PATH:?}"
     mkdir -p "$RELEASE_PATH"
+
+    # Create a function to run steps inside the image.
+    function CHECK() {
+        (
+            printf "[@mango_ci] $*\n" 1>&2
+            docker run --rm -v"$RELEASE_PATH":'/release' 'mango_ci:latest' "$@"
+        )
+    }
+    function CHECK_NIGHTLY() {
+        (
+            printf "[@mango_ci_nightly] $*\n" 1>&2
+            docker run --rm -v"$RELEASE_PATH":'/release' 'mango_ci_nightly:latest' "$@"
+        )
+    }
 
     printf 'setup completed\n'
 fi

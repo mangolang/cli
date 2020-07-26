@@ -6,18 +6,14 @@
 FROM mangocode/mango_nightly_base:latest
 
 # Now add the actual code
-COPY --chown=rust rustfmt.toml Cargo.toml Cargo.lock ./
-COPY --chown=rust src src
-RUN ls -als  #TODO @mark: TEMPORARY! REMOVE THIS!
+COPY rustfmt.toml Cargo.toml Cargo.lock ./
+COPY src src
 
 # This makes sure things are rebuilt
 RUN touch src/main.rs
 
 # Build the code (debug mode)
-RUN cargo build --bin mango
-
-# Build the code (release mode)
-RUN cargo build --bin mango --release
+RUN cargo build --all-targets --all-features --bin mango
 
 # Miscellaneous other files
-COPY --chown=rust ci/image/cargo_for_coverage.sh deny.toml ./
+COPY ci/image/cargo_for_coverage.sh deny.toml ./

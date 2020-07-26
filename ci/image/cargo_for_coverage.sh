@@ -16,10 +16,10 @@ fi
     CARGO_TARGET_DIR="target/coverage"
     CARGO_INCREMENTAL=0
     RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort -Zmacro-backtrace"
-    cargo +nightly install grcov
-    cargo +nightly --offline build --verbose --tests --all-targets --all-features
+    cargo install grcov
+    cargo --offline build --verbose --tests --all-targets --all-features
     if [ "$1" = 'run' ]; then
-        cargo +nightly --offline test --all-targets --all-features
+        cargo --offline test --all-targets --all-features
         mkdir -p '/coverage'
         find . -name '*.gc*'  #TODO @mark: TEMPORARY! REMOVE THIS!
         find /coverage  #TODO @mark: TEMPORARY! REMOVE THIS!
