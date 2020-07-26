@@ -2,9 +2,6 @@
 
 source "${BASH_SOURCE%/*}/../shared.sh"
 
-CHECK chmod 777 -R "/release"
-(
-    set -x
-    rm -f "./${RELEASE_NAME}.zip"
-    zip -rj "./${RELEASE_NAME}.zip" "$RELEASE_PATH"/*
-)
+CHECK rm -f "/release/${RELEASE_NAME}.zip"
+CHECK zip -rj "/release/${RELEASE_NAME}.zip" "/release"/*
+cp "/${RELEASE_PATH}/${RELEASE_NAME}.zip" "./${RELEASE_NAME}.zip"
