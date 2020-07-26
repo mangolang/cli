@@ -10,4 +10,5 @@
 (
     set -x
     docker build -t 'mango_ci:latest' -t 'tmp_mango_ci' -f  'ci/image/debug.Dockerfile' .
+    docker build -t 'mango_ci_nightly:latest' -t 'tmp_mango_ci_nightly' -f  'ci/image/debug_nightly.Dockerfile' .
 )

@@ -55,7 +55,9 @@ STEP 'release/static_files.sh' 'release - readme, license, etc'
 printf '== cleanup ==\n'
 # Untag the docker images so next run cannot accidentally rely on old versions.
 docker rmi 'mangocode/mango_daily_base:latest'
+docker rmi 'mangocode/mango_nightly_base:latest'
 docker rmi 'mango_ci:latest'
+docker rmi 'mango_ci_nightly:latest'
 docker rmi 'mangocode/mango:latest'
 
 printf '== done ==\n'

@@ -4,7 +4,6 @@
 # https://hub.docker.com/r/mangocode/mango_daily_base
 
 # Note: this version should match `executable.Dockerfile`
-# Note: also update nightly version, installed later in image
 FROM ekidd/rust-musl-builder:1.44.1
 
 ENV RUST_BACKTRACE=1
