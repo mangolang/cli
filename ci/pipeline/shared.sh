@@ -38,6 +38,12 @@ then
             docker run --rm 'mango_ci:latest' "$@"
         )
     }
+    function CHECK_NIGHTLY() {
+        (
+            printf "[@mango_ci] $*\n" 1>&2
+            docker run --rm 'mango_ci_nightly:latest' "$@"
+        )
+    }
 
     # Create / clean release directory (this is outside the Docker image)
     CRATE_NAME="$(grep -h -m1 '^name\s*=\s*"[^"]*"' Cargo.toml | sed 's/^name\s*=\s*"\([^"]*\)".*/\1/g')"

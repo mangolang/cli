@@ -20,6 +20,4 @@ RUN cargo build --bin mango
 RUN cargo build --bin mango --release
 
 # Miscellaneous other files
-COPY --chown=rust ci/image/cargo_for_coverage.sh cargo_for_coverage.sh
-COPY --chown=rust ci/image/run_tests_with_miri.sh run_tests_with_miri.sh
-COPY --chown=rust deny.toml deny.toml
+COPY --chown=rust deny.toml ./

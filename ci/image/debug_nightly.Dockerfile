@@ -1,5 +1,7 @@
 
-# Nightly version of `debug.Dockerfile`.
+# Nightly version of `base.Dockerfile`.
+# * Only debug mode.
+# * Also useful for non-musl checks.
 
 FROM mangocode/mango_nightly_base:latest
 
@@ -18,6 +20,4 @@ RUN cargo build --bin mango
 RUN cargo build --bin mango --release
 
 # Miscellaneous other files
-COPY --chown=rust ci/image/cargo_for_coverage.sh cargo_for_coverage.sh
-COPY --chown=rust ci/image/run_tests_with_miri.sh run_tests_with_miri.sh
-COPY --chown=rust deny.toml deny.toml
+COPY --chown=rust ci/image/cargo_for_coverage.sh deny.toml ./

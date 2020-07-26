@@ -1,19 +1,36 @@
 
-# Nightly version of `base.Dockerfile`. Only debug mode.
+# Nightly version of `base.Dockerfile`.
+# * Only debug mode.
+# * Also useful for non-musl checks.
 
 # Nightly is needed for grcov and miri.
-FROM ekidd/rust-musl-builder:nightly-2020-07-12
+FROM buildpack-deps:buster
 
-ENV RUST_BACKTRACE=1
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH \
+    RUST_BACKTRACE=1
+
+RUN set -eux; \
+    url="https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init"; \
+    wget "$url"; \
+    chmod +x rustup-init; \
+    ./rustup-init -y --no-modify-path --default-toolchain nightly; \
+    rm rustup-init; \
+    chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
+    rustup --version; \
+    cargo --version; \
+    rustc --version;
 
 WORKDIR /mango
+
+RUN cargo +nightly install xargo
+RUN rustup +nightly component add miri
 
 # Add the files needed to compile dependencies.
 COPY --chown=rust Cargo.toml .
 COPY --chown=rust Cargo.lock .
-RUN sudo chown rust:rust -R . && \
-    sudo chmod g+s -R . && \
-    mkdir -p src && \
+RUN mkdir -p src && \
     printf 'fn main() { println!("placeholder for compiling nightly dependencies") }' > src/main.rs
 
 # Build the code (development mode).

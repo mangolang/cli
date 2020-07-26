@@ -17,11 +17,6 @@ RUN cargo install cargo-tree
 RUN cargo install cargo-udeps
 RUN cargo install cargo-bloat
 
-# Nightly is needed for grcov and miri.
-#TODO @mark: separate image for nightly
-#ENV NIGHTLY_VERSION=nightly-2020-07-22
-#RUN rustup toolchain install $NIGHTLY_VERSION
-
 WORKDIR /mango
 
 # Add the files needed to compile dependencies.
@@ -30,7 +25,7 @@ COPY --chown=rust Cargo.lock .
 RUN sudo chown rust:rust -R . && \
     sudo chmod g+s -R . && \
     mkdir -p src && \
-    printf 'fn main() { println!("placeholder for compiling dependencies") }' > src/main.rs
+    printf 'fn main() { println!("placeholder for compiling stable dependencies") }' > src/main.rs
 
 # Build the code (development mode).
 RUN cargo build --tests --bin mango
@@ -39,11 +34,6 @@ RUN cargo build --tests --bin mango
 # Note: sharing dependencies between dev/release does not work yet - https://stackoverflow.com/q/59511731
 RUN cargo build --tests --bin mango --release
 #TODO: use --out-dir if it stabilizes
-
-# Build the code with special flags for code coverage.
-#TODO @mark: separate image for nightly
-#COPY --chown=rust ci/image/cargo_for_coverage.sh cargo_for_coverage.sh
-#RUN ./cargo_for_coverage.sh build
 
 # Remove Cargo.toml file, to prevent other images from forgetting to re-add it.
 RUN rm -f cargo_for_coverage.sh Cargo.toml
