@@ -16,7 +16,8 @@ jobs:
   push_to_registry:
     name: Daily stable image
     # IF the last commit was less than 25 hours ago (if older, image is up-to-date).
-    if: sh -c "[ "$(expr $(date +'%s') - $(git show -s --format='%ct' $GITHUB_SHA))" -lt 90000 ]"
+    if: |
+      [ "$(expr $(date +'%s') - $(git show -s --format='%ct' $GITHUB_SHA))" -lt 90000 ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
