@@ -1,5 +1,5 @@
 
-# This checks that thare are no known issues with the current dependency versions.
+# This checks that there are no known issues with the current dependency versions.
 
 name: 'Check dependency status'
 

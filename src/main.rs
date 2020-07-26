@@ -1,8 +1,9 @@
-
 // #[allow(unused_imports)]
 // use ::mangolib;
 
-use crate::options::{Command, MangoArgs, compile::Target};
+use crate::options::compile::Target;
+use crate::options::Command;
+use crate::options::MangoArgs;
 
 mod options;
 
