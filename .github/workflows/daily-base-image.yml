@@ -14,7 +14,7 @@ on:
 
 jobs:
   push_to_registry:
-    name: Daily stable image
+    name: Daily base image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,13 +22,14 @@ jobs:
       - name: Stop if no changes
         continue-on-error: true
         run: |
-          if [ "$(expr $(date +'%s') - $(git show -s --format='%ct' $GITHUB_SHA))" -lt 90000 ]
+          if [ "$(expr $(date +'%s') - $(git show -s --format='%ct' "$GITHUB_SHA"))" -lt 90000 ]
           then
+              echo "::set-env name=LATEST_IS_FRESH::true"
+          else
               printf "last commit $GITHUB_SHA was too old ($(git show -s --format='%ci' master)); image already pushed"
-              exit 1
           fi
       - name: Push to DockerHub (stable)
-        if: ${{ success() }}
+        if: ${{ env.LATEST_IS_FRESH }}
         uses: docker/build-push-action@v1
         with:
           dockerfile: ci/image/base.Dockerfile
@@ -37,7 +38,7 @@ jobs:
           repository: mangocode/mango_daily_base
           tags: stable
       - name: Push to DockerHub (nightly)
-        if: ${{ success() }}
+        if: ${{ env.LATEST_IS_FRESH }}
         uses: docker/build-push-action@v1
         with:
           dockerfile: ci/image/base_nightly.Dockerfile
