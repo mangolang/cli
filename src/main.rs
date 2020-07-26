@@ -1,3 +1,9 @@
+//! The command line interface (CLI) is how you can make the Mango compiler convert your code to executables.
+//!
+//! Note that this is technical API documentation; for more general language documentation, see [docs.mangocode.org](https://docs.mangocode.org/en/latest/).
+#![doc(html_favicon_url = "https://mangocode.org/mango_logo.png")]
+#![doc(html_logo_url = "https://mangocode.org/mango_logo.png")]
+
 // #[allow(unused_imports)]
 // use ::mangolib;
 
@@ -30,6 +36,9 @@ pub fn cli(args: MangoArgs) {
             }
             _ => eprintln!("This operation is not supported yet"),
         },
+        _ => {
+            eprintln!("Not implemented");
+        }
     };
 }
 
