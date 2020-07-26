@@ -6,19 +6,30 @@ name: 'Check dependency status'
 on:
   schedule:
     - cron: '0 4 * * 0'
+  workflow_dispatch:
+#    inputs:
+#      logLevel:
+#        description: 'Log level'
+#        required: true
+#        default: 'warning'
+#      tags:
+#        description: 'Test scenario tags'
 
 jobs:
-  push_to_registry:
+  check_dependencies:
     name: Dependency inspection
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-#      - name: Push to DockerHub
-#        uses: docker/build-push-action@v1
-#        dockerfile: ci/image/base.Dockerfile
-#        with:
-#          username: mangocode
-#          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-#          repository: mangocode/mango_daily_base
-#          tags: latest
+      - name: Build
+        run: ci/pipeline/make/debug.sh
+      - name: Dependency versions
+        run: ci/pipeline/make/versions.sh
+      - name: Audit dependecies
+        run: ci/pipeline/make/audit.sh
+      - name: Dependency licenses
+        continue-on-error: true  #TODO @mark: enable when passed
+        run: ci/pipeline/make/license.sh
+      - name: Unused dependencies
+        run: ci/pipeline/make/unused.sh

@@ -29,6 +29,7 @@ RUN set -eux; \
 WORKDIR /mango
 
 RUN cargo install xargo
+RUN rustup component add rust-src
 RUN rustup component add miri
 RUN cargo install grcov
 
