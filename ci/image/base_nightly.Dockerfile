@@ -7,6 +7,10 @@
 # Nightly is needed for grcov and miri.
 FROM buildpack-deps:buster
 
+RUN apt-get -y update \
+    && apt-get install -y zip \
+    && rm -rf /var/lib/apt/lists/*
+
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH \
