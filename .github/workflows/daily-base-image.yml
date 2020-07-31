@@ -25,7 +25,7 @@ jobs:
           then
               echo "::set-env name=LATEST_IS_FRESH::true"
           else
-              printf "last commit $GITHUB_SHA was too old ($(git show -s --format='%ci' master)); image already pushed"
+              printf "last commit $GITHUB_SHA was too old ($(git show -s --format='%ci' "$GITHUB_SHA")); image already pushed"
           fi
       - name: Push to DockerHub (stable)
         if: ${{ env.LATEST_IS_FRESH }}
