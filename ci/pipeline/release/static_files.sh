@@ -7,3 +7,11 @@ source "${BASH_SOURCE%/*}/../shared.sh"
     cp "${BASH_SOURCE%/*}/../../../README.rst" "$RELEASE_PATH/README.rst"
     cp "${BASH_SOURCE%/*}/../../../LICENSE.txt" "$RELEASE_PATH/LICENSE.txt"
 )
+
+(
+    #TODO @mark: TEMPORARY! REMOVE THIS!
+    echo "package files:"
+    set -e
+    cd "${RELEASE_PATH}"
+    ls -als .
+)
