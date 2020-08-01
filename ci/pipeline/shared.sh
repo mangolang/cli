@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
-if [[ ! -v _IS_SHARED_SCRIPT_SOURCED ]]
+if [ -z "$_IS_SHARED_SCRIPT_SOURCED" ]
 then
+    # This sets the variable for local run. Exporting to environment locally would break subsequent runs.
     _IS_SHARED_SCRIPT_SOURCED='yes'
+    # This sets the variable in Github Action (but not locally), because local variable above is not preserved.
+    echo "::set-env name=_IS_SHARED_SCRIPT_SOURCED::yes"
 
     set -e  # fail if a command fails
     set -E  # technical change so traps work with -E
