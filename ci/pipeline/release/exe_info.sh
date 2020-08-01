@@ -18,4 +18,4 @@ printf '\n== linking ==\n' >> "$INFO_PTH"
 CHECK bash -c 'ldd "$(find . -wholename "*/release/*" -name "mango" -type f -executable)" || printf "ldd failed; perhaps no dynamic linking\\n"' | tee -a "$INFO_PTH"
 
 CHECK ls -als '/release'  #TODO @mark: TEMPORARY! REMOVE THIS!
-(set -e; ls -als "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!
+(set -e; pwd; ls -als "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!

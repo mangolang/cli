@@ -9,4 +9,4 @@ CHECK cargo tree --all-features | tee "$RELEASE_PATH/dependency-tree.txt"
 CHECK cargo --offline deny list --format=Human --layout=Crate -t 0.95 | tee "$RELEASE_PATH/dependency-licenses.txt"
 
 CHECK ls -als '/release'  #TODO @mark: TEMPORARY! REMOVE THIS!
-(set -e; ls -als "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!
+(set -e; pwd; ls -als "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!

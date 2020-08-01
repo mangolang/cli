@@ -9,4 +9,4 @@ source "${BASH_SOURCE%/*}/../shared.sh"
 )
 
 CHECK ls -als '/release'  #TODO @mark: TEMPORARY! REMOVE THIS!
-(set -e; ls -als "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!
+(set -e; pwd; ls -als "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!

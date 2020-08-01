@@ -28,6 +28,11 @@ jobs:
         run: ci/pipeline/release/api_help.sh
       - name: Documentation
         run: ci/pipeline/make/docs.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          name: mango-artifact
+          path: ./artifact/*/*
+          if-no-files-found: error
       - name: Package
         run: ci/pipeline/release/package.sh
       - name: Push to DockerHub
