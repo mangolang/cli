@@ -10,5 +10,5 @@ source "${BASH_SOURCE%/*}/../shared.sh"
     docker rm "$cont_id"
 )
 
-CHECK ls -als '/release'  #TODO @mark: TEMPORARY! REMOVE THIS!
-(set -e; pwd; ls -als "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!
+CHECK ls -ls '/release'  #TODO @mark: TEMPORARY! REMOVE THIS!
+(set -e; pwd; ls -ls "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!

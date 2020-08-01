@@ -12,7 +12,7 @@ function STEP() {
         printf "STEP script '%s' does not exist at '%s'\n" "$1" "$pth" 1>&2
         return 1
     fi
-    printf '== step: %s (%s) ==\n' "$2" "$pth" 1>&2
+    printf '\n=== step: %s (%s) ===\n' "$2" "$pth" 1>&2
     source "$pth"
 }
 
@@ -58,7 +58,6 @@ STEP 'release/exe_info.sh' 'release - executable info'
 STEP 'release/static_files.sh' 'release - readme, license, etc'
 
 STEP 'release/package.sh' 'release - package'
-rm "./${RELEASE_NAME}.zip"
 
 printf '== cleanup ==\n'
 # Untag the docker images so next run cannot accidentally rely on old versions.
@@ -66,6 +65,6 @@ docker rmi 'mangocode/mango_daily_base:stable'
 docker rmi 'mangocode/mango_daily_base:nightly'
 docker rmi 'mango_ci:stable'
 docker rmi 'mango_ci:nightly'
-docker rmi 'mangocode/mango:latest'
+#docker rmi 'mangocode/mango:latest'
 
 printf '== done ==\n'

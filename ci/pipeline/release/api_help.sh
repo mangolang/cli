@@ -38,5 +38,5 @@ if subcommand_start:
 printf '== CLI API HELP ==\n\n' > "$RELEASE_PATH/cli-help.txt"
 subcmd_help ""
 
-CHECK ls -als '/release'  #TODO @mark: TEMPORARY! REMOVE THIS!
-(set -e; pwd; ls -als "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!
+CHECK ls -ls '/release'  #TODO @mark: TEMPORARY! REMOVE THIS!
+(set -e; pwd; ls -ls "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!

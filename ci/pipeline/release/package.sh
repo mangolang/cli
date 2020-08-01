@@ -9,6 +9,7 @@ if ! ls -1qA "${RELEASE_PATH}" | grep -q . ; then
     exit 1
 fi
 CHECK_NIGHTLY bash -c "cd /release; ls -als; zip -r '${RELEASE_NAME}.zip' ."
-cp "/${RELEASE_PATH}/${RELEASE_NAME}.zip" "./${RELEASE_NAME}.zip"
+mv "${RELEASE_PATH}/${RELEASE_NAME}.zip" "${RELEASE_PATH}/../${RELEASE_NAME}.zip"
 
-(set -e; pwd; ls -als "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!
+CHECK ls -ls '/release'  #TODO @mark: TEMPORARY! REMOVE THIS!
+(set -e; pwd; ls -ls "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!
