@@ -64,8 +64,8 @@ printf '== cleanup ==\n'
 # Untag the docker images so next run cannot accidentally rely on old versions.
 docker rmi 'mangocode/mango_daily_base:stable'
 docker rmi 'mangocode/mango_daily_base:nightly'
-docker rmi 'mango_ci:latest'
-docker rmi 'mango_ci_nightly:latest'
+docker rmi 'mango_ci:stable'
+docker rmi 'mango_ci:nightly'
 docker rmi 'mangocode/mango:latest'
 
 printf '== done ==\n'

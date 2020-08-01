@@ -17,7 +17,7 @@ then
 
     # If necessary, build the daily pre-compiled-dependencies image.
     # Ideally this should be downloaded instead of built.
-    if ! docker pull 'mangocode/mango_daily_base:stable' > /dev/null || ! docker pull 'mangocode/mango_daily_base:nightly' > /dev/null
+    if ! docker pull 'mangocode/mango_daily_base:stable' || ! docker pull 'mangocode/mango_daily_base:nightly'
     then
         printf '***************************************************************************\n' 1>&2
         printf '* Could not find base Docker image "mangocode/mango_daily_base:stable" !         *\n' 1>&2
@@ -45,13 +45,13 @@ then
     function CHECK() {
         (
             printf "[@mango_ci] $*\n" 1>&2
-            docker run --rm -v"$RELEASE_PATH":'/release' 'mango_ci:latest' "$@"
+            docker run --rm -v"$RELEASE_PATH":'/release' 'mango_ci:stable' "$@"
         )
     }
     function CHECK_NIGHTLY() {
         (
             printf "[@mango_ci_nightly] $*\n" 1>&2
-            docker run --rm -v"$RELEASE_PATH":'/release' 'mango_ci_nightly:latest' "$@"
+            docker run --rm -v"$RELEASE_PATH":'/release' 'mango_ci:nightly' "$@"
         )
     }
 
