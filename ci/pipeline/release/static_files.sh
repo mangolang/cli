@@ -8,10 +8,5 @@ source "${BASH_SOURCE%/*}/../shared.sh"
     cp "${BASH_SOURCE%/*}/../../../LICENSE.txt" "$RELEASE_PATH/LICENSE.txt"
 )
 
-(
-    #TODO @mark: TEMPORARY! REMOVE THIS!
-    echo "package files:"
-    set -e
-    cd "${RELEASE_PATH}"
-    ls -als .
-)
+CHECK ls -als '/release'  #TODO @mark: TEMPORARY! REMOVE THIS!
+(set -e; ls -als "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!

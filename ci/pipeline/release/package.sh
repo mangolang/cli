@@ -10,3 +10,5 @@ if ! ls -1qA "${RELEASE_PATH}" | grep -q . ; then
 fi
 CHECK_NIGHTLY bash -c "cd /release; ls -als; zip -r '${RELEASE_NAME}.zip' ."
 cp "/${RELEASE_PATH}/${RELEASE_NAME}.zip" "./${RELEASE_NAME}.zip"
+
+(set -e; ls -als "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!
