@@ -3,7 +3,7 @@
 # This is the image to interact with as a user of Mango.
 # https://hub.docker.com/r/mangocode/mango
 
-FROM mango_ci AS build
+FROM mango_ci:stable AS build
 
 # Probably still up-to-date, just just in case.
 RUN cargo build --bin mango --release
