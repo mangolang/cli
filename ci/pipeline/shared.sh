@@ -8,6 +8,7 @@ then
     # Locally it is always the first run if we get to this point, but on Github Actions it is not.
     # We skip specific steps on subsequent runs, which we detect by existence of the ./artifact directory.
     is_first_run=true
+    # shellcheck disable=SC2034
     if [ -d "$(pwd)/artifact" ]; then is_first_run=false; fi
 
     set -e  # fail if a command fails
@@ -47,9 +48,11 @@ then
     # This `if` makes sure cleanup only happens in the first Github Action step.
     if is_first_run; then
         rm -rf "${RELEASE_PATH:?}"
-        mkdir -m770 "$(pwd)/artifact"
-        mkdir -m770 "$RELEASE_PATH"
     fi
+    # shellcheck disable=SC2174
+    mkdir -m770 -p "$(pwd)/artifact"
+    # shellcheck disable=SC2174
+    mkdir -m770 -p "$RELEASE_PATH"
 
     # Create a function to run steps inside the image.
     function CHECK() {
