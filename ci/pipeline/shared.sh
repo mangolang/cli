@@ -5,6 +5,10 @@ then
     # This sets the variable for local run. On Github Actions this is not remembered between steps, and
     # neither are the other definitions defined here, so it is correct that most things are repeated.
     _IS_SHARED_SCRIPT_SOURCED='yes'
+    # Locally it is always the first run if we get to this point, but on Github Actions it is not.
+    # We skip specific steps on subsequent runs, which we detect by existence of the ./artifact directory.
+    is_first_run=true
+    if [ -d "$(pwd)/artifact" ]; then is_first_run=false; fi
 
     set -e  # fail if a command fails
     set -E  # technical change so traps work with -E
@@ -41,15 +45,11 @@ then
     printf 'release name: %s\n' "$RELEASE_NAME"
     RELEASE_PATH="$(pwd)/artifact/$RELEASE_NAME"
     # This `if` makes sure cleanup only happens in the first Github Action step.
-    # Disable -u for the if-z check, because -v does not work for environment variables.
-    set +u
-    if [ -z "$_SHARED_SCRIPT_RAN_IN_ENV" ]
-    then
+    if is_first_run; then
         rm -rf "${RELEASE_PATH:?}"
         mkdir -m770 "$(pwd)/artifact"
         mkdir -m770 "$RELEASE_PATH"
     fi
-    set -u
 
     # Create a function to run steps inside the image.
     function CHECK() {
@@ -64,9 +64,6 @@ then
             docker run --rm -v"$RELEASE_PATH":'/release' 'mango_ci:nightly' "$@"
         )
     }
-
-    # This sets the variable in Github Action (but not locally), because that environment does not use _IS_SHARED_SCRIPT_SOURCED.
-    echo "::set-env name=_SHARED_SCRIPT_RAN_IN_ENV::yes"
 
     printf 'setup completed\n'
 fi
