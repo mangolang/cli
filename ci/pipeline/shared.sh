@@ -40,12 +40,16 @@ then
     if [ "$GIT_BRANCH" = "master" ]; then RELEASE_NAME="${CRATE_NAME}-${CRATE_VERSION}"; else RELEASE_NAME="${CRATE_NAME}-${GIT_BRANCH}-${CRATE_VERSION}-dev"; fi
     printf 'release name: %s\n' "$RELEASE_NAME"
     RELEASE_PATH="$(pwd)/artifact/$RELEASE_NAME"
-    # This `if` makes sure cleanup only happens in the first Github Action step
-    if [ -z "$_IS_SHARED_SCRIPT_SOURCED" ]
+    # This `if` makes sure cleanup only happens in the first Github Action step.
+    # Disable -u for the if-z check, because -v does not work for environment variables.
+    set +u
+    if [ -z "$_SHARED_SCRIPT_RAN_IN_ENV" ]
     then
         rm -rf "${RELEASE_PATH:?}"
-        mkdir -p "$RELEASE_PATH"
+        mkdir -m770 "$(pwd)/artifact"
+        mkdir -m770 "$RELEASE_PATH"
     fi
+    set -u
 
     # Create a function to run steps inside the image.
     function CHECK() {
