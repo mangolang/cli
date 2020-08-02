@@ -28,6 +28,11 @@ jobs:
         run: ci/pipeline/release/api_help.sh
       - name: Documentation
         run: ci/pipeline/make/docs.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          name: mango-artifact
+          path: ./artifact/mango-*/*
+          if-no-files-found: error
       - name: Package
         run: ci/pipeline/release/package.sh
       - name: Push to DockerHub
@@ -38,9 +43,9 @@ jobs:
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
           repository: mangocode/mango
           tags: latest
-      - name: Upload the artifacts
-        uses: skx/github-action-publish-binaries@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: 'mango-*.zip'
+#      - name: Upload the artifacts
+#        uses: skx/github-action-publish-binaries@master
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          args: './artifact/mango-*.zip'

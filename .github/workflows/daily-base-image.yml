@@ -9,8 +9,6 @@ on:
     - cron: '0 3 * * 0'
   workflow_dispatch:
 
-#TODO @mark: should only build if it does not exist
-
 jobs:
   push_to_registry:
     name: Daily base image
@@ -23,9 +21,10 @@ jobs:
         run: |
           if [ "$(expr $(date +'%s') - $(git show -s --format='%ct' "$GITHUB_SHA"))" -lt 90000 ]
           then
+              printf "last commit $GITHUB_SHA was recent, publishing new base image\n"
               echo "::set-env name=LATEST_IS_FRESH::true"
           else
-              printf "last commit $GITHUB_SHA was too old ($(git show -s --format='%ci' master)); image already pushed"
+              printf "last commit $GITHUB_SHA was too old ($(git show -s --format='%ci' "$GITHUB_SHA")); image already pushed\n"
           fi
       - name: Push to DockerHub (stable)
         if: ${{ env.LATEST_IS_FRESH }}
