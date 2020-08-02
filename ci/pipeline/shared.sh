@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
-if [ -z "$_IS_SHARED_SCRIPT_SOURCED" ]
+if [[ ! -v _IS_SHARED_SCRIPT_SOURCED ]]
 then
-    # This sets the variable for local run. Exporting to environment locally would break subsequent runs.
+    # This sets the variable for local run. On Github Actions this is not remembered between steps, and
+    # neither are the other definitions defined here, so it is correct that most things are repeated.
     _IS_SHARED_SCRIPT_SOURCED='yes'
-    # This sets the variable in Github Action (but not locally), because local variable above is not preserved.
-    echo "::set-env name=_IS_SHARED_SCRIPT_SOURCED::yes"
 
     set -e  # fail if a command fails
     set -E  # technical change so traps work with -E
@@ -41,8 +40,12 @@ then
     if [ "$GIT_BRANCH" = "master" ]; then RELEASE_NAME="${CRATE_NAME}-${CRATE_VERSION}"; else RELEASE_NAME="${CRATE_NAME}-${GIT_BRANCH}-${CRATE_VERSION}-dev"; fi
     printf 'release name: %s\n' "$RELEASE_NAME"
     RELEASE_PATH="$(pwd)/artifact/$RELEASE_NAME"
-    rm -rf "${RELEASE_PATH:?}"
-    mkdir -p "$RELEASE_PATH"
+    # This `if` makes sure cleanup only happens in the first Github Action step
+    if [ -z "$_IS_SHARED_SCRIPT_SOURCED" ]
+    then
+        rm -rf "${RELEASE_PATH:?}"
+        mkdir -p "$RELEASE_PATH"
+    fi
 
     # Create a function to run steps inside the image.
     function CHECK() {
@@ -57,6 +60,9 @@ then
             docker run --rm -v"$RELEASE_PATH":'/release' 'mango_ci:nightly' "$@"
         )
     }
+
+    # This sets the variable in Github Action (but not locally), because that environment does not use _IS_SHARED_SCRIPT_SOURCED.
+    echo "::set-env name=_SHARED_SCRIPT_RAN_IN_ENV::yes"
 
     printf 'setup completed\n'
 fi
