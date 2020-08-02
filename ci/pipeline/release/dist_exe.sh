@@ -9,6 +9,3 @@ source "${BASH_SOURCE%/*}/../shared.sh"
     docker cp "${cont_id}:/mango" "$RELEASE_PATH"
     docker rm "$cont_id"
 )
-
-CHECK ls -ls '/release'  #TODO @mark: TEMPORARY! REMOVE THIS!
-(set -e; pwd; ls -ls "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!

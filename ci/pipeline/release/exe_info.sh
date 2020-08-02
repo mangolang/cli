@@ -16,6 +16,3 @@ CHECK cargo --offline bloat --release --all-features --wide -n 30 | tee -a "$INF
 
 printf '\n== linking ==\n' >> "$INFO_PTH"
 CHECK bash -c 'ldd "$(find . -wholename "*/release/*" -name "mango" -type f -executable)" || printf "ldd failed; perhaps no dynamic linking\\n"' | tee -a "$INFO_PTH"
-
-CHECK ls -ls '/release'  #TODO @mark: TEMPORARY! REMOVE THIS!
-(set -e; pwd; ls -ls "${RELEASE_PATH}/")  #TODO @mark: TEMPORARY! REMOVE THIS!

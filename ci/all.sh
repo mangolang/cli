@@ -21,31 +21,32 @@ STEP 'make/base.sh' 'build - dependencies image'
 
 STEP 'make/debug.sh' 'build - ci image'
 
-STEP 'test/test.sh' 'test'
-
-STEP 'test/lint.sh' 'lint'
-STEP 'test/lint.sh' 'lint'
-
-STEP 'test/style.sh' 'style'
-
-#TODO @mark: turn on
-#STEP 'test/test_miri.sh' 'test (miri)'
-
-STEP 'test/cov.sh' 'coverage'
-
-STEP 'deps/versions_direct.sh' 'dependencies - versions'
-#TODO: do something with indirect dependencies, version_deep
-
-STEP 'deps/audit.sh' 'dependencies - audit'
-
-#STEP 'deps/license.sh' 'dependencies - license'
-
-#TODO @mark: turn on
-#STEP 'deps/usage.sh' 'dependencies - unused'
-
-STEP 'make/docs.sh' 'documentation'
-
-STEP 'release/api_help.sh' 'api help'
+#STEP 'test/test.sh' 'test'
+#
+#STEP 'test/lint.sh' 'lint'
+#STEP 'test/lint.sh' 'lint'
+#
+#STEP 'test/style.sh' 'style'
+#
+##TODO @mark: turn on
+##STEP 'test/test_miri.sh' 'test (miri)'
+#
+#STEP 'test/cov.sh' 'coverage'
+#
+#STEP 'deps/versions_direct.sh' 'dependencies - versions'
+##TODO: do something with indirect dependencies, version_deep
+#
+#STEP 'deps/audit.sh' 'dependencies - audit'
+#
+##TODO @mark: turn on
+##STEP 'deps/license.sh' 'dependencies - license'
+#
+##TODO @mark: turn on
+##STEP 'deps/usage.sh' 'dependencies - unused'
+#
+#STEP 'make/docs.sh' 'documentation'
+#
+#STEP 'release/api_help.sh' 'api help'
 
 STEP 'release/dist_image.sh' 'release - image (distributable)'
 
