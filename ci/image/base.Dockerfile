@@ -24,14 +24,14 @@ COPY --chown=rust Cargo.lock .
 RUN sudo chown rust:rust -R . && \
     sudo chmod g+s -R . && \
     mkdir -p src && \
-    printf 'fn main() { println!("placeholder for compiling stable dependencies") }' > src/main.rs
+    printf 'fn main() { println!("placeholder for compiling stable dependencies") }' | tee src/main.rs | tee src/lib.rs
 
 # Build the code (development mode).
-RUN cargo build --tests --bin mango
+RUN cargo build --tests
 
 # Build the code (release mode).
 # Note: sharing dependencies between dev/release does not work yet - https://stackoverflow.com/q/59511731
-RUN cargo build --tests --bin mango --release
+RUN cargo build --tests --release
 #TODO: use --out-dir if it stabilizes
 
 # Remove Cargo.toml file, to prevent other images from forgetting to re-add it.

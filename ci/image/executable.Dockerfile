@@ -6,7 +6,7 @@
 FROM mango_ci:stable AS build
 
 # Probably still up-to-date, just just in case.
-RUN cargo build --bin mango --release
+RUN cargo build --release
 
 # A find is needed here for it to work with multiple platforms (musl uses different path)
 RUN find . -wholename '*/release/*' -name 'mango' -type f -executable -print -exec cp {} /mango/mango_exe \;

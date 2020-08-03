@@ -4,7 +4,6 @@
 name: 'Create a release'
 
 on:
-  push:  #TODO @mark: TEMPORARY! REMOVE THIS!
   workflow_dispatch:
 
 jobs:
