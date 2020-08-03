@@ -42,10 +42,10 @@ RUN cargo install cargo-udeps
 COPY Cargo.toml .
 COPY Cargo.lock .
 RUN mkdir -p src && \
-    printf 'fn main() { println!("placeholder for compiling nightly dependencies") }' > src/main.rs
+    printf 'fn main() { println!("placeholder for compiling nightly dependencies") }' | tee src/main.rs | tee src/lib.rs
 
 # Build the code (development mode).
-RUN cargo build --tests --bin mango
+RUN cargo build --tests
 
 # Build the code with special flags for code coverage.
 COPY ci/image/cargo_for_coverage.sh cargo_for_coverage.sh
