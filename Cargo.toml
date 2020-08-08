@@ -24,6 +24,10 @@ structopt = { version = "^0.3.15" , features = [ "paw" ] }
 paw = "^1.0.0"
 #lazy_static = "^1.4.0"
 
+# Usage based on https://github.com/gnzlbg/jemallocator
+[target.'cfg(not(target_env = "msvc"))'.dependencies]
+jemallocator = "0.3.2"
+
 [dev-dependencies]
 
 [profile.release]

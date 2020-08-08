@@ -14,26 +14,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build for CI
-        run: ci/pipeline/make/debug.sh
+        run: bash ci/pipeline/make/debug.sh
       - name: Optimized image
-        run: ci/pipeline/release/dist_image.sh
+        run: bash ci/pipeline/release/dist_image.sh
       - name: Binary (linux)
-        run: ci/pipeline/release/dist_exe.sh
+        run: bash ci/pipeline/release/dist_exe.sh
       - name: Executable info
-        run: ci/pipeline/release/exe_info.sh
+        run: bash ci/pipeline/release/exe_info.sh
       - name: Static files
-        run: ci/pipeline/release/static_files.sh
+        run: bash ci/pipeline/release/static_files.sh
       - name: Cli api help
-        run: ci/pipeline/release/api_help.sh
+        run: bash ci/pipeline/release/api_help.sh
       - name: Documentation
-        run: ci/pipeline/make/docs.sh
+        run: bash ci/pipeline/make/docs.sh
       - uses: actions/upload-artifact@v2
         with:
           name: mango-artifact
           path: ./artifact/mango-*/*
           if-no-files-found: error
       - name: Package
-        run: ci/pipeline/release/package.sh
+        run: bash ci/pipeline/release/package.sh
       - name: Push to DockerHub
         uses: docker/build-push-action@v1
         with:
