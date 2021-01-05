@@ -4,9 +4,6 @@
 #![doc(html_favicon_url = "https://mangocode.org/mango_logo.png")]
 #![doc(html_logo_url = "https://mangocode.org/mango_logo.png")]
 
-#![feature(alloc_jemalloc)]
-#![crate_type = "dylib"]
-
 #[cfg(not(target_env = "msvc"))]
 use jemallocator::Jemalloc;
 

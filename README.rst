@@ -34,7 +34,7 @@ There are two main ways to use the CLI [note: not finished], Docker and self-com
 Docker
 ...............................
 
-To use the Mango Docker image, you will need Docker installed.
+To use the Mango Docker image, you will need Docker installed. The image is available as `mangocode/mango`_.
 
 We can then start Mango in a Docker container, mounting your code directory so it can be compiled::
 
@@ -47,8 +47,6 @@ Or a short version without name, auto-delete, read-only and version::
 To build the Docker image locally, including running tests, run::
 
     bash ci/all.sh
-
-The image is now available as `mangocode/mango`.
 
 Self-compiled
 ...............................
@@ -78,4 +76,5 @@ Links
 .. _IR: https://github.com/mangolang/mango_ir
 .. _compiled: https://github.com/mangolang/wasm
 .. _interpreted: https://github.com/mangolang/interpreter
+.. _mangocode/mango: https://hub.docker.com/r/mangocode/mango
 .. _Install Rust: https://rustup.rs/
