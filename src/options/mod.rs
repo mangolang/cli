@@ -1,8 +1,8 @@
 use ::structopt::StructOpt;
 
 pub mod compile;
-pub mod run;
 pub mod exec_test;
+pub mod run;
 
 #[derive(StructOpt, Debug)]
 #[structopt(
