@@ -42,7 +42,7 @@ RUN cargo install cargo-udeps
 COPY Cargo.toml .
 COPY Cargo.lock .
 RUN mkdir -p src && \
-    printf 'fn main() { println!("placeholder for compiling nightly dependencies") }' | tee src/main.rs | tee src/lib.rs
+    printf 'fn main() {\n\tprintln!("placeholder for compiling nightly dependencies")\n}' | tee src/main.rs | tee src/lib.rs
 
 # Build the code (development mode).
 RUN cargo build --tests
