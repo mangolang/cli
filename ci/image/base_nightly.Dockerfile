@@ -51,7 +51,7 @@ RUN cargo build --tests
 COPY ci/image/cargo_for_coverage.sh cargo_for_coverage.sh
 RUN ./cargo_for_coverage.sh build
 
-# Remove Cargo.toml file, to prevent other images from forgetting to re-add it.
+# Remove Cargo.toml files, to prevent other images from forgetting to re-add it.
 RUN rm -f cargo_for_coverage.sh Cargo.toml
 
 ## NOTE!
