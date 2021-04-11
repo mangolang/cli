@@ -36,6 +36,8 @@ pub fn cli(args: MangoArgs) {
             }
             _ => eprintln!("This operation is not supported yet"),
         },
+        Command::Run(_) => eprintln!("Run is not supported yet"),
+        Command::Test(_) => eprintln!("Test is not supported yet"),
     };
 }
 

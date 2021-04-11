@@ -4,6 +4,14 @@ use ::structopt::StructOpt;
 pub struct CompileCmd {
     #[structopt(subcommand)]
     pub target: Target,
+
+    //TODO @mark: change this name if the entrypoint keyword is changed
+    #[structopt(
+        long = "main",
+        required = false,
+        help = "Which executables to compile, as comma-separated list. Required if multiple exist."
+    )]
+    pub mains: Vec<String>,
 }
 
 #[derive(StructOpt, Debug)]

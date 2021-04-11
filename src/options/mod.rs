@@ -1,6 +1,8 @@
 use ::structopt::StructOpt;
 
 pub mod compile;
+pub mod exec_test;
+pub mod run;
 
 #[derive(StructOpt, Debug)]
 #[structopt(
@@ -35,4 +37,10 @@ pub enum Command {
     // Note: this particular about text is part of a Github Action to check the CLI
     #[structopt(about = "Compile the code in the current directory to one of various formats")]
     Compile(compile::CompileCmd),
+
+    #[structopt(about = "Run the current Mango project")]
+    Run(run::RunCmd),
+
+    #[structopt(about = "Execute tests for the current Mango project")]
+    Test(exec_test::TestCmd),
 }
