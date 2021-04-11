@@ -42,7 +42,7 @@ RUN cargo install cargo-udeps
 COPY Cargo.toml .
 COPY Cargo.lock .
 RUN mkdir -p src && \
-    printf 'fn main() { println!("placeholder for compiling nightly dependencies") }' | tee src/main.rs | tee src/lib.rs
+    printf 'fn main() {\n\tprintln!("placeholder for compiling nightly dependencies")\n}' | tee src/main.rs | tee src/lib.rs
 
 # Build the code (development mode).
 RUN cargo build --tests
@@ -51,7 +51,7 @@ RUN cargo build --tests
 COPY ci/image/cargo_for_coverage.sh cargo_for_coverage.sh
 RUN ./cargo_for_coverage.sh build
 
-# Remove Cargo.toml file, to prevent other images from forgetting to re-add it.
+# Remove Cargo.toml files, to prevent other images from forgetting to re-add it.
 RUN rm -f cargo_for_coverage.sh Cargo.toml
 
 ## NOTE!

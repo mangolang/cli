@@ -4,7 +4,7 @@
 # https://hub.docker.com/r/mangocode/mango_daily_base
 
 # Note: this version should match `executable.Dockerfile`
-FROM ekidd/rust-musl-builder:1.44.1
+FROM ekidd/rust-musl-builder:1.50.0
 
 ENV RUST_BACKTRACE=1
 
@@ -24,7 +24,7 @@ COPY --chown=rust Cargo.lock .
 RUN sudo chown rust:rust -R . && \
     sudo chmod g+s -R . && \
     mkdir -p src && \
-    printf 'fn main() { println!("placeholder for compiling stable dependencies") }' | tee src/main.rs | tee src/lib.rs
+    printf 'fn main() {\n\tprintln!("placeholder for compiling stable dependencies")\n}' | tee src/main.rs | tee src/lib.rs
 
 # Build the code (development mode).
 RUN cargo build --tests
@@ -34,7 +34,7 @@ RUN cargo build --tests
 RUN cargo build --tests --release
 #TODO: use --out-dir if it stabilizes
 
-# Remove Cargo.toml file, to prevent other images from forgetting to re-add it.
+# Remove Cargo.toml files, to prevent other images from forgetting to re-add it.
 RUN rm -f cargo_for_coverage.sh Cargo.toml
 
 ## NOTE!

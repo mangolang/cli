@@ -2,7 +2,7 @@
 name = "mango"
 description = "The Mango programming language (UNDER CONSTRUCTION)"
 # Note: until version 0.4.0, the crates.io 'mango' crate was what since 0.5.0 is 'mangolib'
-version = "0.5.0"
+version = "0.6.0"
 authors = ["Mark <mverleg.noreply@gmail.com>"]
 homepage = "https://mangocode.org/"
 license = "Apache-2.0"
@@ -19,9 +19,9 @@ path = "src/main.rs"
 
 [dependencies]
 #mangolib = { path = "../compiler" }
-mangolib = "0.5.0"
-structopt = { version = "^0.3.15" , features = [ "paw" ] }
-paw = "^1.0.0"
+mangolib = "0.6.0"
+structopt = { version = "0.3.21", features = [ "paw" ] }
+paw = "1.0.0"
 #lazy_static = "^1.4.0"
 
 [dev-dependencies]
