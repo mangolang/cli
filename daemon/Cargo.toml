@@ -19,7 +19,7 @@ path = "src/main.rs"
 [dependencies]
 #mangolib = { path = "../compiler" }
 mangolib = "0.6.0"
-structopt = { version = "^0.3.15" , features = [ "paw" ] }
+structopt = { version = "^0.3.15" }
 #paw = "^1.0.0"
 #lazy_static = "^1.4.0"
 
