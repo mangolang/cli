@@ -10,6 +10,6 @@
 !rustfmt.toml
 !deny.toml
 !.cargo/
-!src/
+!cli/src/
 !README.rst
 !LICENSE.txt

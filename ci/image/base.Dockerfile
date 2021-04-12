@@ -24,7 +24,7 @@ COPY --chown=rust Cargo.lock .
 RUN sudo chown rust:rust -R . && \
     sudo chmod g+s -R . && \
     mkdir -p src && \
-    printf 'fn main() {\n\tprintln!("placeholder for compiling stable dependencies")\n}' | tee src/mango.rs | tee src/mangod.rs | tee src/lib.rs
+    printf 'fn main() {\n\tprintln!("placeholder for compiling stable dependencies")\n}' | tee cli/src/main.rs | tee daemon/src/main.rs | tee common/src/lib.rs
 
 # Build the code (development mode).
 RUN cargo build --tests
@@ -38,5 +38,5 @@ RUN cargo build --tests --release
 RUN rm -f cargo_for_coverage.sh Cargo.toml
 
 ## NOTE!
-## Make sure to `touch src/mango.rs` and `touch src/mangod.rs` after copying source, so that everything is recompiled
+## Make sure to `touch cli/src/main.rs`, `touch daemon/src/main.rs` and `touch common/src/lib.rs` after copying source, so that everything is recompiled
 

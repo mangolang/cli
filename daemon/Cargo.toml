@@ -12,22 +12,22 @@ include = [
     "src/**/*",
     "Cargo.toml"
 ]
-default-run = "mango"
-
-[[bin]]
-name = "mango"
-path = "src/mango.rs"
 
 [[bin]]
 name = "mangod"
-path = "src/mangod.rs"
+path = "src/main.rs"
 
 [dependencies]
 #mangolib = { path = "../compiler" }
 mangolib = "0.6.0"
-structopt = { version = "0.3.21", features = [ "paw" ] }
-paw = "1.0.0"
+structopt = { version = "^0.3.15" , features = [ "paw" ] }
+#paw = "^1.0.0"
 #lazy_static = "^1.4.0"
+
+ws = { version = "0.7.*" }
+chrono = { version = "0.4.*" }
+log = { version = "0.4.*" }
+env_logger = { version = "0.5.*" }
 
 [dev-dependencies]
 
