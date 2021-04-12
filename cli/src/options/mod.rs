@@ -3,6 +3,8 @@ use ::structopt::StructOpt;
 pub mod compile;
 pub mod exec_test;
 pub mod run;
+pub mod clean;
+pub mod daemon;
 
 #[derive(StructOpt, Debug)]
 #[structopt(
@@ -28,6 +30,13 @@ pub struct MangoArgs {
     )]
     pub quiet: bool,
 
+    #[structopt(
+        long = "daemon",
+        help = "Only show the most important output.",
+        hidden_short_help=true
+    )]
+    pub daemon: bool,
+
     #[structopt(subcommand)]
     pub cmd: Command,
 }
@@ -43,4 +52,10 @@ pub enum Command {
 
     #[structopt(about = "Execute tests for the current Mango project")]
     Test(exec_test::TestCmd),
+
+    #[structopt(about = "Clean any build results or cache for the current Mango project")]
+    Clean(clean::CleanCmd),
+
+    #[structopt(about = "Control the Mango daemon (for all projects)")]
+    Daemon(daemon::DaemonCmd),
 }

@@ -38,6 +38,8 @@ pub fn cli(args: MangoArgs) {
         },
         Command::Run(_) => eprintln!("Run is not supported yet"),
         Command::Test(_) => eprintln!("Test is not supported yet"),
+        Command::Clean(_) => eprintln!("Cleaning output is not supported yet"),
+        Command::Daemon(_) => eprintln!("Daemon interaction is not supported yet"),
     };
 }
 
