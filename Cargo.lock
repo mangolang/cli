@@ -305,6 +305,18 @@ dependencies = [
 name = "mango"
 version = "0.6.0"
 dependencies = [
+ "paw",
+ "structopt",
+]
+
+[[package]]
+name = "mango-cli-api"
+version = "0.6.0"
+
+[[package]]
+name = "mango-cli-daemon"
+version = "0.6.0"
+dependencies = [
  "chrono",
  "env_logger",
  "log",

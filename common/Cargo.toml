@@ -1,7 +1,6 @@
 [package]
-name = "mango"
-description = "The Mango programming language (UNDER CONSTRUCTION)"
-# Note: until version 0.4.0, the crates.io 'mango' crate was what since 0.5.0 is 'mangolib'
+name = "mango-cli-api"
+description = "API between the Mango programming language CLI and daemon"
 version = "0.6.0"
 authors = ["Mark <mverleg.noreply@gmail.com>"]
 homepage = "https://mangocode.org/"
@@ -21,10 +20,3 @@ path = "src/lib.rs"
 
 [dev-dependencies]
 
-[profile.release]
-lto = true
-opt-level = 'z'
-
-[profile.dev.package."*"]
-opt-level = 3
-debug = false
