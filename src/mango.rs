@@ -7,11 +7,11 @@
 // #[allow(unused_imports)]
 // use ::mangolib;
 
-use crate::options::compile::Target;
-use crate::options::Command;
-use crate::options::MangoArgs;
+use crate::cli::options::compile::Target;
+use crate::cli::options::Command;
+use crate::cli::options::MangoArgs;
 
-mod options;
+mod cli;
 
 #[paw::main]
 fn main(args: MangoArgs) {

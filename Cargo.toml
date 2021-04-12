@@ -12,10 +12,15 @@ include = [
     "src/**/*",
     "Cargo.toml"
 ]
+default-run = "mango"
 
 [[bin]]
 name = "mango"
-path = "src/main.rs"
+path = "src/mango.rs"
+
+[[bin]]
+name = "mangod"
+path = "src/mangod.rs"
 
 [dependencies]
 #mangolib = { path = "../compiler" }
