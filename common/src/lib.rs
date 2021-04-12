@@ -1,7 +1,15 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+use ::serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize)]
+struct Request {
+}
+
+#[derive(Serialize, Deserialize)]
+enum Response {
+    Success {
+
+    },
+    Errors {
+
     }
 }
