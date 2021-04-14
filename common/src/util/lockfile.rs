@@ -10,28 +10,36 @@ use crate::util::paths::get_lock_file;
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct LockInfo {
-    pid: Option<u32>,
-    timestamp: u64,
-    hostname: String,
-    port: u16,
+    pid: u32,
+    address: String,
+    update_ts: u64,
 }
 
 impl LockInfo {
-    pub fn new(pid: Option<u32>, hostname: impl Into<String>, port: u16) -> Self {
-        let since_the_epoch_s = SystemTime::now()
+    pub fn new(pid: u32, address: impl Into<String>) -> Self {
+        let address = address.into();
+        assert!(address.contains(":"), "address must contain port");
+        let update_ts = SystemTime::now()
             .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards")
+            .unwrap()
             .as_secs();
         LockInfo {
             pid,
-            timestamp: since_the_epoch_s,
-            hostname: hostname.into(),
-            port,
+            update_ts,
+            address,
         }
+    }
+
+    pub fn pid(&self) -> u32 {
+        self.pid
+    }
+
+    pub fn address(&self) -> &str {
+        &self.address
     }
 }
 
-pub fn load_lock() -> LockInfo {
+pub fn load_lock() -> Option<LockInfo> {
     let pth = get_lock_file();
     let reader = BufReader::new(File::open(&pth)
         .unwrap_or_else(|err| panic!("could not access the mangod lock file: '{}', reason: {}", pth.to_string_lossy(), err)));
@@ -56,7 +64,7 @@ mod tests {
     #[serial]
     #[test]
     fn read_write_pid() {
-        let before = LockInfo::new(Some(1234), "localhost", 47558);
+        let before = LockInfo::new(Some(1234), "localhost:47558");
         store_lock(&before);
         assert!(get_lock_file().is_file());
         let after = load_lock();
@@ -66,7 +74,7 @@ mod tests {
     #[serial]
     #[test]
     fn read_write_no_pid() {
-        let before = LockInfo::new(None, "127.0.0.1", 80);
+        let before = LockInfo::new(None, "127.0.0.1:80");
         store_lock(&before);
         assert!(get_lock_file().is_file());
         let after = load_lock();

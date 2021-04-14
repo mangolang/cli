@@ -2,7 +2,7 @@ use ::structopt::StructOpt;
 
 //TODO @mark: make multiple commands, of which 'start' is the implicit one
 
-const DEFAULT_PORT: int = 47558;
+const DEFAULT_PORT: u16 = 47558;
 
 #[derive(StructOpt, Debug)]
 #[structopt(
@@ -58,11 +58,23 @@ pub struct MangodStopArgs {}
 #[structopt(
     after_help = "Stop the mango compiler daemon if it is running in the background."
 )]
-pub struct MangodGetPidArgs {}
+pub struct MangodGetArgs {
+    #[structopt(subcommand)]
+    pub cmd: GetCommand,
+}
+
+#[derive(StructOpt, Debug)]
+pub enum GetCommand {
+    #[structopt(about = "Get the process id of the currently running mangod, if any.")]
+    Pid,
+
+    #[structopt(about = "Get the address that mangod is currently available at, if any.")]
+    Address,
+}
+
 
 #[derive(StructOpt, Debug)]
 pub enum Command {
-    // Note: this particular about text is part of a Github Action to check the CLI
     #[structopt(about = "Compile the code in the current directory to one of various formats")]
     Start(MangodStartArgs),
 
@@ -70,5 +82,5 @@ pub enum Command {
     Stop(MangodStopArgs),
 
     #[structopt(about = "Execute tests for the current Mango project")]
-    GetPid(MangodGetPidArgs),
+    Get(MangodGetArgs),
 }

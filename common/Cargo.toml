@@ -13,7 +13,7 @@ include = [
 ]
 
 [lib]
-name = "mango_cli_api"
+name = "mango_cli_common"
 path = "src/lib.rs"
 
 [dependencies]
