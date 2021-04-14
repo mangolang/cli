@@ -2,6 +2,8 @@ use ::structopt::StructOpt;
 
 //TODO @mark: make multiple commands, of which 'start' is the implicit one
 
+const DEFAULT_PORT: int = 47558;
+
 #[derive(StructOpt, Debug)]
 #[structopt(
     before_help = "Mango compiler daemon that does the actual compilation in the background.\nIt is often preferable to only use `mango` and not touch `mangod` yourself.",
@@ -29,7 +31,7 @@ pub struct MangodStartArgs {
     #[structopt(
         short = "p",
         long = "port",
-        default_value = "47558",
+        default_value = &format!("{}", DEFAULT_PORT),
         help = "Port to listen on.",
     )]
     pub port: u16,
@@ -40,7 +42,7 @@ impl Default for MangodStartArgs {
     fn default() -> Self {
         MangodStartArgs {
             host: "localhost".to_owned(),
-            port: 47558,
+            port: DEFAULT_PORT,
         }
     }
 }

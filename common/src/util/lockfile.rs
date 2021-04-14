@@ -5,16 +5,19 @@ use ::std::time::SystemTime;
 use ::std::time::UNIX_EPOCH;
 
 use ::serde::{Deserialize, Serialize};
+
 use crate::util::paths::get_lock_file;
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct LockInfo {
     pid: Option<u32>,
     timestamp: u64,
+    hostname: String,
+    port: u16,
 }
 
 impl LockInfo {
-    pub fn new(pid: Option<u32>) -> Self {
+    pub fn new(pid: Option<u32>, hostname: impl Into<String>, port: u16) -> Self {
         let since_the_epoch_s = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .expect("Time went backwards")
@@ -22,6 +25,8 @@ impl LockInfo {
         LockInfo {
             pid,
             timestamp: since_the_epoch_s,
+            hostname: hostname.into(),
+            port,
         }
     }
 }
@@ -51,7 +56,7 @@ mod tests {
     #[serial]
     #[test]
     fn read_write_pid() {
-        let before = LockInfo::new(Some(1234));
+        let before = LockInfo::new(Some(1234), "localhost", 47558);
         store_lock(&before);
         assert!(get_lock_file().is_file());
         let after = load_lock();
@@ -61,7 +66,7 @@ mod tests {
     #[serial]
     #[test]
     fn read_write_no_pid() {
-        let before = LockInfo::new(None);
+        let before = LockInfo::new(None, "127.0.0.1", 80);
         store_lock(&before);
         assert!(get_lock_file().is_file());
         let after = load_lock();
