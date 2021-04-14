@@ -18,6 +18,7 @@ name = "mango"
 path = "src/main.rs"
 
 [dependencies]
+mango-cli-common = { path = "../common" }
 structopt = { version = "^0.3.15" , features = [ "paw" ] }
 paw = "^1.0.0"
 #lazy_static = "^1.4.0"

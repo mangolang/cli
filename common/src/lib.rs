@@ -1,10 +1,12 @@
-use ::serde::{Serialize, Deserialize};
+use ::serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+pub mod util;
+
+#[derive(Debug, Serialize, Deserialize)]
 struct Request {
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 enum Response {
     Success {
 

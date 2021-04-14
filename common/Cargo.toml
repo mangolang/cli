@@ -1,5 +1,5 @@
 [package]
-name = "mango-cli-api"
+name = "mango-cli-common"
 description = "API between the Mango programming language CLI and daemon"
 version = "0.6.0"
 authors = ["Mark <mverleg.noreply@gmail.com>"]
@@ -20,6 +20,7 @@ path = "src/lib.rs"
 serde = { version = "1.0", features = ["derive"] }
 bincode = "1.3.3"
 serde_json = "1.0.64"
+dirs = "3.0.1"
 
 [dev-dependencies]
 
