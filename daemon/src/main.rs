@@ -55,6 +55,5 @@ fn get_pid(args: &MangodGetArgs, lock_info: &Option<LockInfo>) {
             exit(0);
         }
     }
-    unimplemented!()
 }
 

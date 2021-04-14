@@ -31,7 +31,7 @@ pub struct MangodStartArgs {
     #[structopt(
         short = "p",
         long = "port",
-        default_value = &format!("{}", DEFAULT_PORT),
+        default_value = "47558",  // DEFAULT_PORT
         help = "Port to listen on.",
     )]
     pub port: u16,

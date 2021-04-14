@@ -41,10 +41,13 @@ impl LockInfo {
 
 pub fn load_lock() -> Option<LockInfo> {
     let pth = get_lock_file();
-    let reader = BufReader::new(File::open(&pth)
-        .unwrap_or_else(|err| panic!("could not access the mangod lock file: '{}', reason: {}", pth.to_string_lossy(), err)));
-    serde_json::from_reader(reader)
-        .unwrap_or_else(|err| panic!("could not read the content of the mangod lock file (is it valid json?): '{}', reason: {}", pth.to_string_lossy(), err))
+    if let Ok(file) = File::open(&pth) {
+        let reader = BufReader::new(file);
+        Some(serde_json::from_reader(reader)
+            .unwrap_or_else(|err| panic!("could not read the content of the mangod lock file (is it valid json?): '{}', reason: {}", pth.to_string_lossy(), err)))
+    } else {
+        None
+    }
 }
 
 pub fn store_lock(info: &LockInfo) {
@@ -64,17 +67,7 @@ mod tests {
     #[serial]
     #[test]
     fn read_write_pid() {
-        let before = LockInfo::new(Some(1234), "localhost:47558");
-        store_lock(&before);
-        assert!(get_lock_file().is_file());
-        let after = load_lock();
-        assert_eq!(before, after);
-    }
-
-    #[serial]
-    #[test]
-    fn read_write_no_pid() {
-        let before = LockInfo::new(None, "127.0.0.1:80");
+        let before = LockInfo::new(1234, "localhost:47558");
         store_lock(&before);
         assert!(get_lock_file().is_file());
         let after = load_lock();
