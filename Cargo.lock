@@ -341,6 +341,7 @@ dependencies = [
  "env_logger",
  "log",
  "mangolib",
+ "paw",
  "structopt",
  "ws",
 ]
