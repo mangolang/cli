@@ -1,2 +1,3 @@
 
-mod paths;
+pub mod paths;
+pub mod lockfile;

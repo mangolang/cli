@@ -34,6 +34,7 @@ pub struct MangodStartArgs {
     )]
     pub port: u16,
 }
+//TODO @mark: worker thread count? or just set though socket?
 
 impl Default for MangodStartArgs {
     fn default() -> Self {
@@ -49,6 +50,7 @@ impl Default for MangodStartArgs {
     after_help = "Stop the mango compiler daemon if it is running in the background."
 )]
 pub struct MangodStopArgs {}
+//TODO @mark: force stop?
 
 #[derive(StructOpt, Debug)]
 #[structopt(
