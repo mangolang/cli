@@ -1,14 +1,12 @@
 use ::std::process::exit;
 
 use ::mango_cli_common::util::lockfile::load_lock;
+use mango::::check_status::{determine_status, MangodStatus};
+use mango::::get::get_property;
+use mango::::handle_cmd;
+use mango::::options::{MangodArgs, MangodCommand, MangodStartArgs};
+use mango::::startstop::{start, stop};
 
-use crate::status::check_status::{determine_status, MangodStatus};
-use crate::status::get::get_property;
-use crate::status::handle_cmd;
-use crate::status::options::{MangodArgs, MangodCommand, MangodStartArgs};
-use crate::status::startstop::{start, stop};
-
-mod status;
 mod connection;
 
 #[paw::main]

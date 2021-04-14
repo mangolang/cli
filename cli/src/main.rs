@@ -12,6 +12,7 @@ use crate::options::compile::Target;
 use crate::options::MangoArgs;
 
 mod options;
+mod status;
 
 #[paw::main]
 fn main(args: MangoArgs) {

@@ -6,8 +6,8 @@ use ::ws::listen;
 use ::mango_cli_common::util::lockfile::load_lock;
 use ::mango_cli_common::util::lockfile::LockInfo;
 
-use crate::status::options::{MangodGetCommand, MangodGetArgs, MangodStartArgs};
-use crate::status::check_status::MangodStatus;
+use mango::::options::{MangodGetCommand, MangodGetArgs, MangodStartArgs};
+use mango::::check_status::MangodStatus;
 use std::process::{Command, Output};
 use std::io::Error;
 

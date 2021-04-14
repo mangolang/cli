@@ -1,9 +1,9 @@
 use ::mango_cli_common::util::lockfile::LockInfo;
 
-use crate::status::check_status::MangodStatus;
-use crate::status::get::get_property;
-use crate::status::options::{MangodArgs, MangodCommand, MangodStartArgs};
-use crate::status::startstop::{start, stop};
+use mango::::check_status::MangodStatus;
+use mango::::get::get_property;
+use mango::::options::{MangodArgs, MangodCommand, MangodStartArgs};
+use mango::::startstop::{start, stop};
 
 pub mod options;
 pub mod startstop;
