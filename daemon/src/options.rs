@@ -4,10 +4,20 @@ use ::structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
 #[structopt(
-    after_help = "Mango documentation: https://docs.mangocode.org/\nWarning: all Mango daemon options are subject to change!"
+    before_help = "Mango compiler daemon that does the actual compilation in the background.\nIt is often preferable to only use `mango` and not touch `mangod` yourself.",
+    after_help = "Mango documentation: https://docs.mangocode.org/\nWarning: all Mango daemon options are subject to change!",
 )]
-#[rustfmt::skip]
 pub struct MangodArgs {
+    #[structopt(subcommand)]
+    pub cmd: Command,
+}
+
+#[derive(StructOpt, Debug)]
+#[structopt(
+    after_help = "Start the mango compiler daemon in the background."
+)]
+pub struct MangodStartArgs {
+
     #[structopt(
         short = "b",
         long = "hostname",
@@ -23,4 +33,29 @@ pub struct MangodArgs {
         help = "Port to listen on.",
     )]
     pub port: u16,
+}
+
+#[derive(StructOpt, Debug)]
+#[structopt(
+    after_help = "Stop the mango compiler daemon if it is running in the background."
+)]
+pub struct MangodStopArgs {}
+
+#[derive(StructOpt, Debug)]
+#[structopt(
+    after_help = "Stop the mango compiler daemon if it is running in the background."
+)]
+pub struct MangodGetPidArgs {}
+
+#[derive(StructOpt, Debug)]
+pub enum Command {
+    // Note: this particular about text is part of a Github Action to check the CLI
+    #[structopt(about = "Compile the code in the current directory to one of various formats")]
+    Start(MangodStartArgs),
+
+    #[structopt(about = "Run the current Mango project")]
+    Stop(MangodStopArgs),
+
+    #[structopt(about = "Execute tests for the current Mango project")]
+    GetPid(MangodGetPidArgs),
 }
