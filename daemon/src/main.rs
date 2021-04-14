@@ -1,10 +1,12 @@
+use ::std::process::exit;
+
 use ::mango_cli_common::util::lockfile::load_lock;
 
 use crate::status::check_status::{determine_status, MangodStatus};
 use crate::status::get::get_property;
-use crate::status::options::{MangodCommand, MangodArgs, MangodStartArgs};
-use crate::status::startstop::{start, stop};
 use crate::status::handle_cmd;
+use crate::status::options::{MangodArgs, MangodCommand, MangodStartArgs};
+use crate::status::startstop::{start, stop};
 
 mod status;
 mod connection;
@@ -16,5 +18,5 @@ fn main(args: MangodArgs) {
         Some(info) => determine_status(info.pid()),
         None => MangodStatus::Inactive,
     };
-    handle_cmd(&args, &lockfile, &status)
+    handle_cmd(&args, &status);
 }

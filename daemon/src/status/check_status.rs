@@ -1,5 +1,3 @@
-use ::std::process;
-
 #[derive(Debug)]
 pub enum MangodStatus {
     /// There is no lockfile to suggest mangod is running.
@@ -14,7 +12,7 @@ pub enum MangodStatus {
 
 impl MangodStatus {
     pub fn is_ok(&self) -> bool {
-        matches!(self, MangodStatus::Ok)
+        matches!(self, MangodStatus::Ok { .. })
     }
 
     pub fn as_str(&self) -> &str {
@@ -25,9 +23,9 @@ impl MangodStatus {
     pub fn as_code(&self) -> &str {
         match self {
             MangodStatus::Inactive => "not-started",
-            MangodStatus::NotFound => "died-unexpectedly",
-            MangodStatus::Unresponsive => "unresponsive",
-            MangodStatus::Ok => "running",
+            MangodStatus::NotFound { .. } => "died-unexpectedly",
+            MangodStatus::Unresponsive { .. } => "unresponsive",
+            MangodStatus::Ok { .. } => "running",
         }
     }
 }

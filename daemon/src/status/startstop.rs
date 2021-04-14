@@ -22,6 +22,6 @@ pub fn start(args: &MangodStartArgs, status: &MangodStatus) {
     }).unwrap()
 }
 
-pub fn stop(lock_info: &Option<LockInfo>, status: &MangodStatus) {
+pub fn stop(status: &MangodStatus) {
     unimplemented!()
 }
