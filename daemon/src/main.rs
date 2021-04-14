@@ -7,9 +7,13 @@ mod options;
 #[paw::main]
 fn main(args: MangodArgs) {
     match args.cmd {
-        Command::Start(start_args) => start(&start_args),
-        Command::Stop(_) => stop(),
-        Command::GetPid(_) => get_pid(),
+        None => {
+            eprintln!("no subcommand, assuming 'mangod start'");
+            start(&MangodStartArgs::default())
+        },
+        Some(Command::Start(start_args)) => start(&start_args),
+        Some(Command::Stop(_)) => stop(),
+        Some(Command::GetPid(_)) => get_pid(),
     }
 }
 

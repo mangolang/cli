@@ -9,7 +9,7 @@ use ::structopt::StructOpt;
 )]
 pub struct MangodArgs {
     #[structopt(subcommand)]
-    pub cmd: Command,
+    pub cmd: Option<Command>,
 }
 
 #[derive(StructOpt, Debug)]
@@ -33,6 +33,15 @@ pub struct MangodStartArgs {
         help = "Port to listen on.",
     )]
     pub port: u16,
+}
+
+impl Default for MangodStartArgs {
+    fn default() -> Self {
+        MangodStartArgs {
+            host: "localhost".to_owned(),
+            port: 47558,
+        }
+    }
 }
 
 #[derive(StructOpt, Debug)]
