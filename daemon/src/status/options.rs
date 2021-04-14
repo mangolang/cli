@@ -11,7 +11,7 @@ const DEFAULT_PORT: u16 = 47558;
 )]
 pub struct MangodArgs {
     #[structopt(subcommand)]
-    pub cmd: Option<Command>,
+    pub cmd: Option<MangodCommand>,
 }
 
 #[derive(StructOpt, Debug)]
@@ -60,11 +60,11 @@ pub struct MangodStopArgs {}
 )]
 pub struct MangodGetArgs {
     #[structopt(subcommand)]
-    pub cmd: GetCommand,
+    pub cmd: MangodGetCommand,
 }
 
 #[derive(StructOpt, Debug)]
-pub enum GetCommand {
+pub enum MangodGetCommand {
     #[structopt(about = "Get the status of mangod.")]
     Status,
 
@@ -77,7 +77,7 @@ pub enum GetCommand {
 
 
 #[derive(StructOpt, Debug)]
-pub enum Command {
+pub enum MangodCommand {
     #[structopt(about = "Compile the code in the current directory to one of various formats")]
     Start(MangodStartArgs),
 

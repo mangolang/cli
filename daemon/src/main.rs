@@ -2,10 +2,12 @@ use ::mango_cli_common::util::lockfile::load_lock;
 
 use crate::status::check_status::{determine_status, MangodStatus};
 use crate::status::get::get_property;
-use crate::status::options::{Command, MangodArgs, MangodStartArgs};
+use crate::status::options::{MangodCommand, MangodArgs, MangodStartArgs};
 use crate::status::startstop::{start, stop};
+use crate::status::handle_cmd;
 
 mod status;
+mod connection;
 
 #[paw::main]
 fn main(args: MangodArgs) {
@@ -14,13 +16,5 @@ fn main(args: MangodArgs) {
         Some(info) => determine_status(info.pid()),
         None => MangodStatus::Inactive,
     };
-    match args.cmd {
-        None => {
-            eprintln!("no subcommand, assuming 'mangod start'");
-            start(&MangodStartArgs::default(), &lockfile, &status)
-        },
-        Some(Command::Start(start_args)) => start(&start_args, &lockfile, &status),
-        Some(Command::Stop(_)) => stop(&lockfile, &status),
-        Some(Command::Get(get_args)) => get_property(&get_args, &lockfile, &status),
-    }
+    handle_cmd(&args, &lockfile, &status)
 }

@@ -6,10 +6,10 @@ use ::ws::listen;
 use ::mango_cli_common::util::lockfile::load_lock;
 use ::mango_cli_common::util::lockfile::LockInfo;
 
-use crate::status::options::{GetCommand, MangodGetArgs, MangodStartArgs};
+use crate::status::options::{MangodGetCommand, MangodGetArgs, MangodStartArgs};
 use crate::status::check_status::MangodStatus;
 
-pub fn start(args: &MangodStartArgs, lock_info: &Option<LockInfo>, status: &MangodStatus) {
+pub fn start(args: &MangodStartArgs, status: &MangodStatus) {
     assert!(!args.host.contains(":"));
     assert!(!args.host.contains(" "));
     let addr = format!("{}:{}", &args.host, &args.port);
