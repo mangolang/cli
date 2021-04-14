@@ -6,8 +6,8 @@ use ::ws::listen;
 use ::mango_cli_common::util::lockfile::load_lock;
 use ::mango_cli_common::util::lockfile::LockInfo;
 
-use crate::status::options::{MangodGetCommand, MangodGetArgs, MangodStartArgs};
 use crate::status::check_status::MangodStatus;
+use crate::status::options::{MangodGetArgs, MangodGetCommand, MangodStartArgs};
 
 pub fn get_property(args: &MangodGetArgs, status: &MangodStatus) {
     match args.cmd {

@@ -8,6 +8,8 @@ use ::mango_cli_common::util::lockfile::LockInfo;
 
 use crate::status::options::{MangodGetCommand, MangodGetArgs, MangodStartArgs};
 use crate::status::check_status::MangodStatus;
+use std::process::{Command, Output};
+use std::io::Error;
 
 pub fn start(args: &MangodStartArgs, status: &MangodStatus) {
     assert!(!args.host.contains(":"));
@@ -23,5 +25,20 @@ pub fn start(args: &MangodStartArgs, status: &MangodStatus) {
 }
 
 pub fn stop(status: &MangodStatus) {
+    let (pid, addr) = match status {
+        MangodStatus::Inactive => {
+            eprintln!("mangod is not running");
+            return
+        },
+        MangodStatus::NotFound { pid: pid } => {
+            eprintln!("mangod process is not found (pid: {})", pid);
+            return
+        }
+        MangodStatus::Unresponsive { pid: pid, address: addr } => (pid, addr),
+        MangodStatus::Ok { pid: pid, address: addr } => (pid, addr),
+    };
     unimplemented!()
+    //TODO @mark: send stop message
+    //TODO @mark: if that doesn't work, kill
+    //TODO @mark: if successful, remove lock file
 }

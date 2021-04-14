@@ -5,6 +5,7 @@ use ::std::time::SystemTime;
 use ::std::time::UNIX_EPOCH;
 
 use ::serde::{Deserialize, Serialize};
+use ::whoami;
 
 use crate::util::paths::get_lock_file;
 
@@ -13,6 +14,8 @@ pub struct LockInfo {
     pid: u32,
     address: String,
     update_ts: u64,
+    username: String,
+    hostname: String,
 }
 
 impl LockInfo {
@@ -27,6 +30,8 @@ impl LockInfo {
             pid,
             update_ts,
             address,
+            username: whoami::username(),
+            hostname: whoami::hostname()
         }
     }
 
