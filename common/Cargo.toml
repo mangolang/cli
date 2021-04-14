@@ -23,4 +23,6 @@ serde_json = "1.0.64"
 dirs = "3.0.1"
 
 [dev-dependencies]
+serial_test = "0.5.1"
+
 
