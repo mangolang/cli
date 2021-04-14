@@ -65,6 +65,9 @@ pub struct MangodGetArgs {
 
 #[derive(StructOpt, Debug)]
 pub enum GetCommand {
+    #[structopt(about = "Get the status of mangod.")]
+    Status,
+
     #[structopt(about = "Get the process id of the currently running mangod, if any.")]
     Pid,
 
