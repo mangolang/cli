@@ -9,6 +9,8 @@ use ::ws::listen;
 
 mod connection;
 
+//TODO @mark: stop gracefully and remove lockfile on shutdown hook
+
 #[paw::main]
 fn main(args: MangodArgs) {
     env_logger::init();
@@ -65,5 +67,6 @@ fn launch(args: &MangodArgs) {
         move |msg| {
             out.send(msg)
         }
-    }).unwrap()
+    }).unwrap();
+    eprintln!("bye from mangod");  //TODO @mark: TEMPORARY! REMOVE THIS!
 }
