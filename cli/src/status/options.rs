@@ -10,15 +10,6 @@ const DEFAULT_PORT: u16 = 47558;
     after_help = "Mango documentation: https://docs.mangocode.org/\nWarning: all Mango daemon options are subject to change!",
 )]
 pub struct MangodArgs {
-    #[structopt(subcommand)]
-    pub cmd: Option<MangodCommand>,
-}
-
-#[derive(StructOpt, Debug)]
-#[structopt(
-    after_help = "Start the mango compiler daemon in the background."
-)]
-pub struct MangodStartArgs {
 
     #[structopt(
         short = "b",
@@ -35,55 +26,36 @@ pub struct MangodStartArgs {
         help = "Port to listen on.",
     )]
     pub port: u16,
+
+    #[structopt(
+        long = "cpus",
+        help = "The number of compile worker threads.",
+    )]
+    pub worker_count: Option<u16>,
+
+    #[structopt(
+        long = "memory",
+        help = "The amount of memory used for the compile cache.",
+    )]
+    pub cache_mem_mb: Option<u32>,
+
+    #[structopt(
+        long = "ignore-running",
+        default_value = "false",
+        help = "Start the daemon even if there is already one running. Not recommended.",
+    )]
+    pub ignore_running: bool,
 }
 //TODO @mark: worker thread count? or just set though socket?
 
-impl Default for MangodStartArgs {
+impl Default for MangodArgs {
     fn default() -> Self {
-        MangodStartArgs {
+        MangodArgs {
             host: "localhost".to_owned(),
             port: DEFAULT_PORT,
+            worker_count: None,
+            cache_mem_mb: None,
+            ignore_running: false,
         }
     }
-}
-
-#[derive(StructOpt, Debug)]
-#[structopt(
-    after_help = "Stop the mango compiler daemon if it is running in the background."
-)]
-pub struct MangodStopArgs {}
-//TODO @mark: force stop?
-
-#[derive(StructOpt, Debug)]
-#[structopt(
-    after_help = "Stop the mango compiler daemon if it is running in the background."
-)]
-pub struct MangodGetArgs {
-    #[structopt(subcommand)]
-    pub cmd: MangodGetCommand,
-}
-
-#[derive(StructOpt, Debug)]
-pub enum MangodGetCommand {
-    #[structopt(about = "Get the status of mangod.")]
-    Status,
-
-    #[structopt(about = "Get the process id of the currently running mangod, if any.")]
-    Pid,
-
-    #[structopt(about = "Get the address that mangod is currently available at, if any.")]
-    Address,
-}
-
-
-#[derive(StructOpt, Debug)]
-pub enum MangodCommand {
-    #[structopt(about = "Compile the code in the current directory to one of various formats")]
-    Start(MangodStartArgs),
-
-    #[structopt(about = "Run the current Mango project")]
-    Stop(MangodStopArgs),
-
-    #[structopt(about = "Execute tests for the current Mango project")]
-    Get(MangodGetArgs),
 }

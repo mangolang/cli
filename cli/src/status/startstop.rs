@@ -1,17 +1,16 @@
+use ::std::io::Error;
 use ::std::process;
+use ::std::process::{Command, Output};
 use ::std::process::exit;
-
-use ::ws::listen;
 
 use ::mango_cli_common::util::lockfile::load_lock;
 use ::mango_cli_common::util::lockfile::LockInfo;
+use ::ws::listen;
 
-use mango::::options::{MangodGetCommand, MangodGetArgs, MangodStartArgs};
-use mango::::check_status::MangodStatus;
-use std::process::{Command, Output};
-use std::io::Error;
+use crate::status::check_status::MangodStatus;
+use crate::status::options::MangodArgs;
 
-pub fn start(args: &MangodStartArgs, status: &MangodStatus) {
+pub fn start_daemon(args: &MangodArgs, status: &MangodStatus) {
     assert!(!args.host.contains(":"));
     assert!(!args.host.contains(" "));
     let addr = format!("{}:{}", &args.host, &args.port);
@@ -24,7 +23,7 @@ pub fn start(args: &MangodStartArgs, status: &MangodStatus) {
     }).unwrap()
 }
 
-pub fn stop(status: &MangodStatus) {
+pub fn stop_daemon(status: &MangodStatus) {
     let (pid, addr) = match status {
         MangodStatus::Inactive => {
             eprintln!("mangod is not running");
