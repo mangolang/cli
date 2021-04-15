@@ -1,7 +1,11 @@
 use ::std::sync::RwLock;
+use ::std::time::{SystemTime, UNIX_EPOCH};
 
 use ::lazy_static::lazy_static;
-use std::time::{UNIX_EPOCH, SystemTime};
+use ::ws::connect;
+
+use crate::util::load_lock;
+use ws::CloseCode;
 
 lazy_static! {
     static ref LAST_STATUS: RwLock<Option<(u128, MangodStatus)>> = RwLock::new(None);
@@ -18,8 +22,8 @@ pub enum MangodStatus {
 }
 
 impl MangodStatus {
-    pub fn determine(pid: u32, address: impl Into<String>) -> Self {
-        get_status(pid, address)
+    pub fn determine() -> Self {
+        get_status()
     }
 
     pub fn is_ok(&self) -> bool {
@@ -40,7 +44,7 @@ impl MangodStatus {
     }
 }
 
-fn get_status(pid: u32, address: impl Into<String>) -> MangodStatus {
+fn get_status() -> MangodStatus {
 
     // Check if there is a recent status in the cache.
     LAST_STATUS.read().unwrap().as_ref().and_then(|(previous_ms, status)| {
@@ -53,9 +57,24 @@ fn get_status(pid: u32, address: impl Into<String>) -> MangodStatus {
         } else {
             None
         }
-    }).unwrap_or_else(|| determine_status(pid, address))
+    }).unwrap_or_else(|| determine_status(address))
 }
 
-fn determine_status(pid: u32, address: impl Into<String>) -> MangodStatus {
-    unimplemented!()  //TODO @mark: TEMPORARY! REMOVE THIS!
+fn determine_status(address: impl Into<String>) -> MangodStatus {
+    let address = address.into();
+    eprintln!("determining status");  //TODO @mark: TEMPORARY! REMOVE THIS!
+
+    if let Some(info) = load_lock() {
+        connect(format!("ws://{}", info.address()), |out| {
+            //TODO @mark: change this to bincode with serde
+            out.send("ping").unwrap();
+            move |msg| {
+                if msg == "pong" {
+                    true
+                }
+                out.close(CloseCode::Normal)
+            }
+        }).unwrap()
+    }
+    MangodStatus::Inactive
 }

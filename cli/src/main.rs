@@ -7,12 +7,10 @@
 // #[allow(unused_imports)]
 // use ::mangolib;
 
-use ::mango_cli_common::util::lockfile::load_lock;
 
 use crate::options::Command;
 use crate::options::compile::Target;
 use crate::options::MangoArgs;
-use mango_cli_common::util::check_status::{determine_status, MangodStatus};
 
 mod options;
 mod status;
@@ -23,11 +21,11 @@ fn main(args: MangoArgs) {
 }
 
 pub fn cli(args: MangoArgs) {
-    let lockfile = load_lock();
-    let status = match &lockfile {
-        Some(info) => determine_status(info.pid()),
-        None => MangodStatus::Inactive,
-    };
+    // let lockfile = load_lock();
+    // let status = match &lockfile {
+    //     Some(info) => determine_status(info.pid()),
+    //     None => MangodStatus::Inactive,
+    // };
     match args.cmd {
         Command::Compile(compile) => match compile.target {
             Target::Check {} => {
