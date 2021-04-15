@@ -1,11 +1,13 @@
+use ::std::sync::mpsc::channel;
 use ::std::sync::RwLock;
 use ::std::time::{SystemTime, UNIX_EPOCH};
 
 use ::lazy_static::lazy_static;
+use ::ws::CloseCode;
 use ::ws::connect;
+use ws::Message;
 
 use crate::util::load_lock;
-use ws::CloseCode;
 
 lazy_static! {
     static ref LAST_STATUS: RwLock<Option<(u128, MangodStatus)>> = RwLock::new(None);
@@ -16,9 +18,9 @@ pub enum MangodStatus {
     /// There is no lockfile to suggest mangod is running.
     Inactive,
     /// There is a lockfile, but no mangod is responding to requests.
-    Unresponsive { pid: u32, address: String },
+    Unresponsive { address: String },
     /// The mangod process is running and responding to requests.
-    Ok { pid: u32, address: String },
+    Ok { address: String },
 }
 
 impl MangodStatus {
@@ -57,24 +59,34 @@ fn get_status() -> MangodStatus {
         } else {
             None
         }
-    }).unwrap_or_else(|| determine_status(address))
+    }).unwrap_or_else(|| determine_status())
 }
 
-fn determine_status(address: impl Into<String>) -> MangodStatus {
-    let address = address.into();
+fn determine_status() -> MangodStatus {
     eprintln!("determining status");  //TODO @mark: TEMPORARY! REMOVE THIS!
 
+    let (sender, receiver) = channel();
     if let Some(info) = load_lock() {
+
+        // Send ping message to the server.
         connect(format!("ws://{}", info.address()), |out| {
             //TODO @mark: change this to bincode with serde
             out.send("ping").unwrap();
-            move |msg| {
-                if msg == "pong" {
-                    true
-                }
+            move |msg: Message| {
+                let got_pong = msg.as_text().unwrap() == "pong";
+                sender.send(got_pong);
                 out.close(CloseCode::Normal)
             }
-        }).unwrap()
+        }).unwrap();
+        //TODO @mark: get rid of unwraps
+        //TODO @mark: add timeouts
+
+        // Check if we got a pong message back.
+        return match receiver.recv().unwrap() {
+            true => MangodStatus::Ok { address: info.address().to_owned() },
+            false => MangodStatus::Unresponsive { address: info.address().to_owned() },
+        }
     }
+
     MangodStatus::Inactive
 }
