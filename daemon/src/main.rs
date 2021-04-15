@@ -1,4 +1,6 @@
-use mango_cli_common::util::{MangodArgs, load_lock, MangodStatus};
+use ::std::process::exit;
+
+use ::mango_cli_common::util::{load_lock, MangodArgs, MangodStatus};
 
 mod connection;
 
@@ -29,8 +31,27 @@ fn abort_if_running(new_addr: &str) {
     };
     match status {
         MangodStatus::Inactive => {},
-        MangodStatus::NotFound { pid: pid } => {},
-        MangodStatus::Unresponsive { pid: pid, address: old_address } => {},
-        MangodStatus::Ok { pid: pid, address: old_address } => {},
+        MangodStatus::NotFound { pid: pid } => {
+            eprintln!("there is a lockfile for mangod but the process could not be found (pid: {})", &pid);
+            exit(1);
+        },
+        MangodStatus::Unresponsive { pid: pid, address: old_addr } => {
+            if old_addr == new_addr {
+                eprintln!("mangod is already running at {} but is not responding", &old_addr);
+                exit(1);
+            } else {
+                eprintln!("mangod is already running, but with address '{}' instead of '{}'; stop it and restart with the new address", &old_addr, &new_addr);
+                exit(1);
+            }
+        },
+        MangodStatus::Ok { pid: pid, address: old_addr } => {
+            if old_addr == new_addr {
+                eprintln!("mangod is already running at {}", &old_addr);
+                exit(0);
+            } else {
+                eprintln!("mangod is already running, but with address '{}' instead of '{}'; stop it and restart with the new address", &old_addr, &new_addr);
+                exit(1);
+            }
+        },
     }
 }
