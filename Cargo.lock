@@ -423,6 +423,7 @@ version = "0.6.0"
 dependencies = [
  "bincode",
  "dirs",
+ "lazy_static",
  "serde",
  "serde_json",
  "serial_test",

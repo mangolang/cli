@@ -31,7 +31,7 @@ fn abort_if_running(new_addr: &str) {
     };
     match status {
         MangodStatus::Inactive => {},
-        MangodStatus::Unresponsive { pid: pid, address: old_addr } => {
+        MangodStatus::Unresponsive { pid, address: old_addr } => {
             if old_addr == new_addr {
                 eprintln!("mangod is already running at {} but is not responding (pid: {})", &old_addr, pid);
                 exit(1);
@@ -40,7 +40,7 @@ fn abort_if_running(new_addr: &str) {
                 exit(1);
             }
         },
-        MangodStatus::Ok { pid: pid, address: old_addr } => {
+        MangodStatus::Ok { address: old_addr, .. } => {
             if old_addr == new_addr {
                 eprintln!("mangod is already running at {}", &old_addr);
                 exit(0);
