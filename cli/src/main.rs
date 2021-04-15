@@ -12,7 +12,7 @@ use ::mango_cli_common::util::lockfile::load_lock;
 use crate::options::Command;
 use crate::options::compile::Target;
 use crate::options::MangoArgs;
-use crate::status::check_status::{determine_status, MangodStatus};
+use mango_cli_common::util::check_status::{determine_status, MangodStatus};
 
 mod options;
 mod status;

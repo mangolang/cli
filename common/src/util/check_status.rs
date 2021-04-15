@@ -1,3 +1,6 @@
+
+
+
 #[derive(Debug)]
 pub enum MangodStatus {
     /// There is no lockfile to suggest mangod is running.
@@ -11,6 +14,10 @@ pub enum MangodStatus {
 }
 
 impl MangodStatus {
+    pub fn determine(pid: u32, address: impl Into<String>) -> Self {
+        determine_status(pid, address)
+    }
+
     pub fn is_ok(&self) -> bool {
         matches!(self, MangodStatus::Ok { .. })
     }
@@ -30,7 +37,7 @@ impl MangodStatus {
     }
 }
 
-pub fn determine_status(pid: u32) -> MangodStatus {
+fn determine_status(pid: u32, address: impl Into<String>) -> MangodStatus {
     unimplemented!()
 }
 

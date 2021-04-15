@@ -41,7 +41,6 @@ pub struct MangodArgs {
 
     #[structopt(
         long = "ignore-running",
-        default_value = "false",
         help = "Start the daemon even if there is already one running. Not recommended.",
     )]
     pub ignore_running: bool,

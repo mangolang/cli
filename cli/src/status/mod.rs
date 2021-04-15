@@ -1,14 +1,12 @@
 use ::mango_cli_common::util::lockfile::LockInfo;
+use mango_cli_common::util::check_status::MangodStatus;
+use mango_cli_common::util::mangod_options::{MangodArgs, MangodArgs, MangodCommand};
 
-use crate::status::options::{MangodArgs, MangodArgs, MangodCommand};
-use crate::status::check_status::MangodStatus;
-use crate::status::startstop::{start_daemon, stop_daemon};
 use crate::status::get::get_daemon_property;
+use crate::status::startstop::{start_daemon, stop_daemon};
 
-pub mod options;
 pub mod startstop;
 pub mod get;
-pub mod check_status;
 
 pub fn handle_cmd(args: &MangodArgs, status: &MangodStatus) {
     match &args.cmd {

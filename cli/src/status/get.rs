@@ -5,8 +5,8 @@ use ::mango_cli_common::util::lockfile::load_lock;
 use ::mango_cli_common::util::lockfile::LockInfo;
 use ::ws::listen;
 
-use crate::status::check_status::MangodStatus;
-use crate::status::options::{MangodGetArgs, MangodGetCommand};
+use mango_cli_common::util::check_status::MangodStatus;
+use mango_cli_common::util::mangod_options::{MangodGetArgs, MangodGetCommand};
 
 pub fn get_daemon_property(args: &MangodGetArgs, status: &MangodStatus) {
     match args.cmd {

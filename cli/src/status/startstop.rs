@@ -7,8 +7,8 @@ use ::mango_cli_common::util::lockfile::load_lock;
 use ::mango_cli_common::util::lockfile::LockInfo;
 use ::ws::listen;
 
-use crate::status::check_status::MangodStatus;
-use crate::status::options::MangodArgs;
+use mango_cli_common::util::check_status::MangodStatus;
+use mango_cli_common::util::mangod_options::MangodArgs;
 
 pub fn start_daemon(args: &MangodArgs, status: &MangodStatus) {
     assert!(!args.host.contains(":"));
