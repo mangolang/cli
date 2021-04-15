@@ -31,13 +31,9 @@ fn abort_if_running(new_addr: &str) {
     };
     match status {
         MangodStatus::Inactive => {},
-        MangodStatus::NotFound { pid: pid } => {
-            eprintln!("there is a lockfile for mangod but the process could not be found (pid: {})", &pid);
-            exit(1);
-        },
         MangodStatus::Unresponsive { pid: pid, address: old_addr } => {
             if old_addr == new_addr {
-                eprintln!("mangod is already running at {} but is not responding", &old_addr);
+                eprintln!("mangod is already running at {} but is not responding (pid: {})", &old_addr, pid);
                 exit(1);
             } else {
                 eprintln!("mangod is already running, but with address '{}' instead of '{}'; stop it and restart with the new address", &old_addr, &new_addr);
