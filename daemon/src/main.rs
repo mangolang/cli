@@ -28,6 +28,7 @@ fn main(args: MangodArgs) {
 
 fn abort_if_running(new_addr: &str) {
     let status = MangodStatus::determine();
+    let status = MangodStatus::determine();
     dbg!(&status);
     match status {
         MangodStatus::Inactive => {},

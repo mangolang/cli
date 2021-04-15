@@ -69,17 +69,21 @@ fn determine_status() -> MangodStatus {
     if let Some(info) = load_lock() {
 
         // Send ping message to the server.
-        connect(format!("ws://{}", info.address()), |out| {
+        if let Err(_) = connect(format!("ws://{}", info.address()), |out| {
             //TODO @mark: change this to bincode with serde
-            out.send("ping").unwrap();
             let sender = sender.clone();
+            if let Err(_) = out.send("ping") {
+                sender.send(false);
+                out.close(CloseCode::Normal);
+            }
             move |msg: Message| {
                 let got_pong = msg.as_text().unwrap() == "pong";
                 sender.send(got_pong).unwrap();
                 out.close(CloseCode::Normal)
             }
-        }).unwrap();
-        //TODO @mark: get rid of unwraps
+        }) {
+            return MangodStatus::Unresponsive { address: info.address().to_owned() }
+        };
         //TODO @mark: add timeouts
 
         // Check if we got a pong message back.
