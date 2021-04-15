@@ -47,6 +47,14 @@ pub struct MangodArgs {
 }
 
 impl MangodArgs {
+    pub fn address(&self) -> String {
+        assert!(!self.host.contains(":"));
+        assert!(!self.host.contains(" "));
+        format!("{}:{}", &self.host, &self.port)
+    }
+}
+
+impl MangodArgs {
     pub fn as_vec(&self) -> Vec<String> {
         let mut args = vec![];
         args.push("--hostname".to_owned());

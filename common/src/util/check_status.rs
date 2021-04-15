@@ -80,7 +80,7 @@ fn determine_status() -> MangodStatus {
 
 pub fn can_ping(address: &str) -> bool {
     let (sender, receiver) = channel();
-    let timeout = Duration::new(0, 700_000_000);
+    let timeout = Duration::from_millis(700);
 
     // Send ping message to the server.
     if let Err(_) = connect(format!("ws://{}", address), |out| {

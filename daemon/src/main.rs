@@ -12,7 +12,7 @@ mod connection;
 #[paw::main]
 fn main(args: MangodArgs) {
     env_logger::init();
-    let addr = format!("{}:{}", &args.host, args.port);
+    let addr = &args.address();
     if !args.ignore_running {
         abort_if_running(&addr);
     }
@@ -33,7 +33,6 @@ fn main(args: MangodArgs) {
 
 fn abort_if_running(new_addr: &str) {
     let status = MangodStatus::determine();
-    dbg!(&status);
     match status {
         MangodStatus::Inactive => {},
         MangodStatus::Unresponsive { address: old_addr } => {
@@ -58,9 +57,7 @@ fn abort_if_running(new_addr: &str) {
 }
 
 fn launch(args: &MangodArgs) {
-    assert!(!args.host.contains(":"));
-    assert!(!args.host.contains(" "));
-    let addr = format!("{}:{}", &args.host, &args.port);
+    let addr = args.address();
     println!("starting mangod, listening on {}", &addr);
     let lock = LockInfo::new(process::id(), &addr);
     store_lock(&lock);

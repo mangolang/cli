@@ -10,7 +10,7 @@ pub mod get;
 //TODO @mark: TEMPORARY! REMOVE THIS!
 pub fn handle_daemon_cmd(args: &DaemonCmd, status: &MangodStatus) {
     match args {
-        DaemonCmd::Start(start_args) => start_daemon(&start_args, &status),
+        DaemonCmd::Start(start_args) => start_daemon(&start_args),
         DaemonCmd::Stop(_) => stop_daemon(status),
         DaemonCmd::Get(get_args) => get_daemon_property(&get_args, &status),
     }
