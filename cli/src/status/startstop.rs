@@ -1,14 +1,8 @@
-use ::std::io::Error;
 use ::std::process;
-use ::std::process::{Command, Output};
-use ::std::process::exit;
 
-use ::mango_cli_common::util::lockfile::load_lock;
-use ::mango_cli_common::util::lockfile::LockInfo;
 use ::ws::listen;
 
-use mango_cli_common::util::check_status::MangodStatus;
-use mango_cli_common::util::mangod_options::MangodArgs;
+use mango_cli_common::util::{LockInfo, MangodArgs, MangodStatus};
 
 pub fn start_daemon(args: &MangodArgs, status: &MangodStatus) {
     assert!(!args.host.contains(":"));
@@ -24,17 +18,13 @@ pub fn start_daemon(args: &MangodArgs, status: &MangodStatus) {
 }
 
 pub fn stop_daemon(status: &MangodStatus) {
-    let (pid, addr) = match status {
+    let addr = match status {
         MangodStatus::Inactive => {
             eprintln!("mangod is not running");
             return
         },
-        MangodStatus::NotFound { pid: pid } => {
-            eprintln!("mangod process is not found (pid: {})", pid);
-            return
-        }
-        MangodStatus::Unresponsive { pid: pid, address: addr } => (pid, addr),
-        MangodStatus::Ok { pid: pid, address: addr } => (pid, addr),
+        MangodStatus::Unresponsive { address: addr } => addr,
+        MangodStatus::Ok { address: addr } => addr,
     };
     unimplemented!()
     //TODO @mark: send stop message

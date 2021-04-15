@@ -1,6 +1,7 @@
 use ::std::sync::mpsc::channel;
 use ::std::sync::RwLock;
 use ::std::time::{SystemTime, UNIX_EPOCH};
+use ::std::time::Duration;
 
 use ::lazy_static::lazy_static;
 use ::ws::CloseCode;
@@ -73,8 +74,8 @@ fn determine_status() -> MangodStatus {
             //TODO @mark: change this to bincode with serde
             let sender = sender.clone();
             if let Err(_) = out.send("ping") {
-                sender.send(false);
-                out.close(CloseCode::Normal);
+                sender.send(false).unwrap();
+                out.close(CloseCode::Normal).unwrap();
             }
             move |msg: Message| {
                 let got_pong = msg.as_text().unwrap() == "pong";
@@ -87,9 +88,9 @@ fn determine_status() -> MangodStatus {
         //TODO @mark: add timeouts
 
         // Check if we got a pong message back.
-        return match receiver.recv().unwrap() {
-            true => MangodStatus::Ok { address: info.address().to_owned() },
-            false => MangodStatus::Unresponsive { address: info.address().to_owned() },
+        return match receiver.recv_timeout(Duration::new(1, 0)) {
+            Ok(true) => MangodStatus::Ok { address: info.address().to_owned() },
+            Err(_) | Ok(false) => MangodStatus::Unresponsive { address: info.address().to_owned() },
         }
     }
 
