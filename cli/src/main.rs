@@ -12,11 +12,14 @@ use crate::options::Command;
 use crate::options::compile::Target;
 use crate::options::MangoArgs;
 
+use ::env_logger;
+
 mod options;
 mod status;
 
 #[paw::main]
 fn main(args: MangoArgs) {
+    env_logger::init();
     cli(args)
 }
 

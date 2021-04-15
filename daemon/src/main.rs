@@ -1,11 +1,14 @@
 use ::std::process::exit;
 
-use ::mango_cli_common::util::{load_lock, MangodArgs, MangodStatus};
+use ::mango_cli_common::util::{MangodArgs, MangodStatus};
+
+use ::env_logger;
 
 mod connection;
 
 #[paw::main]
 fn main(args: MangodArgs) {
+    env_logger::init();
     let addr = format!("{}:{}", &args.host, args.port);
     if !args.ignore_running {
         abort_if_running(&addr);
@@ -24,16 +27,13 @@ fn main(args: MangodArgs) {
 }
 
 fn abort_if_running(new_addr: &str) {
-    let lockinfo = load_lock();
-    let status = match &lockinfo {
-        Some(info) => MangodStatus::determine(info.pid(), info.address()),
-        None => MangodStatus::Inactive,
-    };
+    let status = MangodStatus::determine();
+    dbg!(&status);
     match status {
         MangodStatus::Inactive => {},
-        MangodStatus::Unresponsive { pid, address: old_addr } => {
+        MangodStatus::Unresponsive { address: old_addr } => {
             if old_addr == new_addr {
-                eprintln!("mangod is already running at {} but is not responding (pid: {})", &old_addr, pid);
+                eprintln!("mangod is already running at {} but is not responding", &old_addr);
                 exit(1);
             } else {
                 eprintln!("mangod is already running, but with address '{}' instead of '{}'; stop it and restart with the new address", &old_addr, &new_addr);

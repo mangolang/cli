@@ -11,7 +11,7 @@ use crate::util::paths::get_lock_file;
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct LockInfo {
-    pid: u32,
+    pid: Option<u32>,
     address: String,
     update_ts: u64,
     username: String,
@@ -27,16 +27,12 @@ impl LockInfo {
             .unwrap()
             .as_secs();
         LockInfo {
-            pid,
+            pid: Some(pid),
             update_ts,
             address,
             username: whoami::username(),
             hostname: whoami::hostname()
         }
-    }
-
-    pub fn pid(&self) -> u32 {
-        self.pid
     }
 
     pub fn address(&self) -> &str {
@@ -75,7 +71,7 @@ mod tests {
         let before = LockInfo::new(1234, "localhost:47558");
         store_lock(&before);
         assert!(get_lock_file().is_file());
-        let after = load_lock();
+        let after = load_lock().unwrap();
         assert_eq!(before, after);
     }
 }

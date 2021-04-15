@@ -5,7 +5,7 @@ use ::std::time::{SystemTime, UNIX_EPOCH};
 use ::lazy_static::lazy_static;
 use ::ws::CloseCode;
 use ::ws::connect;
-use ws::Message;
+use ::ws::Message;
 
 use crate::util::load_lock;
 
@@ -72,9 +72,10 @@ fn determine_status() -> MangodStatus {
         connect(format!("ws://{}", info.address()), |out| {
             //TODO @mark: change this to bincode with serde
             out.send("ping").unwrap();
+            let sender = sender.clone();
             move |msg: Message| {
                 let got_pong = msg.as_text().unwrap() == "pong";
-                sender.send(got_pong);
+                sender.send(got_pong).unwrap();
                 out.close(CloseCode::Normal)
             }
         }).unwrap();

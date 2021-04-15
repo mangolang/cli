@@ -35,7 +35,7 @@ pub struct MangodArgs {
 
     #[structopt(
         long = "memory",
-        help = "The amount of memory used for the compile cache.",
+        help = "The amount of memory used for the compile cache (in MB).",
     )]
     pub cache_mem_mb: Option<u32>,
 
