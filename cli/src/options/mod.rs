@@ -38,11 +38,11 @@ pub struct MangoArgs {
     pub daemon: bool,
 
     #[structopt(subcommand)]
-    pub cmd: Command,
+    pub cmd: MangoCommand,
 }
 
 #[derive(StructOpt, Debug)]
-pub enum Command {
+pub enum MangoCommand {
     // Note: this particular about text is part of a Github Action to check the CLI
     #[structopt(about = "Compile the code in the current directory to one of various formats")]
     Compile(compile::CompileCmd),

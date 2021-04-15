@@ -12,7 +12,7 @@ use ::env_logger;
 
 use ::mango_cli_common::util::MangodStatus;
 
-use crate::options::Command;
+use crate::options::MangoCommand;
 use crate::options::compile::Target;
 use crate::options::MangoArgs;
 use crate::status::handle_daemon_cmd;
@@ -32,9 +32,9 @@ pub fn cli(args: MangoArgs) {
     //     Some(info) => determine_status(info.pid()),
     //     None => MangodStatus::Inactive,
     // };
-    let status = MangodStatus:determine();
+    let status = MangodStatus::determine();
     match args.cmd {
-        Command::Compile(compile) => match compile.target {
+        MangoCommand::Compile(compile) => match compile.target {
             Target::Check {} => {
                 println!("Checking code...");
                 todo!()
@@ -50,10 +50,10 @@ pub fn cli(args: MangoArgs) {
             }
             _ => eprintln!("This operation is not supported yet"),
         },
-        Command::Run(_) => eprintln!("Run is not supported yet"),
-        Command::Test(_) => eprintln!("Test is not supported yet"),
-        Command::Clean(_) => eprintln!("Cleaning output is not supported yet"),
-        Command::Daemon(cmd) => handle_daemon_cmd(&cmd, &status),
+        MangoCommand::Run(_) => eprintln!("Run is not supported yet"),
+        MangoCommand::Test(_) => eprintln!("Test is not supported yet"),
+        MangoCommand::Clean(_) => eprintln!("Cleaning output is not supported yet"),
+        MangoCommand::Daemon(cmd) => handle_daemon_cmd(&cmd, &status),
     };
 }
 

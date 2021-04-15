@@ -64,7 +64,6 @@ fn get_status() -> MangodStatus {
 }
 
 fn determine_status() -> MangodStatus {
-    eprintln!("determining status");  //TODO @mark: TEMPORARY! REMOVE THIS!
 
     let (sender, receiver) = channel();
     if let Some(info) = load_lock() {
@@ -85,7 +84,6 @@ fn determine_status() -> MangodStatus {
         }) {
             return MangodStatus::Unresponsive { address: info.address().to_owned() }
         };
-        //TODO @mark: add timeouts
 
         // Check if we got a pong message back.
         return match receiver.recv_timeout(Duration::new(1, 0)) {

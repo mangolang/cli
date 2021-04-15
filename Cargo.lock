@@ -500,6 +500,7 @@ dependencies = [
  "mangolib",
  "paw",
  "structopt",
+ "ws",
 ]
 
 [[package]]

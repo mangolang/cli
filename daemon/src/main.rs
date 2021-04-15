@@ -3,6 +3,9 @@ use ::std::process::exit;
 use ::mango_cli_common::util::{MangodArgs, MangodStatus};
 
 use ::env_logger;
+use ::mango_cli_common::util::{LockInfo, store_lock};
+use ::std::process;
+use ::ws::listen;
 
 mod connection;
 
@@ -13,6 +16,8 @@ fn main(args: MangodArgs) {
     if !args.ignore_running {
         abort_if_running(&addr);
     }
+    launch(&args);
+
     // host
     // port
     // worker_count
@@ -27,7 +32,6 @@ fn main(args: MangodArgs) {
 }
 
 fn abort_if_running(new_addr: &str) {
-    let status = MangodStatus::determine();
     let status = MangodStatus::determine();
     dbg!(&status);
     match status {
@@ -51,4 +55,18 @@ fn abort_if_running(new_addr: &str) {
             }
         },
     }
+}
+
+fn launch(args: &MangodArgs) {
+    assert!(!args.host.contains(":"));
+    assert!(!args.host.contains(" "));
+    let addr = format!("{}:{}", &args.host, &args.port);
+    println!("starting mangod, listening on {}", &addr);
+    let lock = LockInfo::new(process::id(), &addr);
+    store_lock(&lock);
+    listen(&addr, |out| {
+        move |msg| {
+            out.send(msg)
+        }
+    }).unwrap()
 }

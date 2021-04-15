@@ -45,7 +45,28 @@ pub struct MangodArgs {
     )]
     pub ignore_running: bool,
 }
-//TODO @mark: worker thread count? or just set though socket?
+
+impl MangodArgs {
+    pub fn as_vec(&self) -> Vec<String> {
+        let mut args = vec![];
+        args.push("--host".to_owned());
+        args.push(self.host.clone());
+        args.push("--port".to_owned());
+        args.push(self.port.to_string());
+        if let Some(workers) = self.worker_count {
+            args.push("--cpus".to_owned());
+            args.push(workers.to_string());
+        }
+        if let Some(mem) = self.cache_mem_mb {
+            args.push("--memory".to_owned());
+            args.push(mem.to_string());
+        }
+        if self.ignore_running {
+            args.push("--ignore-running".to_owned());
+        }
+        args
+    }
+}
 
 impl Default for MangodArgs {
     fn default() -> Self {
