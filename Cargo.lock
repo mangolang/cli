@@ -470,6 +470,7 @@ name = "mango"
 version = "0.6.0"
 dependencies = [
  "env_logger",
+ "log",
  "mango-cli-common",
  "paw",
  "structopt",
@@ -483,6 +484,7 @@ dependencies = [
  "bincode",
  "dirs",
  "lazy_static",
+ "log",
  "serde",
  "serde_json",
  "serial_test",
@@ -496,6 +498,7 @@ name = "mango-cli-daemon"
 version = "0.6.0"
 dependencies = [
  "env_logger",
+ "log",
  "mango-cli-common",
  "mangolib",
  "paw",

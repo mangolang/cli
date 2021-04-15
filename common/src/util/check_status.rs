@@ -1,4 +1,5 @@
 use ::std::sync::mpsc::channel;
+use ::std::sync::mpsc::RecvTimeoutError;
 use ::std::sync::RwLock;
 use ::std::time::{SystemTime, UNIX_EPOCH};
 use ::std::time::Duration;
@@ -7,6 +8,8 @@ use ::lazy_static::lazy_static;
 use ::ws::CloseCode;
 use ::ws::connect;
 use ::ws::Message;
+
+use ::log::debug;
 
 use crate::util::load_lock;
 
@@ -65,32 +68,54 @@ fn get_status() -> MangodStatus {
 
 fn determine_status() -> MangodStatus {
 
-    let (sender, receiver) = channel();
     if let Some(info) = load_lock() {
-
-        // Send ping message to the server.
-        if let Err(_) = connect(format!("ws://{}", info.address()), |out| {
-            //TODO @mark: change this to bincode with serde
-            let sender = sender.clone();
-            if let Err(_) = out.send("ping") {
-                sender.send(false).unwrap();
-                out.close(CloseCode::Normal).unwrap();
-            }
-            move |msg: Message| {
-                let got_pong = msg.as_text().unwrap() == "pong";
-                sender.send(got_pong).unwrap();
-                out.close(CloseCode::Normal)
-            }
-        }) {
-            return MangodStatus::Unresponsive { address: info.address().to_owned() }
-        };
-
-        // Check if we got a pong message back.
-        return match receiver.recv_timeout(Duration::new(1, 0)) {
-            Ok(true) => MangodStatus::Ok { address: info.address().to_owned() },
-            Err(_) | Ok(false) => MangodStatus::Unresponsive { address: info.address().to_owned() },
+        return match can_ping(info.address()) {
+            true => MangodStatus::Ok { address: info.address().to_owned() },
+            false => MangodStatus::Unresponsive { address: info.address().to_owned() },
         }
     }
 
     MangodStatus::Inactive
+}
+
+pub fn can_ping(address: &str) -> bool {
+    let (sender, receiver) = channel();
+    let timeout = Duration::new(0, 700_000_000);
+
+    // Send ping message to the server.
+    if let Err(_) = connect(format!("ws://{}", address), |out| {
+        //TODO @mark: change this to bincode with serde
+        let sender = sender.clone();
+        if let Err(_) = out.send("ping") {
+            debug!("failed to send ping message to {}", address);
+            sender.send(false).unwrap();
+            out.close(CloseCode::Normal).unwrap();
+        }
+
+        move |msg: Message| {
+            let got_pong = msg.as_text().unwrap() == "pong";
+            if !got_pong {
+                debug!("got unexpected answer from {} in response to ping", address);
+            }
+            sender.send(got_pong).unwrap();
+            out.close(CloseCode::Normal)
+        }
+    }) {
+        debug!("failed to not connect to {} for ping", address);
+        return false
+    };
+
+    // Check if we got a pong message back.
+    return match receiver.recv_timeout(timeout) {
+        Ok(true) => true,
+        Ok(false) => false,
+        Err(RecvTimeoutError::Timeout) => {
+            debug!("timed out while connecting to {}", address);
+            false
+        }
+        Err(RecvTimeoutError::Disconnected) => {
+            debug!("connection to {} was immediately broken", address);
+            false
+        }
+    }
 }

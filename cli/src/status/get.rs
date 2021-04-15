@@ -22,7 +22,7 @@ pub fn get_status(status: &MangodStatus) {
 pub fn get_address(status: &MangodStatus) {
     match status {
         MangodStatus::Inactive => {},
-        MangodStatus::Unresponsive { address: address, .. } => println!("{}", address),
-        MangodStatus::Ok { address: address, .. } => println!("{}", address),
+        MangodStatus::Unresponsive { address, .. } => println!("{}", address),
+        MangodStatus::Ok { address, .. } => println!("{}", address),
     }
 }

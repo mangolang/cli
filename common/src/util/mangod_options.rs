@@ -49,7 +49,7 @@ pub struct MangodArgs {
 impl MangodArgs {
     pub fn as_vec(&self) -> Vec<String> {
         let mut args = vec![];
-        args.push("--host".to_owned());
+        args.push("--hostname".to_owned());
         args.push(self.host.clone());
         args.push("--port".to_owned());
         args.push(self.port.to_string());

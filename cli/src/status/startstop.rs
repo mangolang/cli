@@ -1,8 +1,8 @@
 use ::std::process::Command;
+use ::std::process::exit;
 
 use ::mango_cli_common::util::{MangodArgs, MangodStatus};
-use std::io::Error;
-use std::process::{Child, exit};
+use mango_cli_common::util::{store_lock, LockInfo};
 
 #[cfg(debug_assertions)]
 fn start_daemon_cmd(args: &[String]) -> Command {
@@ -24,8 +24,9 @@ fn start_daemon_base_cmd(args: &MangodArgs) -> Command {
 pub fn start_daemon(args: &MangodArgs, status: &MangodStatus) {
     match start_daemon_cmd(&args.as_vec())
             .spawn() {
-        //TODO @mark:
-        Ok(_) => {},
+        Ok(_) => {
+            println!("starting mango daemon (mangod)");
+        },
         Err(err) => {
             eprintln!("could not start mango daemon (mangod), reason: {}", err);
             exit(1);

@@ -24,6 +24,7 @@ paw = "^1.0.0"
 #lazy_static = "^1.4.0"
 env_logger = "0.8.3"
 ws = "0.9.1"
+log = "0.4.14"
 
 [dev-dependencies]
 
