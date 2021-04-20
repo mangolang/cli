@@ -1,21 +1,66 @@
-use ws::listen;
-use crate::api::{Request, Response};
+use ::ws::listen;
+use ::ws::Message;
+use ::ws::Sender;
+
+use ::log::warn;
+
+use crate::api::{Request, ResponseEnvelope, RequestEnvelope};
+use crate::api::Response;
 
 #[derive(Debug)]
 pub struct ReqSender {}
 
 #[derive(Debug)]
-pub struct RespSender {}
+pub struct RespSender<'a> {
+    sender: &'a Sender,
+}
 
-pub fn server(addr: &str, handler: fn(Request, RespSender) -> Response) {
+impl <'a> RespSender<'a> {
+    pub fn new(sender: &'a Sender) -> Self {
+        RespSender { sender }
+    }
+
+    pub fn send(&self, data: Response) {
+        let envelope = ResponseEnvelope {
+            id,
+            data,
+        };
+        let resp_data = bincode::serialize(&envelope)
+            .expect("could not encode Response");
+        //TODO @mark: expect msg
+        self.sender.send(resp_data).expect("TODO");
+        unimplemented!() //TODO @mark:
+    }
+
+    pub fn send_err(&self, msg: impl Into<String>) {
+        let msg = msg.into();
+        warn!("sending error response: {}", &msg);
+        self.send(Response::DaemonError(msg))
+    }
+}
+
+pub fn server(addr: &str, handler: fn(Request, RespSender) -> Result<Response, String>) {
     listen(addr, |out| {
-        move |req_data| {
-            let req: Request = bincode::deserialize(&req_data)
-                .expect("could not understand Request");  //TODO: better error handling
-            let resp  = handler(req, todo);
-            let resp_data = bincode::serialize(&world)
-                .expect("could not encode Response");
-            out.send(resp_data)
+        move |req_msg: Message| {
+            let sender = RespSender::new(&out);
+            match req_msg {
+                Message::Text(_) => sender.send_err("got text message, but all messages should be binary"),
+                Message::Binary(req_data) => {
+                    match bincode::deserialize::<RequestEnvelope>(&req_data) {
+                        Ok(request_envelope) => {
+                            let RequestEnvelope { id, data } = request_envelope;
+                            match handler(data, sender) {
+                                Ok(resp) => sender.send(resp),
+                                Err(err_msg) => sender.send_err(err_msg),
+                            }
+                        }
+                        Err(err_msg) => {
+                            warn!("failed to deserialize request: {}", &err_msg);
+                            sender.send_err("could not understand request");
+                        },
+                    }
+                }
+            }
         }
     }).unwrap();
 }

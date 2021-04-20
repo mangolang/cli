@@ -5,25 +5,25 @@ pub use self::control::{ControlRequest, ControlResponse, StopMode};
 mod control;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Request {
-    id: u64,
-    data: RequestData,
+pub struct RequestEnvelope {
+    pub id: u64,
+    pub data: Request,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub enum RequestData {
+pub enum Request {
     Control(ControlRequest),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Response {
-    id: u64,
-    data: ResponseData,
+pub struct ResponseEnvelope {
+    pub id: u64,
+    pub data: Response,
 }
 
-
 #[derive(Debug, Serialize, Deserialize)]
-pub enum ResponseData {
+pub enum Response {
+    Ok,
     DaemonError(String),
     Control(ControlResponse),
     //CompileError(),

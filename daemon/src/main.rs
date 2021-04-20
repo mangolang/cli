@@ -2,9 +2,8 @@ use ::std::process;
 use ::std::process::exit;
 
 use ::env_logger;
-use ::ws::listen;
 
-use ::mango_cli_common::api::{Request, Response};
+use ::mango_cli_common::api::{RequestEnvelope, ResponseEnvelope};
 use ::mango_cli_common::util::{MangodArgs, MangodStatus};
 use ::mango_cli_common::util::{LockInfo, store_lock};
 
@@ -64,15 +63,16 @@ fn launch(args: &MangodArgs) {
     println!("starting mangod, listening on {}", &addr);
     let lock = LockInfo::new(process::id(), &addr);
     store_lock(&lock);
-    listen(&addr, |out| {
-        move |req_data| {
-            let req: Request = bincode::deserialize(&req_data)
-                .expect("could not understand Request");  //TODO: better error handling
-            let resp = Response;
-            let resp_data = bincode::serialize(&world)
-                .expect("could not encode Response");
-            out.send(resp_data)
-        }
-    }).unwrap();
+    // listen(&addr, |out| {
+    //     move |req_data| {
+    //         let req: Request = bincode::deserialize(&req_data)
+    //             .expect("could not understand Request");  //TODO: better error handling
+    //         let resp = Response;
+    //         let resp_data = bincode::serialize(&world)
+    //             .expect("could not encode Response");
+    //         out.send(resp_data)
+    //     }
+    // }).unwrap();
+    unimplemented!();  //TODO @mark: use common wrapper
     eprintln!("bye from mangod");  //TODO @mark: TEMPORARY! REMOVE THIS!
 }
