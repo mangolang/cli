@@ -1,7 +1,8 @@
 use ::serde::{Deserialize, Serialize};
 
-mod control;
 pub use self::control::{ControlRequest, ControlResponse, StopMode};
+
+mod control;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Request {
@@ -23,7 +24,6 @@ pub struct Response {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum ResponseData {
-    Ok,
     DaemonError(String),
     Control(ControlResponse),
     //CompileError(),

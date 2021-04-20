@@ -7,4 +7,4 @@ mod paths;
 mod lockfile;
 mod mangod_options;
 mod check_status;
-
+mod connect;

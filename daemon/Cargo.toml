@@ -25,7 +25,6 @@ paw = "^1.0.0"
 #lazy_static = "^1.4.0"
 log = "0.4.14"
 env_logger = "0.8.3"
-ws = "0.9.1"
 
 #ws = { version = "0.7.*" }
 #chrono = { version = "0.4.*" }
