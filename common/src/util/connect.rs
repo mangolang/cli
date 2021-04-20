@@ -12,17 +12,21 @@ pub struct ReqSender {}
 
 #[derive(Debug)]
 pub struct RespSender<'a> {
+    id: u64,
     sender: &'a Sender,
 }
 
 impl <'a> RespSender<'a> {
     pub fn new(sender: &'a Sender) -> Self {
-        RespSender { sender }
+        RespSender {
+            id: 0,
+            sender,
+        }
     }
 
     pub fn send(&self, data: Response) {
         let envelope = ResponseEnvelope {
-            id,
+            id: self.id,
             data,
         };
         let resp_data = bincode::serialize(&envelope)
@@ -39,17 +43,18 @@ impl <'a> RespSender<'a> {
     }
 }
 
-pub fn server(addr: &str, handler: fn(Request, RespSender) -> Result<Response, String>) {
+pub fn server(addr: &str, handler: fn(Request, &RespSender) -> Result<Response, String>) {
     listen(addr, |out| {
         move |req_msg: Message| {
-            let sender = RespSender::new(&out);
+            let mut sender = RespSender::new(&out);
             match req_msg {
                 Message::Text(_) => sender.send_err("got text message, but all messages should be binary"),
                 Message::Binary(req_data) => {
                     match bincode::deserialize::<RequestEnvelope>(&req_data) {
                         Ok(request_envelope) => {
                             let RequestEnvelope { id, data } = request_envelope;
-                            match handler(data, sender) {
+                            sender.id = id;
+                            match handler(data, &sender) {
                                 Ok(resp) => sender.send(resp),
                                 Err(err_msg) => sender.send_err(err_msg),
                             }
@@ -61,6 +66,7 @@ pub fn server(addr: &str, handler: fn(Request, RespSender) -> Result<Response, S
                     }
                 }
             }
+            Ok(())
         }
     }).unwrap();
 }

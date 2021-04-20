@@ -3,9 +3,12 @@ use ::std::process::exit;
 
 use ::env_logger;
 
-use ::mango_cli_common::api::{RequestEnvelope, ResponseEnvelope};
 use ::mango_cli_common::util::{MangodArgs, MangodStatus};
 use ::mango_cli_common::util::{LockInfo, store_lock};
+use mango_cli_common::api::{ControlRequest, ControlResponse};
+use mango_cli_common::api::Request;
+use mango_cli_common::api::Response;
+use mango_cli_common::util::server;
 
 mod connection;
 
@@ -63,6 +66,15 @@ fn launch(args: &MangodArgs) {
     println!("starting mangod, listening on {}", &addr);
     let lock = LockInfo::new(process::id(), &addr);
     store_lock(&lock);
+    server(&addr, |request, sender| {
+        match request {
+            Request::Control(req) => match req {
+                ControlRequest::Ping => Ok(Response::Control(ControlResponse::Pong)),
+                ControlRequest::Stop(_) => unimplemented!("shutdown"),
+                ControlRequest::Stats => unimplemented!(),
+            }
+        }
+    });
     // listen(&addr, |out| {
     //     move |req_data| {
     //         let req: Request = bincode::deserialize(&req_data)
@@ -73,6 +85,5 @@ fn launch(args: &MangodArgs) {
     //         out.send(resp_data)
     //     }
     // }).unwrap();
-    unimplemented!();  //TODO @mark: use common wrapper
     eprintln!("bye from mangod");  //TODO @mark: TEMPORARY! REMOVE THIS!
 }
