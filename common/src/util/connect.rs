@@ -34,7 +34,7 @@ impl <'a> ReqSender<'a> {
             .expect("failed to send websocket request");
     }
 
-    pub fn stop(&self) {
+    pub fn close(&self) {
         self.sender.close(CloseCode::Normal)
             .expect("failed to close daemon connection");
     }

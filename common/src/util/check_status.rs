@@ -12,6 +12,7 @@ use ::ws::Message;
 use ::log::debug;
 
 use crate::util::{load_lock, client};
+use crate::api::{Response, ControlResponse};
 
 lazy_static! {
     static ref LAST_STATUS: RwLock<Option<(u128, MangodStatus)>> = RwLock::new(None);
@@ -79,32 +80,32 @@ fn determine_status() -> MangodStatus {
 }
 
 pub fn can_ping(address: &str) -> bool {
-    let (sender, receiver) = channel();
+    let (channel_sender, channel_receiver) = channel();
     let timeout = Duration::from_millis(700);
 
     // Send ping message to the server.
-    if let Err(_) = client(address, |resp, req_sender| {
-        if let Err(_) = req_sender.send(Request::Ping) {
+    if let Err(_) = client(address,
+        |req_sender| if let Err(_) = req_sender.send(Request::Ping) {
             debug!("failed to send ping message to {}", address);
-            sender.send(false).unwrap();
-            out.close(CloseCode::Normal).unwrap();
-        }
-
-        move |msg: Message| {
-            let got_pong = msg.as_text().unwrap() == "pong";
-            if !got_pong {
-                debug!("got unexpected answer from {} in response to ping", address);
-            }
-            sender.send(got_pong).unwrap();
-            out.close(CloseCode::Normal)
-        }
+            channel_sender.send(false).unwrap();
+            req_sender.close();
+        },
+       |resp, req_sender| {
+           if matches!(resp, Response::Control(ControlResponse::Pong)) {
+               channel_sender.send(true);
+           } else {
+               debug!("got unexpected answer from {} in response to ping", address);
+               channel_sender.send(true);
+           }
+           req_sender.close();
+           Ok(())
     }) {
         debug!("failed to not connect to {} for ping", address);
         return false
     };
 
     // Check if we got a pong message back.
-    return match receiver.recv_timeout(timeout) {
+    return match channel_receiver.recv_timeout(timeout) {
         Ok(true) => true,
         Ok(false) => false,
         Err(RecvTimeoutError::Timeout) => {
