@@ -104,8 +104,9 @@ pub fn server(addr: &str, handler: fn(Request, &RespSender) -> Result<Response, 
 }
 
 struct ClientHandler {
+    sender: Sender,
     on_start: fn(&ReqSender),
-    handler: fn(Response, &ReqSender) -> Result<Request, String>,
+    handler: fn(Response, &ReqSender) -> Result<(), String>,
 }
 
 impl ws::Handler for ClientHandler {
@@ -114,7 +115,7 @@ impl ws::Handler for ClientHandler {
     }
 
     fn on_message(&mut self, req_msg: Message) -> ws::Result<()> {
-        let mut sender = ReqSender::new(&out);
+        let mut sender = ReqSender::new(&self.sender);
         match req_msg {
             Message::Text(_) => error!("got text message, but all messages should be binary"),
             Message::Binary(resp_data) => {
@@ -122,8 +123,8 @@ impl ws::Handler for ClientHandler {
                     Ok(response_envelope) => {
                         let ResponseEnvelope { id, data } = response_envelope;
                         sender.id = id;
-                        match self.handler(data, &sender) {
-                            Ok(resp) => sender.send(resp),
+                        match (self.handler)(data, &sender) {
+                            Ok(()) => {},
                             Err(err_msg) => error!("error occurred: {}", err_msg),
                         }
                     }
@@ -137,49 +138,13 @@ impl ws::Handler for ClientHandler {
     }
 }
 
-pub fn client(addr: &str, on_start: fn(&ReqSender), handler: fn(Response, &ReqSender) -> Result<Request, String>) {
-    match connect(addr, ClientHandler {
+pub fn client(addr: &str, on_start: fn(&ReqSender), handler: fn(Response, &ReqSender) -> Result<(), String>) {
+    match connect(addr, |sender| ClientHandler {
+        sender,
         on_start,
         handler
     }) {
         Ok(()) => {}
         Err(err) => eprintln!("could not connect to daemon, reason: {}", err),
     };
-
-    //TODO @mark: TEMPORARY! REMOVE THIS!
-    // if let Err(_) = connect(format!("ws://{}", address), |out| {
-    //     //TODO @mark: change this to bincode with serde
-    //     let sender = sender.clone();
-    //     if let Err(_) = out.send("ping") {
-    //         debug!("failed to send ping message to {}", address);
-    //         sender.send(false).unwrap();
-    //         out.close(CloseCode::Normal).unwrap();
-    //     }
-    //
-    //     move |msg: Message| {
-    //         let got_pong = msg.as_text().unwrap() == "pong";
-    //         if !got_pong {
-    //             debug!("got unexpected answer from {} in response to ping", address);
-    //         }
-    //         sender.send(got_pong).unwrap();
-    //         out.close(CloseCode::Normal)
-    //     }
-    // }) {
-    //     debug!("failed to not connect to {} for ping", address);
-    //     return false
-    // };
-    //
-    // // Check if we got a pong message back.
-    // return match receiver.recv_timeout(timeout) {
-    //     Ok(true) => true,
-    //     Ok(false) => false,
-    //     Err(RecvTimeoutError::Timeout) => {
-    //         debug!("timed out while connecting to {}", address);
-    //         false
-    //     }
-    //     Err(RecvTimeoutError::Disconnected) => {
-    //         debug!("connection to {} was immediately broken", address);
-    //         false
-    //     }
-    // }
 }

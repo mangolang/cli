@@ -5,14 +5,10 @@ use ::std::time::{SystemTime, UNIX_EPOCH};
 use ::std::time::Duration;
 
 use ::lazy_static::lazy_static;
-use ::ws::CloseCode;
-use ::ws::connect;
-use ::ws::Message;
-
 use ::log::debug;
 
-use crate::util::{load_lock, client};
-use crate::api::{Response, ControlResponse};
+use crate::api::{ControlResponse, Response};
+use crate::util::{client, load_lock};
 
 lazy_static! {
     static ref LAST_STATUS: RwLock<Option<(u128, MangodStatus)>> = RwLock::new(None);
@@ -92,10 +88,10 @@ pub fn can_ping(address: &str) -> bool {
         },
        |resp, req_sender| {
            if matches!(resp, Response::Control(ControlResponse::Pong)) {
-               channel_sender.send(true);
+               channel_sender.send(true).unwrap();
            } else {
                debug!("got unexpected answer from {} in response to ping", address);
-               channel_sender.send(true);
+               channel_sender.send(false).unwrap();
            }
            req_sender.close();
            Ok(())
