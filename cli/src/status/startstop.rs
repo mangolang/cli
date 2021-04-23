@@ -14,7 +14,7 @@ fn start_daemon_cmd(args: &[String]) -> Command {
     let mut all_args = vec!["run".to_owned(), "-q".to_owned(),
             "-p".to_owned(), "mango-cli-daemon".to_owned(), "--".to_owned()];
     all_args.extend_from_slice(args);
-    info!("start daemon (debug) cmd: cargo {:?}", all_args.join(" "));
+    info!("start daemon (debug) cmd: cargo {}", all_args.join(" "));
     cmd.args(&all_args);
     cmd
 }
