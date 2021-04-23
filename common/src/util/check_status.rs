@@ -11,7 +11,7 @@ use ::ws::Message;
 
 use ::log::debug;
 
-use crate::util::load_lock;
+use crate::util::{load_lock, client};
 
 lazy_static! {
     static ref LAST_STATUS: RwLock<Option<(u128, MangodStatus)>> = RwLock::new(None);
@@ -83,10 +83,8 @@ pub fn can_ping(address: &str) -> bool {
     let timeout = Duration::from_millis(700);
 
     // Send ping message to the server.
-    if let Err(_) = connect(format!("ws://{}", address), |out| {
-        //TODO @mark: change this to bincode with serde
-        let sender = sender.clone();
-        if let Err(_) = out.send("ping") {
+    if let Err(_) = client(address, |resp, req_sender| {
+        if let Err(_) = req_sender.send(Request::Ping) {
             debug!("failed to send ping message to {}", address);
             sender.send(false).unwrap();
             out.close(CloseCode::Normal).unwrap();

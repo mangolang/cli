@@ -7,7 +7,7 @@ use ::ws::Sender;
 
 use crate::api::{Request, RequestEnvelope, ResponseEnvelope};
 use crate::api::Response;
-use ws::CloseCode;
+use ws::{CloseCode, Handshake};
 
 #[derive(Debug)]
 pub struct ReqSender<'a> {
@@ -103,30 +103,44 @@ pub fn server(addr: &str, handler: fn(Request, &RespSender) -> Result<Response, 
     };
 }
 
-pub fn client(addr: &str, handler: fn(Response, &ReqSender) -> Result<Request, String>) {
-    match connect(addr, |out| {
-        move |req_msg: Message| {
-            let mut sender = ReqSender::new(&out);
-            match req_msg {
-                Message::Text(_) => error!("got text message, but all messages should be binary"),
-                Message::Binary(resp_data) => {
-                    match bincode::deserialize::<ResponseEnvelope>(&resp_data) {
-                        Ok(response_envelope) => {
-                            let ResponseEnvelope { id, data } = response_envelope;
-                            sender.id = id;
-                            match handler(data, &sender) {
-                                Ok(resp) => sender.send(resp),
-                                Err(err_msg) => error!("error occurred: {}", err_msg),
-                            }
+struct ClientHandler {
+    on_start: fn(&ReqSender),
+    handler: fn(Response, &ReqSender) -> Result<Request, String>,
+}
+
+impl ws::Handler for ClientHandler {
+    fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
+        Ok(())
+    }
+
+    fn on_message(&mut self, req_msg: Message) -> ws::Result<()> {
+        let mut sender = ReqSender::new(&out);
+        match req_msg {
+            Message::Text(_) => error!("got text message, but all messages should be binary"),
+            Message::Binary(resp_data) => {
+                match bincode::deserialize::<ResponseEnvelope>(&resp_data) {
+                    Ok(response_envelope) => {
+                        let ResponseEnvelope { id, data } = response_envelope;
+                        sender.id = id;
+                        match self.handler(data, &sender) {
+                            Ok(resp) => sender.send(resp),
+                            Err(err_msg) => error!("error occurred: {}", err_msg),
                         }
-                        Err(err_msg) => {
-                            error!("failed to deserialize response: {}", &err_msg);
-                        },
                     }
+                    Err(err_msg) => {
+                        error!("failed to deserialize response: {}", &err_msg);
+                    },
                 }
             }
-            Ok(())
         }
+        Ok(())
+    }
+}
+
+pub fn client(addr: &str, on_start: fn(&ReqSender), handler: fn(Response, &ReqSender) -> Result<Request, String>) {
+    match connect(addr, ClientHandler {
+        on_start,
+        handler
     }) {
         Ok(()) => {}
         Err(err) => eprintln!("could not connect to daemon, reason: {}", err),
