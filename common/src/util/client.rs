@@ -1,10 +1,7 @@
 use ::log::debug;
 use ::log::error;
-use ::log::info;
-use ::log::warn;
 use ::ws::{CloseCode, Handshake};
 use ::ws::connect;
-use ::ws::listen;
 use ::ws::Message;
 use ::ws::Sender;
 
@@ -53,71 +50,6 @@ impl <'a> ReqSender<'a> {
         self.sender.close(CloseCode::Normal)
             .expect("failed to close daemon connection");
     }
-}
-
-#[derive(Debug)]
-pub struct RespSender<'a> {
-    id: u64,
-    sender: &'a Sender,
-}
-
-impl <'a> RespSender<'a> {
-    pub fn new(sender: &'a Sender) -> Self {
-        RespSender {
-            id: 0,
-            sender,
-        }
-    }
-
-    pub fn send(&self, data: Response) {
-        let envelope = ResponseEnvelope {
-            id: self.id,
-            data,
-        };
-        let resp_data = bincode::serialize(&envelope)
-            .expect("could not encode Response");
-        self.sender.send(resp_data)
-            .expect("failed to send websocket response");
-    }
-
-    pub fn send_err(&self, msg: impl Into<String>) {
-        let msg = msg.into();
-        warn!("sending error response: {}", &msg);
-        self.send(Response::DaemonError(msg))
-    }
-}
-
-pub fn server(addr: &str, handler: fn(Request, &RespSender) -> Result<Response, String>) -> Result<(), ()> {
-    let ws_addr = format!("ws://{}", addr);
-    info!("starting server at {}", &ws_addr);
-    listen(&ws_addr, |out| {
-        move |req_msg: Message| {
-            let mut sender = RespSender::new(&out);
-            match req_msg {
-                Message::Text(_) => sender.send_err("got text message, but all messages should be binary"),
-                Message::Binary(req_data) => {
-                    match bincode::deserialize::<RequestEnvelope>(&req_data) {
-                        Ok(request_envelope) => {
-                            let RequestEnvelope { id, data } = request_envelope;
-                            sender.id = id;
-                            match handler(data, &sender) {
-                                Ok(resp) => sender.send(resp),
-                                Err(err_msg) => sender.send_err(err_msg),
-                            }
-                        }
-                        Err(err_msg) => {
-                            warn!("failed to deserialize request: {}", &err_msg);
-                            sender.send_err("could not understand request");
-                        },
-                    }
-                }
-            }
-            Ok(())
-        }
-    }).map_err(|err| {
-        error!("could not start daemon at {}, reason: {}", ws_addr, err);
-        ()
-    })
 }
 
 struct ClientHandler<S: Fn(&ReqSender), H: Fn(Response, &ReqSender) -> Result<(), String>> {

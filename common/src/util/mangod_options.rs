@@ -14,7 +14,7 @@ pub struct MangodArgs {
     #[structopt(
         short = "b",
         long = "hostname",
-        default_value = "localhost",
+        default_value = "127.0.0.1",
         help = "Hostname to listen on. Do not expose mangod to untrusted networks.",
     )]
     pub host: String,
@@ -79,7 +79,7 @@ impl MangodArgs {
 impl Default for MangodArgs {
     fn default() -> Self {
         MangodArgs {
-            host: "localhost".to_owned(),
+            host: "127.0.0.1".to_owned(),
             port: DEFAULT_PORT,
             worker_count: None,
             cache_mem_mb: None,
