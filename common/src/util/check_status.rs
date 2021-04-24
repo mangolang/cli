@@ -1,9 +1,12 @@
 use ::std::sync::RwLock;
 use ::std::time::{SystemTime, UNIX_EPOCH};
+use ::std::time::Duration;
 
 use ::lazy_static::lazy_static;
 
-use crate::util::load_lock;
+use crate::api::{ControlRequest, Request};
+use crate::api::{ControlResponse, Response};
+use crate::util::{load_lock, single_msg_client};
 
 lazy_static! {
     static ref LAST_STATUS: RwLock<Option<(u128, MangodStatus)>> = RwLock::new(None);
@@ -71,44 +74,10 @@ fn determine_status() -> MangodStatus {
 }
 
 pub fn can_ping(address: &str) -> bool {
-    unimplemented!("use single_msg_client"); //TODO @mark: TEMPORARY! REMOVE THIS!
-    // let (channel_sender, channel_receiver) = channel();
-    // let timeout = Duration::from_millis(700);
-    //
-    // // Send ping message to the server.
-    // if let Err(_) = client(address,
-    //     |req_sender| {
-    //         if let Err(()) = req_sender.try_send(Request::Control(ControlRequest::Ping)) {
-    //             debug!("failed to send ping message");
-    //             channel_sender.send(false).unwrap();
-    //             req_sender.close();
-    //         }
-    //     },
-    //    |resp, req_sender| {
-    //        if matches!(resp, Response::Control(ControlResponse::Pong)) {
-    //            channel_sender.send(true).unwrap();
-    //        } else {
-    //            debug!("got unexpected answer from {} in response to ping", address);
-    //            channel_sender.send(false).unwrap();
-    //        }
-    //        req_sender.close();
-    //        Ok(())
-    // }) {
-    //     debug!("failed to not connect to {} for ping", address);
-    //     return false
-    // };
-    //
-    // // Check if we got a pong message back.
-    // return match channel_receiver.recv_timeout(timeout) {
-    //     Ok(true) => true,
-    //     Ok(false) => false,
-    //     Err(RecvTimeoutError::Timeout) => {
-    //         debug!("timed out while connecting to {}", address);
-    //         false
-    //     }
-    //     Err(RecvTimeoutError::Disconnected) => {
-    //         debug!("connection to {} was immediately broken", address);
-    //         false
-    //     }
-    // }
+    single_msg_client(
+        address,
+        Request::Control(ControlRequest::Ping),
+        Some(|resp| matches!(resp, Response::Control(ControlResponse::Pong))),
+        Duration::from_secs(1),
+    )
 }

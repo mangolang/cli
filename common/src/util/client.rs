@@ -104,7 +104,7 @@ pub fn client<T: Clone>(addr: &str, scope: T, on_start: impl Fn(&T, &ReqSender) 
     })
 }
 
-pub fn single_msg_client(address: &str, request: Request, await_response: Option<fn(Response) -> bool>, timeout: Duration) -> bool {
+pub fn single_msg_client(address: &str, request: Request, await_response: Option<fn(&Response) -> bool>, timeout: Duration) -> bool {
     let (channel_sender, channel_receiver) = channel();
 
     // Send a message to the server.
@@ -123,10 +123,12 @@ pub fn single_msg_client(address: &str, request: Request, await_response: Option
         },
         move |scope, actual_response, req_sender| {
             if let Some(is_expected_response) = scope.2 {
-                if !is_expected_response(actual_response) {
+                if is_expected_response(&actual_response) {
                     debug!("received the expected response from {} to single-message request", address);
                     scope.0.send(true).unwrap();
                     req_sender.close();
+                } else if let Response::DaemonError(err_msg) = actual_response {
+                    error!("daemon error: {}", err_msg);
                 }
             }
             Ok(())
