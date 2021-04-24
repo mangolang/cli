@@ -41,9 +41,8 @@ impl <'a> RespSender<'a> {
 }
 
 pub fn server(addr: &str, handler: fn(Request, &RespSender) -> Result<Response, String>) -> Result<(), ()> {
-    let ws_addr = format!("ws://{}", addr);
-    info!("starting server at {}", &ws_addr);
-    listen(&ws_addr, |out| {
+    info!("starting server at {}", addr);
+    listen(addr, |out| {
         move |req_msg: Message| {
             let mut sender = RespSender::new(&out);
             match req_msg {
@@ -68,7 +67,7 @@ pub fn server(addr: &str, handler: fn(Request, &RespSender) -> Result<Response, 
             Ok(())
         }
     }).map_err(|err| {
-        error!("could not start daemon at {}, reason: {}", ws_addr, err);
+        error!("could not start daemon at {}, reason: {}", addr, err);
         ()
     })
 }
