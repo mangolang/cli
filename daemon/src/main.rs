@@ -60,19 +60,3 @@ fn abort_if_running(new_addr: &str) {
         },
     }
 }
-
-fn launch(args: &MangodArgs) {
-    let addr = args.address();
-    println!("starting mangod, listening on {}", &addr);
-    let lock = LockInfo::new(process::id(), &addr);
-    store_lock(&lock);
-    server(&addr, |request, _sender| {
-        match request {
-            Request::Control(req) => match req {
-                ControlRequest::Ping => Ok(Response::Control(ControlResponse::Pong)),
-                ControlRequest::Stop(_) => unimplemented!("shutdown"),
-            }
-        }
-    }).expect("failed to start server");
-    eprintln!("bye from mangod");  //TODO @mark: TEMPORARY! REMOVE THIS!
-}
