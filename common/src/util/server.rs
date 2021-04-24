@@ -8,6 +8,7 @@ use ::ws::Sender;
 
 use crate::api::{Request, RequestEnvelope, ResponseEnvelope};
 use crate::api::Response;
+use ws::CloseCode;
 
 #[derive(Debug)]
 pub struct RespSender<'a> {
@@ -51,6 +52,12 @@ impl <'a> RespSender<'a> {
             .expect("could not encode Response");
         self.sender.broadcast(resp_data)
             .expect("failed to send websocket response");
+    }
+
+    // This close is important because exiting without returning control to the event loop
+    // will cause pending messages to be dropped (including when sleeping).
+    pub fn close(&self) {
+        self.sender.close(CloseCode::Away).unwrap();
     }
 }
 

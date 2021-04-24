@@ -74,11 +74,13 @@ impl <T, S: Fn(&T, &ReqSender), H: Fn(&T, Response, &ReqSender) -> Result<(), St
 
     fn on_message(&mut self, req_msg: Message) -> ws::Result<()> {
         let mut sender = ReqSender::new(&self.sender);
+        trace!("got a message!");  //TODO @mark: TEMPORARY! REMOVE THIS!
         match req_msg {
             Message::Text(_) => error!("got text message, but all messages should be binary"),
             Message::Binary(resp_data) => {
                 match bincode::deserialize::<ResponseEnvelope>(&resp_data) {
                     Ok(response_envelope) => {
+                        trace!("received: {:?}", response_envelope);
                         let ResponseEnvelope { id, data } = response_envelope;
                         sender.id = id;
                         match (self.handler)(&self.scope, data, &sender) {
@@ -151,7 +153,7 @@ pub fn single_msg_client(address: &str, request: Request, await_response: Option
             false
         }
         Err(RecvTimeoutError::Disconnected) => {
-            debug!("connection to {} was immediately broken", address);
+            debug!("it appears the websocket client for {} has died", address);
             false
         }
     }
