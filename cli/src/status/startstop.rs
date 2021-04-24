@@ -40,7 +40,7 @@ pub fn start_daemon(args: &MangodArgs) -> Result<(), ()> {
         //TODO @mark: fail if memory/cpu are different in lock: `load_lock()`
         Ok(mut child) => {
             let start = SystemTime::now();
-            let delay = Duration::from_millis(100);
+            let delay = Duration::from_millis(50);
             while SystemTime::now().duration_since(start).unwrap().as_millis() < 5000 {
                 let has_exit_code = child.try_wait()
                     .map(|exit_code| exit_code.is_some())
@@ -94,10 +94,10 @@ pub fn stop_daemon(args: &DaemonStopCmd, status: &MangodStatus) -> Result<(), ()
                 Some(|resp| matches!(resp, Response::Control(ControlResponse::Stopped))),
                 Duration::from_secs(30),
             ) {
-                //TODO @mark: if successful, remove lock file
-                unimplemented!();
+                println!("shutdown complete");
                 Ok(())
             } else {
+                println!("shutdown failed");
                 Err(())
             }
         },

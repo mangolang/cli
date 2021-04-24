@@ -1,4 +1,5 @@
 use ::log::debug;
+use ::log::trace;
 use ::log::error;
 use ::ws::{CloseCode, Handshake};
 use ::ws::connect;
@@ -29,6 +30,7 @@ impl <'a> ReqSender<'a> {
             id: self.id,
             data,
         };
+        trace!("sending: {:?}", envelope);
         let req_data = bincode::serialize(&envelope)
             .expect("could not encode Request");
         self.sender.send(req_data)
@@ -40,6 +42,7 @@ impl <'a> ReqSender<'a> {
             id: self.id,
             data,
         };
+        trace!("(try-)sending: {:?}", envelope);
         let req_data = match bincode::serialize(&envelope) {
             Ok(data) => data,
             Err(_) => return Err(()),
@@ -49,6 +52,7 @@ impl <'a> ReqSender<'a> {
     }
 
     pub fn close(&self) {
+        trace!("closing {}", self.id);
         self.sender.close(CloseCode::Normal)
             .expect("failed to close daemon connection");
     }

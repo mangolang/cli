@@ -1,5 +1,6 @@
 use ::log::error;
 use ::log::info;
+use ::log::trace;
 use ::log::warn;
 use ::ws::listen;
 use ::ws::Message;
@@ -27,6 +28,7 @@ impl <'a> RespSender<'a> {
             id: self.id,
             data,
         };
+        trace!("sending {:?}", envelope);
         let resp_data = bincode::serialize(&envelope)
             .expect("could not encode Response");
         self.sender.send(resp_data)
@@ -44,6 +46,7 @@ impl <'a> RespSender<'a> {
             id: 0,
             data,
         };
+        trace!("broadcasting {:?}", envelope);
         let resp_data = bincode::serialize(&envelope)
             .expect("could not encode Response");
         self.sender.broadcast(resp_data)

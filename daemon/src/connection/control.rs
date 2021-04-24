@@ -1,4 +1,6 @@
 use ::std::process::exit;
+use ::std::thread::sleep;
+use ::std::time::Duration;
 
 use ::log::info;
 
@@ -31,5 +33,9 @@ pub fn shutdown_quick(sender: &RespSender) -> ! {
     sender.broadcast(Response::Control(ControlResponse::Stopping(StopMode::Quick)));
     sender.broadcast(Response::Control(ControlResponse::Stopped));
     clear_lock();
+    // Sleep so that the broadcast has time to reach all clients.
+    // Sleep is not great, but the server is shutting down anyway.
+    sleep(Duration::from_millis(500));
+    info!("quick server shutdown complete");
     exit(0)
 }
