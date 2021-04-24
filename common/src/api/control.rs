@@ -1,6 +1,6 @@
 use ::serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StopMode {
     Force,
     Quick,
@@ -8,14 +8,14 @@ pub enum StopMode {
     WhenIdle,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ControlRequest {
     Ping,
     Stop(StopMode),
     Stats
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ControlResponse {
     Pong,
     Stats

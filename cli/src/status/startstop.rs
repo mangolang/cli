@@ -1,12 +1,13 @@
 use ::std::process::{Command, Stdio};
-use ::std::process::exit;
 use ::std::thread::sleep;
 use ::std::time::{Duration, SystemTime};
 
 use ::log::info;
+use ::log::debug;
 
 use ::mango_cli_common::util::{MangodArgs, MangodStatus};
 use ::mango_cli_common::util::can_ping;
+use mango_cli_common::api::{Request, ControlRequest, StopMode};
 
 #[cfg(debug_assertions)]
 fn start_daemon_cmd(args: &[String]) -> Command {
@@ -28,12 +29,13 @@ fn start_daemon_cmd(args: &[String]) -> Command {
     cmd
 }
 
-pub fn start_daemon(args: &MangodArgs) {
+pub fn start_daemon(args: &MangodArgs) -> Result<(), ()> {
     match start_daemon_cmd(&args.as_vec())
             .stdin(Stdio::null())
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn() {
+        //TODO @mark: fail if memory/cpu are different in lock: `load_lock()`
         Ok(mut child) => {
             let start = SystemTime::now();
             let delay = Duration::from_millis(100);
@@ -43,37 +45,52 @@ pub fn start_daemon(args: &MangodArgs) {
                     .unwrap_or(false);
                 if has_exit_code {
                     eprintln!("started mango daemon (mangod), but it terminated");
-                    return;
+                    return Err(());
                 }
                 if can_ping(&args.address()) {
                     println!("started mango daemon (mangod)");
-                    return;
+                    return Ok(());
                 }
                 sleep(delay);
             }
             eprintln!("started mango daemon (mangod), but could not connect to it");
+            Err(())
         },
         Err(err) => {
             eprintln!("could not start mango daemon (mangod), reason: {}", err);
-            exit(1);  //TODO @mark: use return instead of exit
+            Err(())
         },
     }
 }
 
-pub fn stop_daemon(status: &MangodStatus) {
+pub fn stop_daemon(status: &MangodStatus) -> Result<(), ()> {
     match status {
         MangodStatus::Inactive => {
             eprintln!("mangod is not running");
-            return
+            Ok(())
         },
         MangodStatus::Unresponsive { .. } => {
             eprintln!("cannot stop mango daemon because it is not responding; if it is still running, stop it manually");
-            return
+            Err(())
         },
-        MangodStatus::Ok { .. } => {
+        MangodStatus::Ok { address } => {
+            //TODO @mark: single_msg_client
+            // Send ping message to the server.
+            if let Err(_) = client(
+                address,
+                |req_sender| {
+                    if let Err(()) = req_sender.try_send(Request::Control(ControlRequest::Stop(StopMode::FinishCurrentWork))) {
+                        debug!("failed to send shutdown request");
+                        req_sender.close();
+                    }
+                },
+                |resp, req_sender| { Ok(()) }) {
+                debug!("failed to not connect to {} for ping", address);
+                return Err(())
+            };
             unimplemented!("stop daemon")
         },
-    };
+    }
     //TODO @mark: send stop message
     //TODO @mark: if successful, remove lock file
 }
