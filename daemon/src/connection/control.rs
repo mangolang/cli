@@ -1,10 +1,12 @@
 use ::std::process::exit;
 
 use ::log::error;
+use ::log::info;
 
-use ::mango_cli_common::api::{ControlRequest, ControlResponse, Request, Response, StopMode};
+use ::mango_cli_common::api::{ControlRequest, ControlResponse, Response, StopMode};
+use ::mango_cli_common::util::{clear_lock, RespSender};
 
-pub fn handle_control(request: &ControlRequest) -> Result<Response, ()> {
+pub fn handle_control(request: &ControlRequest, sender: &RespSender) -> Result<Response, String> {
     match request {
         ControlRequest::Ping => Ok(Response::Control(ControlResponse::Pong)),
         ControlRequest::Stop(mode) => {
@@ -14,11 +16,11 @@ pub fn handle_control(request: &ControlRequest) -> Result<Response, ()> {
                     shutdown_quick()
                 },
                 StopMode::FinishCurrentWork => {
-                    error!("shutdown mode 'finish current work' is not implemented yet, shutting down quickly");
+                    sender.send_err("shutdown mode 'finish current work' is not implemented yet, shutting down quickly");
                     shutdown_quick()
                 },
                 StopMode::WhenIdle => {
-                    error!("shutdown mode 'when idle' is not implemented yet, shutting down quickly");
+                    sender.send_err("shutdown mode 'when idle' is not implemented yet, shutting down quickly");
                     shutdown_quick()
                 },
             }
@@ -26,8 +28,9 @@ pub fn handle_control(request: &ControlRequest) -> Result<Response, ()> {
     }
 }
 
-pub fn shutdown_quick() {
-    //TODO @mark:
+pub fn shutdown_quick() -> ! {
+    //TODO @mark: send notifications to all connected clients
     error!("shutdown mode 'quick' is not implemented yet");
+    clear_lock();
     exit(0)
 }

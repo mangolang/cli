@@ -1,14 +1,10 @@
-use ::std::process;
 use ::std::process::exit;
 
 use ::env_logger;
 
 use ::mango_cli_common::util::{MangodArgs, MangodStatus};
-use ::mango_cli_common::util::{LockInfo, store_lock};
-use mango_cli_common::api::{ControlRequest, ControlResponse};
-use mango_cli_common::api::Request;
-use mango_cli_common::api::Response;
-use mango_cli_common::util::server;
+
+use crate::connection::server::launch;
 
 mod connection;
 

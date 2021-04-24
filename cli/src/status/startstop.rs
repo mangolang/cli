@@ -66,6 +66,12 @@ pub fn start_daemon(args: &MangodArgs) -> Result<(), ()> {
 }
 
 pub fn stop_daemon(args: &DaemonStopCmd, status: &MangodStatus) -> Result<(), ()> {
+    let mode = match (args.quick, args.when_idle) {
+        (true, true) => panic!("conflicting arguments"),
+        (true, false) => StopMode::Quick,
+        (false, true) => StopMode::WhenIdle,
+        (false, false) => StopMode::FinishCurrentWork,
+    };
     match status {
         MangodStatus::Inactive => {
             eprintln!("mangod is not running");
@@ -84,7 +90,7 @@ pub fn stop_daemon(args: &DaemonStopCmd, status: &MangodStatus) -> Result<(), ()
         MangodStatus::Ok { address } => {
             if single_msg_client(
                 address,
-                Request::Control(ControlRequest::Stop(StopMode::FinishCurrentWork)),
+                Request::Control(ControlRequest::Stop(mode)),
                 Some(|resp| matches!(resp, Response::Control(ControlResponse::Stopped))),
                 Duration::from_secs(30),
             ) {

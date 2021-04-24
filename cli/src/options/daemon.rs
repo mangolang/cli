@@ -15,7 +15,7 @@ after_help = "Stop the mango daemon. Unless otherwise requested, finish all curr
 pub struct DaemonStopCmd {
     #[structopt(
         short = "c",
-        long = "clear",
+        long = "clear-lock",
         help = "If a lockfile for a daemon is found, but it is not responding, clear the lockfile and proceed. Useful if the previous daemon did not stop gracefully.",
     )]
     pub clear: bool,
