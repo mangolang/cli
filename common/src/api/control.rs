@@ -16,6 +16,6 @@ pub enum ControlRequest {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ControlResponse {
     Pong,
-    Stopping,
+    Stopping(StopMode),
     Stopped,
 }

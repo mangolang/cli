@@ -38,6 +38,17 @@ impl <'a> RespSender<'a> {
         warn!("sending error response: {}", &msg);
         self.send(Response::DaemonError(msg))
     }
+
+    pub fn broadcast(&self, data: Response) {
+        let envelope = ResponseEnvelope {
+            id: 0,
+            data,
+        };
+        let resp_data = bincode::serialize(&envelope)
+            .expect("could not encode Response");
+        self.sender.broadcast(resp_data)
+            .expect("failed to send websocket response");
+    }
 }
 
 pub fn server(addr: &str, handler: fn(Request, &RespSender) -> Result<Response, String>) -> Result<(), ()> {
