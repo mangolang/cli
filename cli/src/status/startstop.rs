@@ -3,11 +3,11 @@ use ::std::thread::sleep;
 use ::std::time::{Duration, SystemTime};
 
 use ::log::info;
-use ::log::debug;
 
 use ::mango_cli_common::util::{MangodArgs, MangodStatus};
 use ::mango_cli_common::util::can_ping;
-use mango_cli_common::api::{Request, ControlRequest, StopMode};
+use mango_cli_common::api::{ControlRequest, Request, StopMode};
+use mango_cli_common::util::single_msg_client;
 
 #[cfg(debug_assertions)]
 fn start_daemon_cmd(args: &[String]) -> Command {
@@ -74,23 +74,18 @@ pub fn stop_daemon(status: &MangodStatus) -> Result<(), ()> {
             Err(())
         },
         MangodStatus::Ok { address } => {
-            //TODO @mark: single_msg_client
-            // Send ping message to the server.
-            if let Err(_) = client(
+            if single_msg_client(
                 address,
-                |req_sender| {
-                    if let Err(()) = req_sender.try_send(Request::Control(ControlRequest::Stop(StopMode::FinishCurrentWork))) {
-                        debug!("failed to send shutdown request");
-                        req_sender.close();
-                    }
-                },
-                |resp, req_sender| { Ok(()) }) {
-                debug!("failed to not connect to {} for ping", address);
-                return Err(())
-            };
-            unimplemented!("stop daemon")
+                Request::Control(ControlRequest::Stop(StopMode::FinishCurrentWork)),
+                Some(|resp| unimplemented!()),
+                Duration::from_secs(30),
+            ) {
+                //TODO @mark: if successful, remove lock file
+                unimplemented!();
+                Ok(())
+            } else {
+                Err(())
+            }
         },
     }
-    //TODO @mark: send stop message
-    //TODO @mark: if successful, remove lock file
 }

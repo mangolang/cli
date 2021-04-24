@@ -4,6 +4,7 @@ pub use self::paths::get_cache_dir;
 pub use self::check_status::{MangodStatus, can_ping};
 pub use self::server::server;
 pub use self::client::client;
+pub use self::client::single_msg_client;
 
 mod paths;
 mod lockfile;
