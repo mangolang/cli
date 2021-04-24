@@ -14,17 +14,24 @@ after_help = "Stop the mango daemon. Unless otherwise requested, finish all curr
 )]
 pub struct DaemonStopCmd {
     #[structopt(
-        long = "quick",
-        about = "Stop all current tasks, just communicate the shutdown to clients and then stop.",
+        short = "c",
+        long = "clear",
+        help = "If a lockfile for a daemon is found, but it is not responding, clear the lockfile and proceed. Useful if the previous daemon did not stop gracefully.",
     )]
-    quick: bool,
+    pub clear: bool,
+
+    #[structopt(
+        long = "quick",
+        help = "Stop all current tasks, just communicate the shutdown to clients and then stop.",
+    )]
+    pub quick: bool,
 
     #[structopt(
         long = "when-idle",
         conflicts_with = "quick",
-        about = "Keep accepting new tasks, but if there is ever no work left, stop.",
+        help = "Keep accepting new tasks, but if there is ever no work left, stop.",
     )]
-    when_idle: bool,
+    pub when_idle: bool,
 
 }
 //TODO @mark:

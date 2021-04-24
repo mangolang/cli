@@ -8,6 +8,7 @@ use ::serde::{Deserialize, Serialize};
 use ::whoami;
 
 use crate::util::paths::get_lock_file;
+use std::fs::remove_file;
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct LockInfo {
@@ -57,6 +58,12 @@ pub fn store_lock(info: &LockInfo) {
         .unwrap_or_else(|err| panic!("could not access the mangod lock file: '{}', reason: {}", pth.to_string_lossy(), err)));
     serde_json::to_writer_pretty(writer, info)
         .unwrap_or_else(|err| panic!("could not write to the mangod lock file: '{}', reason: {}", pth.to_string_lossy(), err))
+}
+
+pub fn clear_lock() {
+    let pth = get_lock_file();
+    remove_file(&pth)
+        .unwrap_or_else(|err| panic!("could not remove mangod lock file: '{}', reason: {}", pth.to_string_lossy(), err))
 }
 
 #[cfg(test)]

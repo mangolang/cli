@@ -8,7 +8,8 @@ use ::mango_cli_common::util::{MangodArgs, MangodStatus};
 use ::mango_cli_common::util::can_ping;
 use mango_cli_common::api::{ControlRequest, Request, StopMode};
 use mango_cli_common::api::{ControlResponse, Response};
-use mango_cli_common::util::single_msg_client;
+use crate::options::daemon::DaemonStopCmd;
+use mango_cli_common::util::{single_msg_client, clear_lock};
 
 #[cfg(debug_assertions)]
 fn start_daemon_cmd(args: &[String]) -> Command {
@@ -64,15 +65,21 @@ pub fn start_daemon(args: &MangodArgs) -> Result<(), ()> {
     }
 }
 
-pub fn stop_daemon(status: &MangodStatus) -> Result<(), ()> {
+pub fn stop_daemon(args: &DaemonStopCmd, status: &MangodStatus) -> Result<(), ()> {
     match status {
         MangodStatus::Inactive => {
             eprintln!("mangod is not running");
             Ok(())
         },
         MangodStatus::Unresponsive { .. } => {
-            eprintln!("cannot stop mango daemon because it is not responding; if it is still running, stop it manually");
-            Err(())
+            if args.clear {
+                eprintln!("could not get response from mango daemon; lockfile will be cleared");
+                clear_lock();
+                Ok(())
+            } else {
+                eprintln!("cannot stop mango daemon because it is not responding; if it is still running, stop it manually");
+                Err(())
+            }
         },
         MangodStatus::Ok { address } => {
             if single_msg_client(
