@@ -7,7 +7,7 @@ use ::std::time::Duration;
 use ::lazy_static::lazy_static;
 use ::log::debug;
 
-use crate::api::{ControlResponse, Response};
+use crate::api::{ControlResponse, Response, Request, ControlRequest};
 use crate::util::{client, load_lock};
 
 lazy_static! {
@@ -81,10 +81,12 @@ pub fn can_ping(address: &str) -> bool {
 
     // Send ping message to the server.
     if let Err(_) = client(address,
-        |req_sender| if let Err(_) = req_sender.send(Request::Ping) {
-            debug!("failed to send ping message to {}", address);
-            channel_sender.send(false).unwrap();
-            req_sender.close();
+        |req_sender| {
+            if let Err(()) = req_sender.try_send(Request::Control(ControlRequest::Ping)) {
+                debug!("failed to send ping message");
+                channel_sender.send(false).unwrap();
+                req_sender.close();
+            }
         },
        |resp, req_sender| {
            if matches!(resp, Response::Control(ControlResponse::Pong)) {

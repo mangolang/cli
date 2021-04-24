@@ -1,5 +1,7 @@
-use ::log::warn;
+use ::log::debug;
 use ::log::error;
+use ::log::warn;
+use ::ws::{CloseCode, Handshake};
 use ::ws::connect;
 use ::ws::listen;
 use ::ws::Message;
@@ -7,7 +9,6 @@ use ::ws::Sender;
 
 use crate::api::{Request, RequestEnvelope, ResponseEnvelope};
 use crate::api::Response;
-use ws::{CloseCode, Handshake};
 
 #[derive(Debug)]
 pub struct ReqSender<'a> {
@@ -32,6 +33,19 @@ impl <'a> ReqSender<'a> {
             .expect("could not encode Request");
         self.sender.send(req_data)
             .expect("failed to send websocket request");
+    }
+
+    pub fn try_send(&self, data: Request) -> Result<(), ()> {
+        let envelope = RequestEnvelope {
+            id: self.id,
+            data,
+        };
+        let req_data = match bincode::serialize(&envelope) {
+            Ok(data) => data,
+            Err(_) => return Err(()),
+        };
+        self.sender.send(req_data)
+            .map_err(|_| ())
     }
 
     pub fn close(&self) {
@@ -72,8 +86,8 @@ impl <'a> RespSender<'a> {
     }
 }
 
-pub fn server(addr: &str, handler: fn(Request, &RespSender) -> Result<Response, String>) {
-    match listen(addr, |out| {
+pub fn server(addr: &str, handler: fn(Request, &RespSender) -> Result<Response, String>) -> Result<(), ()> {
+    listen(addr, |out| {
         move |req_msg: Message| {
             let mut sender = RespSender::new(&out);
             match req_msg {
@@ -97,20 +111,22 @@ pub fn server(addr: &str, handler: fn(Request, &RespSender) -> Result<Response, 
             }
             Ok(())
         }
-    }) {
-        Ok(()) => {}
-        Err(err) => eprintln!("could not start daemon, reason: {}", err),
-    };
+    }).map_err(|err| {
+        debug!("could not start daemon, reason: {}", err);
+        ()
+    })
 }
 
-struct ClientHandler {
+struct ClientHandler<S: Fn(&ReqSender), H: Fn(Response, &ReqSender) -> Result<(), String>> {
     sender: Sender,
-    on_start: fn(&ReqSender),
-    handler: fn(Response, &ReqSender) -> Result<(), String>,
+    on_start: S,
+    handler: H,
 }
 
-impl ws::Handler for ClientHandler {
+impl <S: Fn(&ReqSender), H: Fn(Response, &ReqSender) -> Result<(), String>> ws::Handler for ClientHandler<S, H> {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
+        let sender = ReqSender::new(&self.sender);
+        (self.on_start)(&sender);
         Ok(())
     }
 
@@ -138,13 +154,13 @@ impl ws::Handler for ClientHandler {
     }
 }
 
-pub fn client(addr: &str, on_start: fn(&ReqSender), handler: fn(Response, &ReqSender) -> Result<(), String>) {
-    match connect(addr, |sender| ClientHandler {
+pub fn client(addr: &str, on_start: impl Fn(&ReqSender) + Copy, handler: impl Fn(Response, &ReqSender) -> Result<(), String> + Copy) -> Result<(), ()> {
+    connect(addr, move |sender| ClientHandler {
         sender,
         on_start,
         handler
-    }) {
-        Ok(()) => {}
-        Err(err) => eprintln!("could not connect to daemon, reason: {}", err),
-    };
+    }).map_err(|err| {
+        debug!("could not connect to daemon, reason: {}", err);
+        ()
+    })
 }

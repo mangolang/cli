@@ -74,16 +74,6 @@ fn launch(args: &MangodArgs) {
                 ControlRequest::Stats => unimplemented!(),
             }
         }
-    });
-    // listen(&addr, |out| {
-    //     move |req_data| {
-    //         let req: Request = bincode::deserialize(&req_data)
-    //             .expect("could not understand Request");  //TODO: better error handling
-    //         let resp = Response;
-    //         let resp_data = bincode::serialize(&world)
-    //             .expect("could not encode Response");
-    //         out.send(resp_data)
-    //     }
-    // }).unwrap();
+    }).expect("failed to start server");
     eprintln!("bye from mangod");  //TODO @mark: TEMPORARY! REMOVE THIS!
 }
