@@ -7,6 +7,7 @@ use ::log::info;
 use ::mango_cli_common::util::{MangodArgs, MangodStatus};
 use ::mango_cli_common::util::can_ping;
 use mango_cli_common::api::{ControlRequest, Request, StopMode};
+use mango_cli_common::api::{ControlResponse, Response};
 use mango_cli_common::util::single_msg_client;
 
 #[cfg(debug_assertions)]
@@ -77,7 +78,7 @@ pub fn stop_daemon(status: &MangodStatus) -> Result<(), ()> {
             if single_msg_client(
                 address,
                 Request::Control(ControlRequest::Stop(StopMode::FinishCurrentWork)),
-                Some(|resp| unimplemented!()),
+                Some(|resp| matches!(resp, Response::Control(ControlResponse::Stopped))),
                 Duration::from_secs(30),
             ) {
                 //TODO @mark: if successful, remove lock file

@@ -12,11 +12,11 @@ pub enum StopMode {
 pub enum ControlRequest {
     Ping,
     Stop(StopMode),
-    Stats
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ControlResponse {
     Pong,
-    Stats
+    Stopping,
+    Stopped,
 }

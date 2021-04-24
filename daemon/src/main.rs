@@ -71,7 +71,6 @@ fn launch(args: &MangodArgs) {
             Request::Control(req) => match req {
                 ControlRequest::Ping => Ok(Response::Control(ControlResponse::Pong)),
                 ControlRequest::Stop(_) => unimplemented!("shutdown"),
-                ControlRequest::Stats => unimplemented!(),
             }
         }
     }).expect("failed to start server");
