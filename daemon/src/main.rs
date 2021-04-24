@@ -66,7 +66,7 @@ fn launch(args: &MangodArgs) {
     println!("starting mangod, listening on {}", &addr);
     let lock = LockInfo::new(process::id(), &addr);
     store_lock(&lock);
-    server(&addr, |request, sender| {
+    server(&addr, |request, _sender| {
         match request {
             Request::Control(req) => match req {
                 ControlRequest::Ping => Ok(Response::Control(ControlResponse::Pong)),

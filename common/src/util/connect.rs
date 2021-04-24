@@ -1,5 +1,6 @@
 use ::log::debug;
 use ::log::error;
+use ::log::info;
 use ::log::warn;
 use ::ws::{CloseCode, Handshake};
 use ::ws::connect;
@@ -87,7 +88,9 @@ impl <'a> RespSender<'a> {
 }
 
 pub fn server(addr: &str, handler: fn(Request, &RespSender) -> Result<Response, String>) -> Result<(), ()> {
-    listen(addr, |out| {
+    let ws_addr = format!("ws://{}", addr);
+    info!("starting server at {}", &ws_addr);
+    listen(&ws_addr, |out| {
         move |req_msg: Message| {
             let mut sender = RespSender::new(&out);
             match req_msg {
@@ -112,7 +115,7 @@ pub fn server(addr: &str, handler: fn(Request, &RespSender) -> Result<Response, 
             Ok(())
         }
     }).map_err(|err| {
-        debug!("could not start daemon, reason: {}", err);
+        error!("could not start daemon at {}, reason: {}", ws_addr, err);
         ()
     })
 }
@@ -155,7 +158,7 @@ impl <S: Fn(&ReqSender), H: Fn(Response, &ReqSender) -> Result<(), String>> ws::
 }
 
 pub fn client(addr: &str, on_start: impl Fn(&ReqSender) + Copy, handler: impl Fn(Response, &ReqSender) -> Result<(), String> + Copy) -> Result<(), ()> {
-    connect(addr, move |sender| ClientHandler {
+    connect(format!("ws://{}", addr), move |sender| ClientHandler {
         sender,
         on_start,
         handler
