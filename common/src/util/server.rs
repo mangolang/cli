@@ -1,41 +1,47 @@
 use ::std::collections::HashMap;
 use ::std::sync::Arc;
+use ::std::sync::atomic::{AtomicBool, Ordering};
+use ::std::sync::atomic::AtomicU64;
 use ::std::sync::RwLock;
 use ::std::thread;
 
+use ::bincode;
 use ::log::error;
 use ::log::info;
 use ::log::trace;
 use ::log::warn;
+use ::serde_json;
 use ::ws::CloseCode;
 use ::ws::Handshake;
 use ::ws::Message;
 use ::ws::Sender;
-use ws::util::Token;
+use ::ws::util::Token;
 
-use crate::api::{Request, Response, ResponseEnvelope};
+use crate::api::{Request, RequestEnvelope, Response, ResponseEnvelope};
 
 #[derive(Debug, Clone)]
 pub struct RespSender {
+    id: u64,
     content: Arc<RespSenderContent>,
 }
 
 #[derive(Debug)]
 pub struct RespSenderContent {
-    is_active: bool,
-    id: u64,
-    use_json: bool,
+    is_active: AtomicBool,
+    use_json: AtomicBool,
     sender: Sender,
+    control: Arc<ServerControl>,
 }
 
 impl RespSender {
-    pub fn new(sender: Sender) -> Self {
+    pub fn new(sender: Sender, control: Arc<ServerControl>) -> Self {
         RespSender {
             content: Arc::new(RespSenderContent {
-                is_active: true,
-                id: 0,
-                use_json: false,
+                is_active: AtomicBool::new(true),
+                id: AtomicU64::new(0),
+                use_json: AtomicBool::new(false),
                 sender,
+                control
             }),
         }
     }
@@ -46,11 +52,11 @@ impl RespSender {
 
     pub fn send(&self, data: Response) {
         let envelope = ResponseEnvelope {
-            id: self.content.id,
+            id: self.content.id.load(Ordering::Acquire),
             data,
         };
         trace!("sending {:?}", envelope);
-        assert!(!self.content.use_json, "to implement: json");  //TODO @mark:
+        assert!(!self.content.use_json.load(Ordering::Acquire), "to implement: json");  //TODO @mark:
         let resp_data = bincode::serialize(&envelope)
             .expect("could not encode Response");
         self.content.sender.send(resp_data)
@@ -65,27 +71,53 @@ impl RespSender {
 }
 
 #[derive(Debug)]
-struct ServerControl {
+pub struct ServerControl {
     clients: RwLock<HashMap<Token, Arc<RespSender>>>,
     handle: RwLock<Option<Sender>>,
 }
 
-struct ServerHandler<H: Fn(Request, &RespSender) -> Result<(), String>> {
-    control: Arc<ServerControl>,
+struct ServerHandler<H: Fn(Request, &RespSender) -> Result<Response, String>> {
     sender: RespSender,
     handler: H,
 }
 
-impl <H: Fn(Request, &RespSender) -> Result<(), String>> ws::Handler for ServerHandler<H> {
+impl <H: Fn(Request, &RespSender) -> Result<Response, String>> ws::Handler for ServerHandler<H> {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
-        self.control.clients.write().unwrap()
+        //TODO @mark: too long path
+        self.sender.content.control.clients.write().unwrap()
             .insert(self.sender.token(), Arc::new(self.sender.clone()));
         Ok(())
     }
 
     fn on_message(&mut self, req_msg: Message) -> ws::Result<()> {
-        unimplemented!()  //TODO @mark: TEMPORARY! REMOVE THIS!
-
+        let request_envelope = match req_msg {
+            Message::Text(req_data) => {
+                //TODO @mark: test this path
+                self.sender.content.use_json.store(true, Ordering::Release);
+                serde_json::from_str::<RequestEnvelope>(&req_data)
+                    .map_err(|err| format!("{}", err))
+            },
+            Message::Binary(req_data) => {
+                self.sender.content.use_json.store(false, Ordering::Release);
+                bincode::deserialize::<RequestEnvelope>(&req_data)
+                    .map_err(|err| format!("{}", err))
+            },
+        };
+        match request_envelope {
+            Ok(request_envelope) => {
+                let RequestEnvelope { id, data } = request_envelope;
+                self.sender.content.id.store(id, Ordering::Release);
+                match (self.handler)(data, &self.sender) {
+                    Ok(resp) => self.sender.send(resp),
+                    Err(err_msg) => self.sender.send_err(err_msg),
+                }
+            }
+            Err(err_msg) => {
+                warn!("failed to deserialize binary request: {}", &err_msg);
+                self.sender.send_err("could not understand binary request");
+            },
+        }
+        Ok(())
 
         // let mut sender = RespSender::new(&self.sender);
         // match req_msg {
@@ -112,13 +144,13 @@ impl <H: Fn(Request, &RespSender) -> Result<(), String>> ws::Handler for ServerH
 
     //TODO @mark: is on_close always called? also when timeout/dropped/crashed?
     fn on_close(&mut self, _: CloseCode, _: &str) {
-        self.control.clients.write().unwrap()
+        self.sender.content.control.clients.write().unwrap()
             .remove(&self.sender.token());
     }
 }
 
 //TODO @mark: check all Arc and RwLock to make sure it's not excessive
-pub fn server(addr: &str, handler: impl Fn(Request, &RespSender) -> Result<(), String> + Clone + Send + 'static) {
+pub fn server(addr: &str, handler: impl Fn(Request, &RespSender) -> Result<Response, String> + Clone + Send + 'static) {
     info!("starting server at {}", addr);
     let control = Arc::new(ServerControl {
         clients: RwLock::new(HashMap::new()),
@@ -127,8 +159,7 @@ pub fn server(addr: &str, handler: impl Fn(Request, &RespSender) -> Result<(), S
     let control_ref = control.clone();
     let socket = ws::Builder::new()
         .build(move |sender| ServerHandler {
-            control: control.clone(),
-            sender: RespSender::new(sender),
+            sender: RespSender::new(sender, control.clone()),
             handler: handler.clone(),
         })
         .expect("failed to build websocket server");

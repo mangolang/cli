@@ -1,11 +1,11 @@
 use ::std::process::exit;
+use ::std::thread::{sleep, spawn};
 use ::std::time::Duration;
 
 use ::log::info;
 
 use ::mango_cli_common::api::{ControlRequest, ControlResponse, Response, StopMode};
 use ::mango_cli_common::util::{clear_lock, RespSender};
-use std::thread::{sleep, spawn};
 
 pub fn handle_control(request: &ControlRequest, sender: &RespSender) -> Result<Response, String> {
     match request {
