@@ -19,6 +19,8 @@ use ::ws::util::Token;
 
 use crate::api::{Request, RequestEnvelope, Response, ResponseEnvelope};
 use crate::util::clear_lock;
+use std::thread::{spawn, sleep};
+use std::time::Duration;
 
 #[derive(Debug, Clone)]
 pub struct RespSender<'a> {
@@ -95,9 +97,14 @@ impl ConnectionData {
     }
 
     pub fn shutdown(&self) {
-        self.control.handle.read().unwrap().as_ref()
-            .expect("could not shut down server, the handle was not initialized at startup")
-            .shutdown().unwrap();
+        self.no_new_connections();
+        let control_copy = self.control.clone();
+        spawn(move || {
+            sleep(Duration::from_millis(100));
+            control_copy.handle.read().unwrap().as_ref()
+                .expect("could not shut down server, the handle was not initialized at startup")
+                .shutdown().unwrap();
+        });
     }
 }
 

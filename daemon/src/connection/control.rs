@@ -29,7 +29,8 @@ pub fn shutdown_quick(sender: &RespSender) -> Result<Response, String> {
     sender.connection.broadcast(Response::Control(ControlResponse::Stopping(StopMode::Quick)));
     sender.connection.no_new_connections();
     sender.connection.broadcast(Response::Control(ControlResponse::Stopped));
+    // //TODO @mark:
     sender.connection.shutdown();
-    info!("quick server shutdown complete");
+    // info!("quick server shutdown complete");
     Ok(Response::Ok)
 }
