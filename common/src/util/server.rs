@@ -1,8 +1,9 @@
-use ::std::rc::Rc;
+use ::std::collections::HashMap;
+use ::std::sync::Arc;
 use ::std::sync::RwLock;
 use ::std::thread;
-use std::collections::HashMap;
 
+use ::log::error;
 use ::log::info;
 use ::log::trace;
 use ::log::warn;
@@ -10,15 +11,13 @@ use ::ws::CloseCode;
 use ::ws::Handshake;
 use ::ws::Message;
 use ::ws::Sender;
+use ws::util::Token;
 
 use crate::api::{Request, Response, ResponseEnvelope};
-use ws::util::Token;
-use std::sync::Arc;
-use std::borrow::BorrowMut;
 
 #[derive(Debug, Clone)]
 pub struct RespSender {
-    content: Rc<RespSenderContent>,
+    content: Arc<RespSenderContent>,
 }
 
 #[derive(Debug)]
@@ -32,7 +31,7 @@ pub struct RespSenderContent {
 impl RespSender {
     pub fn new(sender: Sender) -> Self {
         RespSender {
-            content: Rc::new(RespSenderContent {
+            content: Arc::new(RespSenderContent {
                 is_active: true,
                 id: 0,
                 use_json: false,
@@ -118,12 +117,14 @@ impl <H: Fn(Request, &RespSender) -> Result<(), String>> ws::Handler for ServerH
     }
 }
 
-pub fn server(addr: &str, handler: impl Fn(Request, &RespSender) -> Result<(), String> + Clone) {
+//TODO @mark: check all Arc and RwLock to make sure it's not excessive
+pub fn server(addr: &str, handler: impl Fn(Request, &RespSender) -> Result<(), String> + Clone + Send + 'static) {
     info!("starting server at {}", addr);
     let control = Arc::new(ServerControl {
         clients: RwLock::new(HashMap::new()),
         handle: RwLock::new(None),
     });
+    let control_ref = control.clone();
     let socket = ws::Builder::new()
         .build(move |sender| ServerHandler {
             control: control.clone(),
@@ -131,17 +132,18 @@ pub fn server(addr: &str, handler: impl Fn(Request, &RespSender) -> Result<(), S
             handler: handler.clone(),
         })
         .expect("failed to build websocket server");
-    // *control.handle.borrow_mut().get_mut().unwrap() = Some(socket.broadcaster());
-    // let thrd = thread::spawn(move || {
-    //     if let Err(err) = socket.listen(addr) {
-    //         error!("could not start daemon at {}, reason: {}", addr, err)
-    //     }
-    // });
+    *control_ref.handle.write().unwrap() = Some(socket.broadcaster());
+    let addr_copy = addr.to_owned();
+    let thrd = thread::spawn(move || {
+        if let Err(err) = socket.listen(&addr_copy) {
+            error!("could not start daemon at {}, reason: {}", &addr_copy, err)
+        }
+    });
 
 
 
 
-    // thrd.join().expect("something went wrong with the server thread");
+    thrd.join().expect("something went wrong with the server thread");
 
 
     // |out| {
