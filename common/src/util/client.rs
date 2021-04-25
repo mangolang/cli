@@ -13,21 +13,21 @@ use std::time::Duration;
 
 #[derive(Debug)]
 pub struct ReqSender<'a> {
-    id: u64,
+    trace: u64,
     sender: &'a Sender,
 }
 
 impl <'a> ReqSender<'a> {
     pub fn new(sender: &'a Sender) -> Self {
         ReqSender {
-            id: 0,
+            trace: 0,
             sender,
         }
     }
 
     pub fn send(&self, data: Request) {
         let envelope = RequestEnvelope {
-            id: self.id,
+            id: self.trace,
             data,
         };
         trace!("sending: {:?}", envelope);
@@ -39,7 +39,7 @@ impl <'a> ReqSender<'a> {
 
     pub fn try_send(&self, data: Request) -> Result<(), ()> {
         let envelope = RequestEnvelope {
-            id: self.id,
+            id: self.trace,
             data,
         };
         trace!("(try-)sending: {:?}", envelope);
@@ -52,7 +52,7 @@ impl <'a> ReqSender<'a> {
     }
 
     pub fn close(&self) {
-        trace!("closing {}", self.id);
+        trace!("closing");
         self.sender.close(CloseCode::Normal)
             .expect("failed to close daemon connection");
     }
@@ -81,7 +81,7 @@ impl <T, S: Fn(&T, &ReqSender), H: Fn(&T, Response, &ReqSender) -> Result<(), St
                     Ok(response_envelope) => {
                         trace!("received: {:?}", response_envelope);
                         let ResponseEnvelope { id, data } = response_envelope;
-                        sender.id = id;
+                        sender.trace = id;
                         match (self.handler)(&self.scope, data, &sender) {
                             Ok(()) => {},
                             Err(err_msg) => error!("error occurred: {}", err_msg),

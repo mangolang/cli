@@ -1,7 +1,6 @@
 use ::std::collections::HashMap;
 use ::std::sync::Arc;
 use ::std::sync::atomic::{AtomicBool, Ordering};
-use ::std::sync::atomic::AtomicU64;
 use ::std::sync::RwLock;
 use ::std::thread;
 
@@ -20,46 +19,61 @@ use ::ws::util::Token;
 use crate::api::{Request, RequestEnvelope, Response, ResponseEnvelope};
 
 #[derive(Debug, Clone)]
-pub struct RespSender {
-    id: u64,
-    content: Arc<RespSenderContent>,
+pub struct RespSender<'a> {
+    trace: u64,
+    connection: &'a ConnectionData,
+}
+
+impl <'a> RespSender<'a> {
+    pub fn new(trace: u64, connection: &'a ConnectionData) -> Self {
+        RespSender {
+            trace,
+            connection,
+        }
+    }
+
+    pub fn untraced(connection: &'a ConnectionData) -> Self {
+        RespSender {
+            trace: 0,
+            connection,
+        }
+    }
 }
 
 #[derive(Debug)]
-pub struct RespSenderContent {
+pub struct ConnectionData {
     is_active: AtomicBool,
     use_json: AtomicBool,
     sender: Sender,
     control: Arc<ServerControl>,
 }
 
-impl RespSender {
-    pub fn new(sender: Sender, control: Arc<ServerControl>) -> Self {
-        RespSender {
-            content: Arc::new(RespSenderContent {
-                is_active: AtomicBool::new(true),
-                id: AtomicU64::new(0),
-                use_json: AtomicBool::new(false),
-                sender,
-                control
-            }),
-        }
+impl ConnectionData {
+    pub fn new(sender: Sender, control: Arc<ServerControl>) -> Arc<Self> {
+        Arc::new(ConnectionData {
+            is_active: AtomicBool::new(true),
+            use_json: AtomicBool::new(false),
+            sender,
+            control
+        })
     }
 
     pub fn token(&self) -> Token {
-        self.content.sender.token()
+        self.sender.token()
     }
+}
 
+impl <'a> RespSender<'a> {
     pub fn send(&self, data: Response) {
         let envelope = ResponseEnvelope {
-            id: self.content.id.load(Ordering::Acquire),
+            id: self.trace,
             data,
         };
         trace!("sending {:?}", envelope);
-        assert!(!self.content.use_json.load(Ordering::Acquire), "to implement: json");  //TODO @mark:
+        assert!(!self.connection.use_json.load(Ordering::Acquire), "to implement: json");  //TODO @mark:
         let resp_data = bincode::serialize(&envelope)
             .expect("could not encode Response");
-        self.content.sender.send(resp_data)
+        self.connection.sender.send(resp_data)
             .expect("failed to send websocket response");
     }
 
@@ -72,20 +86,21 @@ impl RespSender {
 
 #[derive(Debug)]
 pub struct ServerControl {
-    clients: RwLock<HashMap<Token, Arc<RespSender>>>,
+    clients: RwLock<HashMap<Token, Arc<ConnectionData>>>,
     handle: RwLock<Option<Sender>>,
 }
 
 struct ServerHandler<H: Fn(Request, &RespSender) -> Result<Response, String>> {
-    sender: RespSender,
+    connection: Arc<ConnectionData>,
     handler: H,
 }
 
 impl <H: Fn(Request, &RespSender) -> Result<Response, String>> ws::Handler for ServerHandler<H> {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
         //TODO @mark: too long path
-        self.sender.content.control.clients.write().unwrap()
-            .insert(self.sender.token(), Arc::new(self.sender.clone()));
+        let connection = &self.connection;
+        connection.control.clients.write().unwrap()
+            .insert(connection.token(), connection.clone());
         Ok(())
     }
 
@@ -93,12 +108,12 @@ impl <H: Fn(Request, &RespSender) -> Result<Response, String>> ws::Handler for S
         let request_envelope = match req_msg {
             Message::Text(req_data) => {
                 //TODO @mark: test this path
-                self.sender.content.use_json.store(true, Ordering::Release);
+                self.connection.use_json.store(true, Ordering::Release);
                 serde_json::from_str::<RequestEnvelope>(&req_data)
                     .map_err(|err| format!("{}", err))
             },
             Message::Binary(req_data) => {
-                self.sender.content.use_json.store(false, Ordering::Release);
+                self.connection.use_json.store(false, Ordering::Release);
                 bincode::deserialize::<RequestEnvelope>(&req_data)
                     .map_err(|err| format!("{}", err))
             },
@@ -106,46 +121,25 @@ impl <H: Fn(Request, &RespSender) -> Result<Response, String>> ws::Handler for S
         match request_envelope {
             Ok(request_envelope) => {
                 let RequestEnvelope { id, data } = request_envelope;
-                self.sender.content.id.store(id, Ordering::Release);
-                match (self.handler)(data, &self.sender) {
-                    Ok(resp) => self.sender.send(resp),
-                    Err(err_msg) => self.sender.send_err(err_msg),
+                let sender = RespSender::new(id, &self.connection);
+                match (self.handler)(data, &sender) {
+                    Ok(resp) => sender.send(resp),
+                    Err(err_msg) => sender.send_err(err_msg),
                 }
             }
             Err(err_msg) => {
+                let sender = RespSender::untraced(&self.connection);
                 warn!("failed to deserialize binary request: {}", &err_msg);
-                self.sender.send_err("could not understand binary request");
+                sender.send_err("could not understand binary request");
             },
         }
         Ok(())
-
-        // let mut sender = RespSender::new(&self.sender);
-        // match req_msg {
-        //     Message::Text(_) => error!("got text message, but all messages should be binary"),
-        //     Message::Binary(resp_data) => {
-        //         match bincode::deserialize::<ResponseEnvelope>(&resp_data) {
-        //             Ok(response_envelope) => {
-        //                 trace!("received: {:?}", response_envelope);
-        //                 let ResponseEnvelope { id, data } = response_envelope;
-        //                 sender.id = id;
-        //                 match (self.handler)(&self.scope, data, &sender) {
-        //                     Ok(()) => {},
-        //                     Err(err_msg) => error!("error occurred: {}", err_msg),
-        //                 }
-        //             }
-        //             Err(err_msg) => {
-        //                 error!("failed to deserialize response: {}", &err_msg);
-        //             },
-        //         }
-        //     }
-        // }
-        // Ok(())
     }
 
     //TODO @mark: is on_close always called? also when timeout/dropped/crashed?
     fn on_close(&mut self, _: CloseCode, _: &str) {
-        self.sender.content.control.clients.write().unwrap()
-            .remove(&self.sender.token());
+        self.connection.control.clients.write().unwrap()
+            .remove(&self.connection.token());
     }
 }
 
@@ -159,7 +153,7 @@ pub fn server(addr: &str, handler: impl Fn(Request, &RespSender) -> Result<Respo
     let control_ref = control.clone();
     let socket = ws::Builder::new()
         .build(move |sender| ServerHandler {
-            sender: RespSender::new(sender, control.clone()),
+            connection: ConnectionData::new(sender, control.clone()),
             handler: handler.clone(),
         })
         .expect("failed to build websocket server");
@@ -170,39 +164,5 @@ pub fn server(addr: &str, handler: impl Fn(Request, &RespSender) -> Result<Respo
             error!("could not start daemon at {}, reason: {}", &addr_copy, err)
         }
     });
-
-
-
-
     thrd.join().expect("something went wrong with the server thread");
-
-
-    // |out| {
-    //     move |req_msg: Message| {
-    //         let mut sender = RespSender::new(&out);
-    //         match req_msg {
-    //             Message::Text(_) => sender.send_err("got text message, but all messages should be binary"),
-    //             Message::Binary(req_data) => {
-    //                 match bincode::deserialize::<RequestEnvelope>(&req_data) {
-    //                     Ok(request_envelope) => {
-    //                         let RequestEnvelope { id, data } = request_envelope;
-    //                         sender.id = id;
-    //                         match handler(data, &sender) {
-    //                             Ok(resp) => sender.send(resp),
-    //                             Err(err_msg) => sender.send_err(err_msg),
-    //                         }
-    //                     }
-    //                     Err(err_msg) => {
-    //                         warn!("failed to deserialize request: {}", &err_msg);
-    //                         sender.send_err("could not understand request");
-    //                     },
-    //                 }
-    //             }
-    //         }
-    //         Ok(())
-    //     }
-    // }).map_err(|err| {
-    //     error!("could not start daemon at {}, reason: {}", addr, err);
-    //     ()
-    // })
 }
