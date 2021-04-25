@@ -74,7 +74,6 @@ impl <T, S: Fn(&T, &ReqSender), H: Fn(&T, Response, &ReqSender) -> Result<(), St
 
     fn on_message(&mut self, req_msg: Message) -> ws::Result<()> {
         let mut sender = ReqSender::new(&self.sender);
-        trace!("got a message!");  //TODO @mark: TEMPORARY! REMOVE THIS!
         match req_msg {
             Message::Text(_) => error!("got text message, but all messages should be binary"),
             Message::Binary(resp_data) => {

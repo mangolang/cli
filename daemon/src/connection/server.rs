@@ -14,6 +14,6 @@ pub fn launch(args: &MangodArgs) {
         match request {
             Request::Control(request) => handle_control(&request, sender)
         }
-    }).expect("failed to start server");
+    });
     eprintln!("bye from mangod");  //TODO @mark: TEMPORARY! REMOVE THIS!
 }
