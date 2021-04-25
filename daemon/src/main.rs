@@ -18,18 +18,6 @@ fn main(args: MangodArgs) {
         abort_if_running(&addr);
     }
     launch(&args);
-
-    // host
-    // port
-    // worker_count
-    // cache_mem_mb
-
-    // let lockfile = load_lock();
-    // let status = match &lockfile {
-    //     Some(info) => determine_status(info.pid()),
-    //     None => MangodStatus::Inactive,
-    // };
-    // handle_cmd(&args, &status);
 }
 
 fn abort_if_running(new_addr: &str) {

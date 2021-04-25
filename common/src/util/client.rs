@@ -135,7 +135,6 @@ pub fn single_msg_client(address: &str, request: Request, await_response: Option
                     req_sender.close();
                 } else if let Response::DaemonError(err_msg) = actual_response {
                     error!("daemon error: {}", err_msg);
-                    req_sender.close();
                 }
             }
             Ok(())

@@ -36,7 +36,6 @@ pub struct DaemonStopCmd {
     pub when_idle: bool,
 
 }
-//TODO @mark:
 
 #[derive(StructOpt, Debug)]
 pub enum DaemonCmd {

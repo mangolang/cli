@@ -1,7 +1,9 @@
 use ::std::process::Command;
+use ::std::process::Output;
 use ::std::str::from_utf8;
 use ::std::sync::Once;
-use std::process::Output;
+use ::std::thread::sleep;
+use ::std::time::Duration;
 
 use ::assert_cmd::prelude::*;
 use ::serial_test::serial;
@@ -69,7 +71,9 @@ fn daemon_start_stop() {
 
     // Start
     let res = do_cli(&["daemon", "start"]);
-    assert!(res.status.success(), "{:?}", res);
+    let start_txt = from_utf8(&res.stderr).unwrap();
+    println!("starting:\n{}/starting", start_txt);
+    assert!(res.status.success(), "{}", start_txt);
 
     let res = do_cli(&["daemon", "get", "status"]);
     let out = from_utf8(&res.stdout).unwrap().trim();
@@ -77,9 +81,14 @@ fn daemon_start_stop() {
 
     // Stop
     let res = do_cli(&["daemon", "stop"]);
-    assert!(res.status.success());
+    println!("stopping:\n{}/stopped", start_txt);
+    assert!(res.status.success(), "{}", from_utf8(&res.stderr).unwrap());
+
+    // Sleep here because the server sleept 50ms before shutting down
+    //TODO get rid of sleep when the server no longer sleeps
+    sleep(Duration::from_millis(75));
 
     let res = do_cli(&["daemon", "get", "status"]);
     let out = from_utf8(&res.stdout).unwrap().trim();
-    assert_eq!(out, "stopped");
+    assert_eq!(out, "not-started");
 }

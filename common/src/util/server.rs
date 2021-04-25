@@ -100,7 +100,8 @@ impl ConnectionData {
         self.no_new_connections();
         let control_copy = self.control.clone();
         spawn(move || {
-            sleep(Duration::from_millis(100));
+            //TODO get rid of spawn/sleep: https://github.com/housleyjk/ws-rs/issues/332
+            sleep(Duration::from_millis(50));
             control_copy.handle.read().unwrap().as_ref()
                 .expect("could not shut down server, the handle was not initialized at startup")
                 .shutdown().unwrap();
