@@ -1,10 +1,8 @@
-use ::std::borrow::BorrowMut;
 use ::std::rc::Rc;
 use ::std::sync::RwLock;
 use ::std::thread;
 use std::collections::HashMap;
 
-use ::log::error;
 use ::log::info;
 use ::log::trace;
 use ::log::warn;
@@ -15,6 +13,8 @@ use ::ws::Sender;
 
 use crate::api::{Request, Response, ResponseEnvelope};
 use ws::util::Token;
+use std::sync::Arc;
+use std::borrow::BorrowMut;
 
 #[derive(Debug, Clone)]
 pub struct RespSender {
@@ -67,31 +67,25 @@ impl RespSender {
 
 #[derive(Debug)]
 struct ServerControl {
-    clients: RwLock<HashMap<Token, Rc<RespSender>>>,
+    clients: RwLock<HashMap<Token, Arc<RespSender>>>,
     handle: RwLock<Option<Sender>>,
 }
 
 struct ServerHandler<H: Fn(Request, &RespSender) -> Result<(), String>> {
-    control: Rc<ServerControl>,
+    control: Arc<ServerControl>,
     sender: RespSender,
     handler: H,
 }
 
 impl <H: Fn(Request, &RespSender) -> Result<(), String>> ws::Handler for ServerHandler<H> {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
-        self.control.clients.get_mut().unwrap()
-            .insert(self.sender.token(), Rc::new(self.sender.clone()));
+        self.control.clients.write().unwrap()
+            .insert(self.sender.token(), Arc::new(self.sender.clone()));
         Ok(())
     }
 
-    //TODO @mark: is on_close always called? also when timeout/dropped/crashed?
-    fn on_close(&mut self, _: CloseCode, _: &str) {
-        self.control.clients.get_mut().unwrap()
-            .remove(&self.sender.token());
-    }
-
     fn on_message(&mut self, req_msg: Message) -> ws::Result<()> {
-        unimplemented!()
+        unimplemented!()  //TODO @mark: TEMPORARY! REMOVE THIS!
 
 
         // let mut sender = RespSender::new(&self.sender);
@@ -116,32 +110,38 @@ impl <H: Fn(Request, &RespSender) -> Result<(), String>> ws::Handler for ServerH
         // }
         // Ok(())
     }
+
+    //TODO @mark: is on_close always called? also when timeout/dropped/crashed?
+    fn on_close(&mut self, _: CloseCode, _: &str) {
+        self.control.clients.write().unwrap()
+            .remove(&self.sender.token());
+    }
 }
 
-pub fn server(addr: &str, handler: fn(Request, &RespSender) -> Result<Response, String>) {
+pub fn server(addr: &str, handler: impl Fn(Request, &RespSender) -> Result<(), String> + Clone) {
     info!("starting server at {}", addr);
-    let control = Rc::new(ServerControl {
+    let control = Arc::new(ServerControl {
         clients: RwLock::new(HashMap::new()),
         handle: RwLock::new(None),
     });
     let socket = ws::Builder::new()
-        .build(|sender| ServerHandler {
+        .build(move |sender| ServerHandler {
             control: control.clone(),
             sender: RespSender::new(sender),
-            handler,
+            handler: handler.clone(),
         })
         .expect("failed to build websocket server");
-    *control.handle.borrow_mut().get_mut().unwrap() = Some(socket.broadcaster());
-    let thrd = thread::spawn(move || {
-        if let Err(err) = socket.listen(addr) {
-            error!("could not start daemon at {}, reason: {}", addr, err)
-        }
-    });
+    // *control.handle.borrow_mut().get_mut().unwrap() = Some(socket.broadcaster());
+    // let thrd = thread::spawn(move || {
+    //     if let Err(err) = socket.listen(addr) {
+    //         error!("could not start daemon at {}, reason: {}", addr, err)
+    //     }
+    // });
 
 
 
 
-    thrd.join().expect("something went wrong with the server thread");
+    // thrd.join().expect("something went wrong with the server thread");
 
 
     // |out| {
