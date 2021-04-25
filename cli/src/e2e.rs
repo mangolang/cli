@@ -1,12 +1,14 @@
-use ::std::path::PathBuf;
-use ::std::process::{Command, Stdio};
+use ::std::process::Command;
+use ::std::str::from_utf8;
 use ::std::sync::Once;
+use std::process::Output;
 
+use ::assert_cmd::prelude::*;
+use ::serial_test::serial;
 use ::structopt::clap::ErrorKind;
 use ::structopt::StructOpt;
 
 use super::*;
-use std::str::from_utf8;
 
 static INIT: Once = Once::new();
 
@@ -17,8 +19,6 @@ fn init() {
         let result = Command::new("cargo")
             .arg("build")
             .arg("--workspace")
-            .arg("--release")
-            .stdin(Stdio::null())
             .output()
             .unwrap();
         assert!(result.status.success(), "build failed: {}", from_utf8(&result.stderr).unwrap());
@@ -34,12 +34,11 @@ fn init() {
     });
 }
 
-fn do_cli(args: &[&str]) {
-    Command::new("target/debug/mango")
+fn do_cli(args: &[&str]) -> Output {
+    Command::cargo_bin("mango").unwrap()
         .args(args)
-        .stdin(Stdio::null())
         .output()
-        .unwrap();
+        .unwrap()
 }
 
 #[test]
@@ -62,13 +61,25 @@ fn compile_ir() {
     cli(args)
 }
 
+#[serial]
 #[test]
 fn daemon_start_stop() {
     init();
-    //cli(MangoArgs::from_iter(&["mango", "daemon", "start"]));
-    let args = do_cli(&["daemon", "get", "status"]);
-    // dbg!(&args);  //TODO @mark: TEMPORARY! REMOVE THIS!
-    // cli(args.unwrap());
-    //cli(MangoArgs::from_iter(&["mango", "daemon", "stop", "-c", "--quick"]));
-    //cli(MangoArgs::from_iter(&["mango", "daemon", "get", "status"]));
+    do_cli(&["mango", "daemon", "stop", "-c"]);
+
+    // Start
+    let res = do_cli(&["daemon", "start"]);
+    assert!(res.status.success(), "{:?}", res);
+
+    let res = do_cli(&["daemon", "get", "status"]);
+    let out = from_utf8(&res.stdout).unwrap().trim();
+    assert_eq!(out, "running");
+
+    // Stop
+    let res = do_cli(&["daemon", "stop"]);
+    assert!(res.status.success());
+
+    let res = do_cli(&["daemon", "get", "status"]);
+    let out = from_utf8(&res.stdout).unwrap().trim();
+    assert_eq!(out, "stopped");
 }
