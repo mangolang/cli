@@ -69,8 +69,10 @@ fn daemon_start_stop() {
     init();
     do_cli(&["mango", "daemon", "stop", "-c"]);
 
+    //TODO @mark: should use a separate lockfile, possibly pass as env var (or param)?
+
     // Start
-    let res = do_cli(&["daemon", "start"]);
+    let res = do_cli(&["daemon", "start", "-p", "47559"]);
     let start_txt = from_utf8(&res.stderr).unwrap();
     println!("starting:\n{}/starting", start_txt);
     assert!(res.status.success(), "{}", start_txt);
@@ -81,7 +83,8 @@ fn daemon_start_stop() {
 
     // Stop
     let res = do_cli(&["daemon", "stop"]);
-    println!("stopping:\n{}/stopped", start_txt);
+    let stop_txt = from_utf8(&res.stderr).unwrap();
+    println!("stopping:\n{}/stopped", stop_txt);
     assert!(res.status.success(), "{}", from_utf8(&res.stderr).unwrap());
 
     // Sleep here because the server sleept 50ms before shutting down

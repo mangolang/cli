@@ -80,5 +80,6 @@ mod tests {
         assert!(get_lock_file().is_file());
         let after = load_lock().unwrap();
         assert_eq!(before, after);
+        clear_lock();
     }
 }
