@@ -6,7 +6,7 @@ mod control;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RequestEnvelope {
-    pub id: u64,
+    pub trace: u64,
     pub data: Request,
 }
 
@@ -17,7 +17,7 @@ pub enum Request {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ResponseEnvelope {
-    pub id: u64,
+    pub trace: u64,
     pub data: Response,
 }
 

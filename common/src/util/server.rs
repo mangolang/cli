@@ -5,6 +5,7 @@ use ::std::sync::RwLock;
 use ::std::thread;
 
 use ::bincode;
+use ::log::debug;
 use ::log::error;
 use ::log::info;
 use ::log::trace;
@@ -17,11 +18,12 @@ use ::ws::Sender;
 use ::ws::util::Token;
 
 use crate::api::{Request, RequestEnvelope, Response, ResponseEnvelope};
+use crate::util::clear_lock;
 
 #[derive(Debug, Clone)]
 pub struct RespSender<'a> {
     trace: u64,
-    connection: &'a ConnectionData,
+    pub connection: &'a ConnectionData,
 }
 
 impl <'a> RespSender<'a> {
@@ -42,7 +44,6 @@ impl <'a> RespSender<'a> {
 
 #[derive(Debug)]
 pub struct ConnectionData {
-    is_active: AtomicBool,
     use_json: AtomicBool,
     sender: Sender,
     control: Arc<ServerControl>,
@@ -51,7 +52,6 @@ pub struct ConnectionData {
 impl ConnectionData {
     pub fn new(sender: Sender, control: Arc<ServerControl>) -> Arc<Self> {
         Arc::new(ConnectionData {
-            is_active: AtomicBool::new(true),
             use_json: AtomicBool::new(false),
             sender,
             control
@@ -61,20 +61,49 @@ impl ConnectionData {
     pub fn token(&self) -> Token {
         self.sender.token()
     }
+
+    fn send_with_trace(&self, trace: u64, data: Response) {
+        let envelope = ResponseEnvelope {
+            trace,
+            data,
+        };
+        trace!("sending {:?}", envelope);
+        assert!(!self.use_json.load(Ordering::Acquire), "to implement: json");  //TODO @mark:
+        let resp_data = bincode::serialize(&envelope)
+            .expect("could not encode Response");
+        self.sender.send(resp_data)
+            .expect("failed to send websocket response");
+    }
+
+    pub fn send_untraced(&self, data: Response) {
+        self.send_with_trace(0, data)
+    }
+
+    pub fn send_err_untraced(&self, msg: impl Into<String>) {
+        let msg = msg.into();
+        warn!("sending error response: {}", &msg);
+        self.send_untraced(Response::DaemonError(msg))
+    }
+
+    pub fn broadcast(&self, response: Response) {
+        self.control.clients.read().unwrap().values()
+            .for_each(|client| client.send_untraced(response.clone()))
+    }
+
+    pub fn no_new_connections(&self) {
+        self.control.is_accepting_connections.store(false, Ordering::Release);
+    }
+
+    pub fn shutdown(&self) {
+        self.control.handle.read().unwrap().as_ref()
+            .expect("could not shut down server, the handle was not initialized at startup")
+            .shutdown().unwrap();
+    }
 }
 
 impl <'a> RespSender<'a> {
     pub fn send(&self, data: Response) {
-        let envelope = ResponseEnvelope {
-            id: self.trace,
-            data,
-        };
-        trace!("sending {:?}", envelope);
-        assert!(!self.connection.use_json.load(Ordering::Acquire), "to implement: json");  //TODO @mark:
-        let resp_data = bincode::serialize(&envelope)
-            .expect("could not encode Response");
-        self.connection.sender.send(resp_data)
-            .expect("failed to send websocket response");
+        self.connection.send_with_trace(self.trace, data);
     }
 
     pub fn send_err(&self, msg: impl Into<String>) {
@@ -88,6 +117,17 @@ impl <'a> RespSender<'a> {
 pub struct ServerControl {
     clients: RwLock<HashMap<Token, Arc<ConnectionData>>>,
     handle: RwLock<Option<Sender>>,
+    is_accepting_connections: AtomicBool,
+}
+
+impl ServerControl {
+    pub fn new() -> Arc<Self> {
+        Arc::new(ServerControl {
+            clients: RwLock::new(HashMap::new()),
+            handle: RwLock::new(None),
+            is_accepting_connections: AtomicBool::new(true),
+        })
+    }
 }
 
 struct ServerHandler<H: Fn(Request, &RespSender) -> Result<Response, String>> {
@@ -99,8 +139,13 @@ impl <H: Fn(Request, &RespSender) -> Result<Response, String>> ws::Handler for S
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
         //TODO @mark: too long path
         let connection = &self.connection;
-        connection.control.clients.write().unwrap()
-            .insert(connection.token(), connection.clone());
+        if connection.control.is_accepting_connections.load(Ordering::Acquire) {
+            connection.control.clients.write().unwrap()
+                .insert(connection.token(), connection.clone());
+        } else {
+            debug!("rejecting connection because mangod is shutting down");
+            connection.send_err_untraced("the mango daemon is currently shutting down, no new connections accepted");
+        }
         Ok(())
     }
 
@@ -120,7 +165,7 @@ impl <H: Fn(Request, &RespSender) -> Result<Response, String>> ws::Handler for S
         };
         match request_envelope {
             Ok(request_envelope) => {
-                let RequestEnvelope { id, data } = request_envelope;
+                let RequestEnvelope { trace: id, data } = request_envelope;
                 let sender = RespSender::new(id, &self.connection);
                 match (self.handler)(data, &sender) {
                     Ok(resp) => sender.send(resp),
@@ -128,9 +173,8 @@ impl <H: Fn(Request, &RespSender) -> Result<Response, String>> ws::Handler for S
                 }
             }
             Err(err_msg) => {
-                let sender = RespSender::untraced(&self.connection);
                 warn!("failed to deserialize binary request: {}", &err_msg);
-                sender.send_err("could not understand binary request");
+                self.connection.send_err_untraced("could not understand binary request");
             },
         }
         Ok(())
@@ -146,10 +190,7 @@ impl <H: Fn(Request, &RespSender) -> Result<Response, String>> ws::Handler for S
 //TODO @mark: check all Arc and RwLock to make sure it's not excessive
 pub fn server(addr: &str, handler: impl Fn(Request, &RespSender) -> Result<Response, String> + Clone + Send + 'static) {
     info!("starting server at {}", addr);
-    let control = Arc::new(ServerControl {
-        clients: RwLock::new(HashMap::new()),
-        handle: RwLock::new(None),
-    });
+    let control = ServerControl::new();
     let control_ref = control.clone();
     let socket = ws::Builder::new()
         .build(move |sender| ServerHandler {
@@ -165,4 +206,5 @@ pub fn server(addr: &str, handler: impl Fn(Request, &RespSender) -> Result<Respo
         }
     });
     thrd.join().expect("something went wrong with the server thread");
+    clear_lock();
 }

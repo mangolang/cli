@@ -1,6 +1,9 @@
+use ::std::sync::mpsc::{channel, RecvTimeoutError};
+use ::std::time::Duration;
+
 use ::log::debug;
-use ::log::trace;
 use ::log::error;
+use ::log::trace;
 use ::ws::{CloseCode, Handshake};
 use ::ws::connect;
 use ::ws::Message;
@@ -8,8 +11,6 @@ use ::ws::Sender;
 
 use crate::api::{Request, RequestEnvelope, ResponseEnvelope};
 use crate::api::Response;
-use std::sync::mpsc::{channel, RecvTimeoutError};
-use std::time::Duration;
 
 #[derive(Debug)]
 pub struct ReqSender<'a> {
@@ -27,7 +28,7 @@ impl <'a> ReqSender<'a> {
 
     pub fn send(&self, data: Request) {
         let envelope = RequestEnvelope {
-            id: self.trace,
+            trace: self.trace,
             data,
         };
         trace!("sending: {:?}", envelope);
@@ -39,7 +40,7 @@ impl <'a> ReqSender<'a> {
 
     pub fn try_send(&self, data: Request) -> Result<(), ()> {
         let envelope = RequestEnvelope {
-            id: self.trace,
+            trace: self.trace,
             data,
         };
         trace!("(try-)sending: {:?}", envelope);
@@ -80,7 +81,7 @@ impl <T, S: Fn(&T, &ReqSender), H: Fn(&T, Response, &ReqSender) -> Result<(), St
                 match bincode::deserialize::<ResponseEnvelope>(&resp_data) {
                     Ok(response_envelope) => {
                         trace!("received: {:?}", response_envelope);
-                        let ResponseEnvelope { id, data } = response_envelope;
+                        let ResponseEnvelope { trace: id, data } = response_envelope;
                         sender.trace = id;
                         match (self.handler)(&self.scope, data, &sender) {
                             Ok(()) => {},
