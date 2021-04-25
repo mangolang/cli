@@ -3,7 +3,9 @@ use ::mango_cli_common::util::MangodArgs;
 
 #[derive(StructOpt, Debug)]
 pub enum DaemonGetCmd {
+    #[structopt(about = "Get the current status of the Mango daemon process")]
     Status,
+    #[structopt(about = "Get the address that the Mango daemon process, if it is running")]
     Address,
 }
 

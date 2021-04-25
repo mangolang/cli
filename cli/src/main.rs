@@ -12,13 +12,16 @@ use ::env_logger;
 
 use ::mango_cli_common::util::MangodStatus;
 
-use crate::options::MangoCommand;
 use crate::options::compile::Target;
 use crate::options::MangoArgs;
+use crate::options::MangoCommand;
 use crate::status::handle_daemon_cmd;
 
 mod options;
 mod status;
+
+#[cfg(test)]
+mod e2e;
 
 #[paw::main]
 fn main(args: MangoArgs) {
@@ -55,30 +58,4 @@ pub fn cli(args: MangoArgs) {
         MangoCommand::Clean(_) => eprintln!("Cleaning output is not supported yet"),
         MangoCommand::Daemon(cmd) => handle_daemon_cmd(&cmd, &status),
     };
-}
-
-#[cfg(test)]
-mod tests {
-    use ::structopt::clap::ErrorKind;
-    use ::structopt::StructOpt;
-
-    use super::*;
-
-    #[test]
-    fn show_help() {
-        assert_eq!(
-            ErrorKind::HelpDisplayed,
-            MangoArgs::from_iter_safe(&["mango", "-h"]).unwrap_err().kind
-        );
-        assert_eq!(
-            ErrorKind::HelpDisplayed,
-            MangoArgs::from_iter_safe(&["mango", "--help"]).unwrap_err().kind
-        );
-    }
-
-    #[test]
-    fn compile_ir() {
-        let args = MangoArgs::from_iter(&["mango", "compile", "ir"]);
-        cli(args)
-    }
 }
