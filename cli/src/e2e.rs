@@ -1,3 +1,4 @@
+use ::std::env;
 use ::std::process::Command;
 use ::std::process::Output;
 use ::std::str::from_utf8;
@@ -9,6 +10,8 @@ use ::assert_cmd::prelude::*;
 use ::serial_test::serial;
 use ::structopt::clap::ErrorKind;
 use ::structopt::StructOpt;
+
+use ::tempdir::TempDir;
 
 use super::*;
 
@@ -66,10 +69,9 @@ fn compile_ir() {
 #[serial]
 #[test]
 fn daemon_start_stop() {
+    let dir = TempDir::new("mango_project_build").unwrap();
+    env::set_var("MANGO_USER_CACHE_PATH", &dir.path().to_string_lossy().into_owned());
     init();
-    do_cli(&["mango", "daemon", "stop", "-c"]);
-
-    //TODO @mark: should use a separate lockfile, possibly pass as env var (or param)?
 
     // Start
     let res = do_cli(&["daemon", "start", "-p", "47559"]);

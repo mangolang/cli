@@ -519,6 +519,7 @@ dependencies = [
  "paw",
  "serial_test",
  "structopt",
+ "tempdir",
 ]
 
 [[package]]

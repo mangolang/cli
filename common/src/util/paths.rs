@@ -10,6 +10,7 @@ use ::dirs::home_dir;
 //TODO @mark: cache all these things (what about changing environment?)
 
 /// Get user cache directory for Mango (multi-project).
+/// Documented at https://docs.mangocode.org/en/latest/setup_guide/paths.html
 pub fn mango_user_cache_dir() -> PathBuf {
     let pth = env::var("MANGO_USER_CACHE_PATH")
         .map(|env_pth| PathBuf::from(env_pth))
@@ -32,6 +33,7 @@ pub fn mango_user_cache_dir() -> PathBuf {
 }
 
 /// Get user configuration directory for Mango (multi-project).
+/// Documented at https://docs.mangocode.org/en/latest/setup_guide/paths.html
 pub fn mango_user_config_dir() -> PathBuf {
     let pth = env::var("MANGO_USER_CONFIG_PATH")
         .map(|env_pth| PathBuf::from(env_pth))
@@ -49,6 +51,7 @@ pub fn mango_user_config_dir() -> PathBuf {
     pth
 }
 
+/// The root directory of the current Mango project.
 pub fn mango_project_root_dir() -> PathBuf {
     panic!("start at current dir and go up until project file is found?");   //TODO @mark
     //TODO @mark: also implement unit test, including for mango_project_build_dir
@@ -58,6 +61,7 @@ pub fn mango_project_root_dir() -> PathBuf {
 }
 
 /// Get project build output directory for Mango (single-user, single-project).
+/// Documented at https://docs.mangocode.org/en/latest/setup_guide/paths.html
 pub fn mango_project_build_dir() -> PathBuf {
     let pth = env::var("MANGO_TARGET_DIR")
         .map(|env_pth| PathBuf::from(env_pth))

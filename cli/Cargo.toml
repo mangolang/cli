@@ -28,3 +28,4 @@ log = "0.4.14"
 [dev-dependencies]
 assert_cmd = "1.0.3"
 serial_test = "0.5.1"
+tempdir = "0.3.7"
