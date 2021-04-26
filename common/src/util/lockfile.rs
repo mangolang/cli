@@ -7,7 +7,7 @@ use ::std::time::UNIX_EPOCH;
 use ::serde::{Deserialize, Serialize};
 use ::whoami;
 
-use crate::util::paths::get_lock_file;
+use crate::util::paths::mangod_lock_file_path;
 use std::fs::remove_file;
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -42,7 +42,7 @@ impl LockInfo {
 }
 
 pub fn load_lock() -> Option<LockInfo> {
-    let pth = get_lock_file();
+    let pth = mangod_lock_file_path();
     if let Ok(file) = File::open(&pth) {
         let reader = BufReader::new(file);
         Some(serde_json::from_reader(reader)
@@ -53,7 +53,7 @@ pub fn load_lock() -> Option<LockInfo> {
 }
 
 pub fn store_lock(info: &LockInfo) {
-    let pth = get_lock_file();
+    let pth = mangod_lock_file_path();
     let writer = BufWriter::new(File::create(&pth)
         .unwrap_or_else(|err| panic!("could not access the mangod lock file: '{}', reason: {}", pth.to_string_lossy(), err)));
     serde_json::to_writer_pretty(writer, info)
@@ -61,7 +61,7 @@ pub fn store_lock(info: &LockInfo) {
 }
 
 pub fn clear_lock() {
-    let pth = get_lock_file();
+    let pth = mangod_lock_file_path();
     remove_file(&pth)
         .unwrap_or_else(|err| panic!("could not remove mangod lock file: '{}', reason: {}", pth.to_string_lossy(), err))
 }
@@ -77,7 +77,7 @@ mod tests {
     fn read_write_pid() {
         let before = LockInfo::new(1234, "localhost:47558");
         store_lock(&before);
-        assert!(get_lock_file().is_file());
+        assert!(mangod_lock_file_path().is_file());
         let after = load_lock().unwrap();
         assert_eq!(before, after);
         clear_lock();

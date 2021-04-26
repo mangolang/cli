@@ -1,6 +1,6 @@
 pub use self::lockfile::{LockInfo, load_lock, store_lock, clear_lock};
 pub use self::mangod_options::MangodArgs;
-pub use self::paths::get_cache_dir;
+pub use self::paths::{mango_user_cache_dir, mango_user_config_dir};
 pub use self::check_status::{MangodStatus, can_ping};
 pub use self::server::{server, RespSender};
 pub use self::client::{client, ReqSender};
