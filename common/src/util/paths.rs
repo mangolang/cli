@@ -38,10 +38,10 @@ pub fn mango_user_config_dir() -> PathBuf {
             p.push("mango");
             p
         })).or_else(|| home_dir().map(|mut p| {
-            p.push(".mango");
-            p.push("config");
-            p
-        })).expect("could not find any configuration directory; set MANGO_CONFIG_PATH to provide one");
+        p.push(".mango");
+        p.push("config");
+        p
+    })).expect("could not find any configuration directory; set MANGO_CONFIG_PATH to provide one");
     create_dir_all(&pth)
         .expect("could not create mango config directory");
     pth
