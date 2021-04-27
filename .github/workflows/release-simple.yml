@@ -1,0 +1,24 @@
+
+name: 'Publish Docker image for Mango CLI using simple image'
+
+on:
+  push:
+    branches:
+      - 'master'
+  workflow_dispatch:
+
+jobs:
+  checks:
+    name: Compile and test (basic)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Push to DockerHub
+        uses: docker/build-push-action@v1
+        with:
+          dockerfile: ci/simple.Dockerfile
+          username: mangocode
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+          repository: mangocode/mango
+          tags: latest
