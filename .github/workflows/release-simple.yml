@@ -17,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Get date
-        run: echo "CURRENT_DATE::$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+        run: echo "CURRENT_DATE::$(date +'%Y-%m-%d')" >> $GITHUB_ENV
       - name: Push to DockerHub
         uses: docker/build-push-action@v1
         with:
