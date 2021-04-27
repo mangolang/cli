@@ -5,6 +5,9 @@ ENV RUST_BACKTRACE=1
 
 RUN rustup component add rustfmt
 RUN rustup component add clippy
+RUN cargo install cargo-outdated
+RUN cargo install cargo-audit
+RUN cargo install cargo-deny
 RUN cargo install cargo-tree
 
 # Add the files needed to compile dependencies.
@@ -35,8 +38,13 @@ RUN cargo --offline clippy --workspace --all-targets --all-features -- -D warnin
 RUN cargo --offline fmt --all -- --check
 
 # Dependencies
-RUN cargo tree --workspace --all-features
-#TODO @mark:
+RUN cargo --offline tree --workspace --all-features > dep.tree
+#TODO @mark: deny warnings after `lock_api` is fixed
+RUN cat dep.tree && cargo --offline audit # --deny warnings
+RUN cat dep.tree && cargo --offline deny check advisories
+RUN cat dep.tree && cargo --offline deny check licenses
+RUN cat dep.tree && cargo --offline deny check bans
+RUN cat dep.tree && cargo --offline outdated --exit-code 1
 
 # Build release
 RUN cargo --offline build --workspace --release
