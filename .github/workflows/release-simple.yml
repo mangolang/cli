@@ -17,7 +17,7 @@ jobs:
       - name: Push to DockerHub
         uses: docker/build-push-action@v1
         with:
-          dockerfile: ci/image/new.Dockerfile
+          dockerfile: ci/simple.Dockerfile
           username: mangocode
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
           repository: mangocode/mango
