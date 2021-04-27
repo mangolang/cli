@@ -19,7 +19,24 @@ RUN cargo build --workspace --tests &&\
 
 # Copy the actual code.
 COPY ./Cargo.toml ./Cargo.lock ./deny.toml ./rustfmt.toml ./
+COPY ./src ./src
 
 # Build (for test)
 RUN touch -c src/main.rs &&\
     cargo --offline build --workspace --tests
+
+# Test
+RUN cargo --offline test --workspace --all-targets --all-features
+
+# Lint
+RUN cargo --offline clippy --workspace --all-targets --all-features -- -D warnings
+
+# Style
+RUN cargo --offline fmt --all -- --check
+
+# Dependencies
+RUN cargo tree --workspace --all-features
+#TODO @mark:
+
+# Build release
+RUN cargo --offline build --workspace --release
