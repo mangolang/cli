@@ -49,3 +49,21 @@ RUN cat dep.tree && cargo --offline outdated --exit-code 1
 
 # Build release
 RUN cargo --offline build --workspace --release
+
+# A find is needed here for it to work with multiple platforms (musl uses different path)
+RUN find . -wholename '*/release/*' -name 'mango' -type f -executable -print -exec cp {} /mango_exe \;
+
+# Second stage image to decrease size
+FROM scratch AS executable
+
+ENV RUST_BACKTRACE=1
+
+# It's really just the executable; other files are part of the Github release, but not Docker image.
+#COPY README.rst LICENSE.txt ./
+COPY --from=build /mango_exe /mango
+
+# Smoketest
+RUN ["/mango", "--help"]
+
+ENTRYPOINT ["/mango"]
+
