@@ -24,10 +24,14 @@ RUN cargo build --workspace --tests &&\
     rm -rf Cargo.toml Cargo.lock common/ daemon/ cli/
 
 # Copy the actual code.
-COPY ./Cargo.toml ./Cargo.lock ./deny.toml ./rustfmt.toml ./common/ ./daemon/ ./cli/ ./
+COPY ./Cargo.toml ./Cargo.lock ./deny.toml ./rustfmt.toml ./
+COPY ./common/ ./common
+COPY ./daemon/ ./daemon
+COPY ./cli/ ./cli
 
 # Build (for test)
-RUN touch -c common/src/lib.rs daemon/src/main.rs cli/src/main.rs &&\
+RUN find . -name target -prune -o -type f &&\
+    touch -c common/src/lib.rs daemon/src/main.rs cli/src/main.rs &&\
     cargo --offline build --workspace --tests
 
 # Test
