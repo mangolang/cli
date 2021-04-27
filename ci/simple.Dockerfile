@@ -13,18 +13,21 @@ RUN cargo install cargo-tree
 # Add the files needed to compile dependencies.
 COPY ./Cargo.toml Cargo.lock ./
 RUN mkdir -p src common/src daemon/src cli/src && \
-    printf '\nfn main() {\n\tprintln!("placeholder for compiling dependencies")\n}\n' | tee common/src/main.rs | tee daemon/src/main.rs | tee cli/src/main.rs
+    printf '\nfn main() {\n\tprintln!("placeholder for compiling dependencies")\n}\n' | tee common/src/lib.rs | tee daemon/src/main.rs | tee cli/src/main.rs
+COPY common/Cargo.toml ./common/
+COPY daemon/Cargo.toml ./daemon/
+COPY cli/Cargo.toml ./cli/
 
 # Build the dependencies, remove Cargo files so they have to be re-added.
 RUN cargo build --workspace --tests &&\
     cargo build --workspace --release &&\
-    rm -f Cargo.lock Cargo.toml common/src/main.rs daemon/src/main.rs cli/src/main.rs
+    rm -rf Cargo.toml Cargo.lock common/ daemon/ cli/
 
 # Copy the actual code.
 COPY ./Cargo.toml ./Cargo.lock ./deny.toml ./rustfmt.toml ./common/ ./daemon/ ./cli/ ./
 
 # Build (for test)
-RUN touch -c common/src/main.rs daemon/src/main.rs cli/src/main.rs &&\
+RUN touch -c common/src/lib.rs daemon/src/main.rs cli/src/main.rs &&\
     cargo --offline build --workspace --tests
 
 # Test
@@ -38,12 +41,10 @@ RUN cargo --offline fmt --all -- --check
 
 # Dependencies
 RUN cargo --offline tree --workspace --all-features > dep.tree
-#TODO @mark: deny warnings after https://github.com/anderslanglands/ustr/issues/17
-RUN cat dep.tree && cargo --offline audit # --deny warnings
+RUN cat dep.tree && cargo --offline audit --deny warnings
 RUN cat dep.tree && cargo --offline deny check advisories
 RUN cat dep.tree && cargo --offline deny check licenses
-#TODO @mark: enable after https://github.com/anderslanglands/ustr/issues/17
-#RUN cat dep.tree && cargo --offline deny check bans
+RUN cat dep.tree && cargo --offline deny check bans
 RUN cat dep.tree && cargo --offline outdated --exit-code 1
 
 # Build release

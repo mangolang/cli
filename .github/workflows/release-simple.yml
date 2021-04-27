@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Get date
+        run: echo "CURRENT_DATE::$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
       - name: Push to DockerHub
         uses: docker/build-push-action@v1
         with:
@@ -23,4 +25,6 @@ jobs:
           username: mangocode
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
           repository: mangocode/mango
-          tags: latest
+          tags: |
+            latest
+            nightly-${{ env.CURRENT_DATE }}
