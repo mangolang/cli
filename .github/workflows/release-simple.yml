@@ -5,11 +5,13 @@ on:
   push:
     branches:
       - 'master'
+  schedule:
+    - cron: '0 4 * * 0'
   workflow_dispatch:
 
 jobs:
   checks:
-    name: Compile and test (basic)
+    name: Release Docker image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
