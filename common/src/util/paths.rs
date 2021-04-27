@@ -94,14 +94,14 @@ pub fn mangod_lock_file_path() -> PathBuf {
 #[cfg(test)]
 mod tests {
     use ::serial_test::serial;
-    use ::tempdir::TempDir;
+    use ::tempfile::TempDir;
 
     use super::*;
 
     #[serial]
     #[test]
     fn user_cache_env() {
-        let dir = TempDir::new("mango_user_cache").unwrap();
+        let dir = TempDir::new().unwrap();
         let env_pth = dir.path().to_string_lossy().into_owned();
         env::set_var("MANGO_USER_CACHE_PATH", &env_pth);
         let cache_pth = mango_user_cache_dir();
@@ -120,7 +120,7 @@ mod tests {
     #[serial]
     #[test]
     fn user_config_env() {
-        let dir = TempDir::new("mango_user_config").unwrap();
+        let dir = TempDir::new().unwrap();
         let env_pth = dir.path().to_string_lossy().into_owned();
         env::set_var("MANGO_USER_CONFIG_PATH", &env_pth);
         let conf_pth = mango_user_config_dir();
@@ -139,7 +139,7 @@ mod tests {
     #[serial]
     #[test]
     fn project_build_env() {
-        let dir = TempDir::new("mango_project_build").unwrap();
+        let dir = TempDir::new().unwrap();
         let env_pth = dir.path().to_string_lossy().into_owned();
         env::set_var("MANGO_TARGET_DIR", &env_pth);
         let conf_pth = mango_project_build_dir();

@@ -38,13 +38,14 @@ RUN find . -name target -prune -o -type f &&\
 RUN cargo --offline test --workspace --all-targets --all-features
 
 # Lint
-RUN cargo --offline clippy --workspace --all-targets --all-features -- -D warnings
+RUN cargo --offline clippy --workspace --all-targets --all-features --tests -- -D warnings
 
 # Style
 RUN cargo --offline fmt --all -- --check
 
 # Dependencies
 RUN cargo --offline tree --workspace --all-features > dep.tree
+#TODO @mark: re-enable dependency checks
 #RUN cat dep.tree && cargo --offline audit --deny warnings
 #RUN cat dep.tree && cargo --offline deny check advisories
 RUN cat dep.tree && cargo --offline deny check licenses
@@ -61,7 +62,8 @@ RUN find . -wholename '*/release/*' -name 'mango' -type f -executable -print -ex
 # Second stage image to decrease size
 FROM scratch AS executable
 
-ENV RUST_BACKTRACE=1
+ENV RUST_BACKTRACE=1,
+ENV RUST_LOG='debug,ws=warn,mio=warn'
 
 # It's really just the executable; other files are part of the Github release, but not Docker image.
 #COPY README.rst LICENSE.txt ./

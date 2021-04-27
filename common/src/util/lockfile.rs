@@ -87,14 +87,14 @@ mod tests {
     use ::std::env;
 
     use ::serial_test::serial;
-    use ::tempdir::TempDir;
+    use ::tempfile::TempDir;
 
     use super::*;
 
     #[serial]
     #[test]
     fn read_write_pid() {
-        let dir = TempDir::new("mango_project_build").unwrap();
+        let dir = TempDir::new().unwrap();
         env::set_var("MANGO_USER_CACHE_PATH", &dir.path().to_string_lossy().into_owned());
 
         let before = LockInfo::new(1234, "localhost:47558");

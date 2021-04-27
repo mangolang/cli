@@ -10,7 +10,7 @@ use ::assert_cmd::prelude::*;
 use ::serial_test::serial;
 use ::structopt::clap::ErrorKind;
 use ::structopt::StructOpt;
-use ::tempdir::TempDir;
+use ::tempfile::TempDir;
 
 use super::*;
 
@@ -61,7 +61,7 @@ fn compile_ir() {
 #[serial]
 #[test]
 fn daemon_start_stop() {
-    let dir = TempDir::new("mango_project_build").unwrap();
+    let dir = TempDir::new().unwrap();
     env::set_var("MANGO_USER_CACHE_PATH", &dir.path().to_string_lossy().into_owned());
     init();
 
