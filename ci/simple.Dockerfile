@@ -45,10 +45,10 @@ RUN cargo --offline fmt --all -- --check
 
 # Dependencies
 RUN cargo --offline tree --workspace --all-features > dep.tree
-RUN cat dep.tree && cargo --offline audit --deny warnings
-RUN cat dep.tree && cargo --offline deny check advisories
+#RUN cat dep.tree && cargo --offline audit --deny warnings
+#RUN cat dep.tree && cargo --offline deny check advisories
 RUN cat dep.tree && cargo --offline deny check licenses
-RUN cat dep.tree && cargo --offline deny check bans
+#RUN cat dep.tree && cargo --offline deny check bans
 RUN cat dep.tree && cargo --offline outdated --exit-code 1
 
 # Build release
