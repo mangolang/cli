@@ -1,6 +1,8 @@
 use ::structopt::StructOpt;
 
+pub mod clean;
 pub mod compile;
+pub mod daemon;
 pub mod exec_test;
 pub mod run;
 
@@ -28,12 +30,19 @@ pub struct MangoArgs {
     )]
     pub quiet: bool,
 
+    #[structopt(
+        long = "daemon",
+        help = "Only show the most important output.",
+        hidden_short_help=true
+    )]
+    pub daemon: bool,
+
     #[structopt(subcommand)]
-    pub cmd: Command,
+    pub cmd: MangoCommand,
 }
 
 #[derive(StructOpt, Debug)]
-pub enum Command {
+pub enum MangoCommand {
     // Note: this particular about text is part of a Github Action to check the CLI
     #[structopt(about = "Compile the code in the current directory to one of various formats")]
     Compile(compile::CompileCmd),
@@ -43,4 +52,10 @@ pub enum Command {
 
     #[structopt(about = "Execute tests for the current Mango project")]
     Test(exec_test::TestCmd),
+
+    #[structopt(about = "Clean any build results or cache for the current Mango project")]
+    Clean(clean::CleanCmd),
+
+    #[structopt(about = "Control the Mango daemon (for all projects)")]
+    Daemon(daemon::DaemonCmd),
 }

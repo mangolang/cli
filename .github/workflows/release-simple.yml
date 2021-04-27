@@ -5,15 +5,19 @@ on:
   push:
     branches:
       - 'master'
+  schedule:
+    - cron: '0 4 * * 0'
   workflow_dispatch:
 
 jobs:
   checks:
-    name: Compile and test (basic)
+    name: Release Docker image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Get date
+        run: echo "CURRENT_DATE::$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
       - name: Push to DockerHub
         uses: docker/build-push-action@v1
         with:
@@ -21,4 +25,6 @@ jobs:
           username: mangocode
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
           repository: mangocode/mango
-          tags: latest
+          tags: |
+            latest
+            nightly-${{ env.CURRENT_DATE }}

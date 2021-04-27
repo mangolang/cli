@@ -41,8 +41,11 @@ RUN cargo install cargo-udeps
 # Add the files needed to compile dependencies.
 COPY Cargo.toml .
 COPY Cargo.lock .
-RUN mkdir -p src && \
-    printf 'fn main() {\n\tprintln!("placeholder for compiling nightly dependencies")\n}' | tee src/main.rs | tee src/lib.rs
+RUN mkdir -p cli/src daemon/src common/src && \
+    printf 'fn main() {\n\tprintln!("placeholder for compiling stable dependencies")\n}' | tee cli/src/main.rs | tee daemon/src/main.rs | tee common/src/lib.rs
+COPY --chown=rust cli/Cargo.toml ./cli/Cargo.toml
+COPY --chown=rust daemon/Cargo.toml ./daemon/Cargo.toml
+COPY --chown=rust common/Cargo.toml ./common/Cargo.toml
 
 # Build the code (development mode).
 RUN cargo build --tests
@@ -55,5 +58,5 @@ RUN ./cargo_for_coverage.sh build
 RUN rm -f cargo_for_coverage.sh Cargo.toml
 
 ## NOTE!
-## Make sure to `touch src/main.rs` after copying source, so that everything is recompiled
+## Make sure to `touch cli/src/main.rs`, `touch daemon/src/main.rs` and `touch common/src/lib.rs` after copying source, so that everything is recompiled
 

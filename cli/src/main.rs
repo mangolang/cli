@@ -7,20 +7,36 @@
 // #[allow(unused_imports)]
 // use ::mangolib;
 
+use ::env_logger;
+
+use ::mango_cli_common::util::MangodStatus;
+
 use crate::options::compile::Target;
-use crate::options::Command;
 use crate::options::MangoArgs;
+use crate::options::MangoCommand;
+use crate::status::handle_daemon_cmd;
 
 mod options;
+mod status;
+
+#[cfg(test)]
+mod e2e;
 
 #[paw::main]
 fn main(args: MangoArgs) {
+    env_logger::init();
     cli(args)
 }
 
 pub fn cli(args: MangoArgs) {
+    // let lockfile = load_lock();
+    // let status = match &lockfile {
+    //     Some(info) => determine_status(info.pid()),
+    //     None => MangodStatus::Inactive,
+    // };
+    let status = MangodStatus::determine();
     match args.cmd {
-        Command::Compile(compile) => match compile.target {
+        MangoCommand::Compile(compile) => match compile.target {
             Target::Check {} => {
                 println!("Checking code...");
                 todo!()
@@ -36,33 +52,9 @@ pub fn cli(args: MangoArgs) {
             }
             _ => eprintln!("This operation is not supported yet"),
         },
-        Command::Run(_) => eprintln!("Run is not supported yet"),
-        Command::Test(_) => eprintln!("Test is not supported yet"),
+        MangoCommand::Run(_) => eprintln!("Run is not supported yet"),
+        MangoCommand::Test(_) => eprintln!("Test is not supported yet"),
+        MangoCommand::Clean(_) => eprintln!("Cleaning output is not supported yet"),
+        MangoCommand::Daemon(cmd) => handle_daemon_cmd(&cmd, &status),
     };
-}
-
-#[cfg(test)]
-mod tests {
-    use ::structopt::clap::ErrorKind;
-    use ::structopt::StructOpt;
-
-    use super::*;
-
-    #[test]
-    fn show_help() {
-        assert_eq!(
-            ErrorKind::HelpDisplayed,
-            MangoArgs::from_iter_safe(&["mango", "-h"]).unwrap_err().kind
-        );
-        assert_eq!(
-            ErrorKind::HelpDisplayed,
-            MangoArgs::from_iter_safe(&["mango", "--help"]).unwrap_err().kind
-        );
-    }
-
-    #[test]
-    fn compile_ir() {
-        let args = MangoArgs::from_iter(&["mango", "compile", "ir"]);
-        cli(args)
-    }
 }

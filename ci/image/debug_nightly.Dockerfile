@@ -7,10 +7,10 @@ FROM mangocode/mango_daily_base:nightly
 
 # Now add the actual code
 COPY rustfmt.toml Cargo.toml Cargo.lock ./
-COPY src src
+COPY common daemon cli ./
 
 # This makes sure things are rebuilt
-RUN bash -c 'touch -c src/main.rs; touch -c src/lib.rs'
+RUN bash -c 'touch -c cli/src/main.rs; touch daemon/src/main.rs; touch common/src/lib.rs'
 
 # Build the code (debug mode)
 RUN cargo build --all-targets --all-features

@@ -4,12 +4,12 @@
 *
 
 # Now explicitly add the source code, Cargo files and readme:
-!ci/image
 !Cargo.toml
 !Cargo.lock
 !rustfmt.toml
 !deny.toml
-!.cargo/
-!src/
+!common/
+!daemon/
+!cli/
 !README.rst
 !LICENSE.txt
