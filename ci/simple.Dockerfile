@@ -39,11 +39,12 @@ RUN cargo --offline fmt --all -- --check
 
 # Dependencies
 RUN cargo --offline tree --workspace --all-features > dep.tree
-#TODO @mark: deny warnings after `lock_api` is fixed
+#TODO @mark: deny warnings after https://github.com/anderslanglands/ustr/issues/17
 RUN cat dep.tree && cargo --offline audit # --deny warnings
 RUN cat dep.tree && cargo --offline deny check advisories
 RUN cat dep.tree && cargo --offline deny check licenses
-RUN cat dep.tree && cargo --offline deny check bans
+#TODO @mark: enable after https://github.com/anderslanglands/ustr/issues/17
+#RUN cat dep.tree && cargo --offline deny check bans
 RUN cat dep.tree && cargo --offline outdated --exit-code 1
 
 # Build release
