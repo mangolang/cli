@@ -6,8 +6,8 @@ use crate::options::daemon::DaemonCmd;
 use crate::status::get::get_daemon_property;
 use crate::status::startstop::{start_daemon, stop_daemon};
 
-pub mod startstop;
 pub mod get;
+pub mod startstop;
 
 //TODO @mark: TEMPORARY! REMOVE THIS!
 pub fn handle_daemon_cmd(args: &DaemonCmd, status: &MangodStatus) {

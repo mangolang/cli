@@ -1,6 +1,6 @@
 use ::std::sync::RwLock;
-use ::std::time::{SystemTime, UNIX_EPOCH};
 use ::std::time::Duration;
+use ::std::time::{SystemTime, UNIX_EPOCH};
 
 use ::lazy_static::lazy_static;
 
@@ -46,28 +46,32 @@ impl MangodStatus {
 }
 
 fn get_status() -> MangodStatus {
-
     // Check if there is a recent status in the cache.
-    LAST_STATUS.read().unwrap().as_ref().and_then(|(previous_ms, status)| {
-        let current_ms = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_millis();
-        if current_ms - previous_ms < 2_000 {
-            Some(status.clone())
-        } else {
-            None
-        }
-    }).unwrap_or_else(|| determine_status())
+    LAST_STATUS
+        .read()
+        .unwrap()
+        .as_ref()
+        .and_then(|(previous_ms, status)| {
+            let current_ms = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
+            if current_ms - previous_ms < 2_000 {
+                Some(status.clone())
+            } else {
+                None
+            }
+        })
+        .unwrap_or_else(|| determine_status())
 }
 
 fn determine_status() -> MangodStatus {
-
     if let Some(info) = load_lock() {
         return match can_ping(info.address()) {
-            true => MangodStatus::Ok { address: info.address().to_owned() },
-            false => MangodStatus::Unresponsive { address: info.address().to_owned() },
-        }
+            true => MangodStatus::Ok {
+                address: info.address().to_owned(),
+            },
+            false => MangodStatus::Unresponsive {
+                address: info.address().to_owned(),
+            },
+        };
     }
 
     MangodStatus::Inactive

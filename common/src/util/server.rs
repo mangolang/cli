@@ -1,6 +1,6 @@
 use ::std::collections::HashMap;
-use ::std::sync::Arc;
 use ::std::sync::atomic::{AtomicBool, Ordering};
+use ::std::sync::Arc;
 use ::std::sync::RwLock;
 use ::std::thread;
 
@@ -11,15 +11,15 @@ use ::log::info;
 use ::log::trace;
 use ::log::warn;
 use ::serde_json;
+use ::ws::util::Token;
 use ::ws::CloseCode;
 use ::ws::Handshake;
 use ::ws::Message;
 use ::ws::Sender;
-use ::ws::util::Token;
 
 use crate::api::{Request, RequestEnvelope, Response, ResponseEnvelope};
 use crate::util::clear_lock;
-use std::thread::{spawn, sleep};
+use std::thread::{sleep, spawn};
 use std::time::Duration;
 
 #[derive(Debug, Clone)]
@@ -28,19 +28,13 @@ pub struct RespSender<'a> {
     pub connection: &'a ConnectionData,
 }
 
-impl <'a> RespSender<'a> {
+impl<'a> RespSender<'a> {
     pub fn new(trace: u64, connection: &'a ConnectionData) -> Self {
-        RespSender {
-            trace,
-            connection,
-        }
+        RespSender { trace, connection }
     }
 
     pub fn untraced(connection: &'a ConnectionData) -> Self {
-        RespSender {
-            trace: 0,
-            connection,
-        }
+        RespSender { trace: 0, connection }
     }
 }
 
@@ -56,7 +50,7 @@ impl ConnectionData {
         Arc::new(ConnectionData {
             use_json: AtomicBool::new(false),
             sender,
-            control
+            control,
         })
     }
 
@@ -65,16 +59,11 @@ impl ConnectionData {
     }
 
     fn send_with_trace(&self, trace: u64, data: Response) {
-        let envelope = ResponseEnvelope {
-            trace,
-            data,
-        };
+        let envelope = ResponseEnvelope { trace, data };
         trace!("sending {:?}", envelope);
-        assert!(!self.use_json.load(Ordering::Acquire), "to implement: json");  //TODO @mark:
-        let resp_data = bincode::serialize(&envelope)
-            .expect("could not encode Response");
-        self.sender.send(resp_data)
-            .expect("failed to send websocket response");
+        assert!(!self.use_json.load(Ordering::Acquire), "to implement: json"); //TODO @mark:
+        let resp_data = bincode::serialize(&envelope).expect("could not encode Response");
+        self.sender.send(resp_data).expect("failed to send websocket response");
     }
 
     pub fn send_untraced(&self, data: Response) {
@@ -88,7 +77,11 @@ impl ConnectionData {
     }
 
     pub fn broadcast(&self, response: Response) {
-        self.control.clients.read().unwrap().values()
+        self.control
+            .clients
+            .read()
+            .unwrap()
+            .values()
             .for_each(|client| client.send_untraced(response.clone()))
     }
 
@@ -102,14 +95,19 @@ impl ConnectionData {
         spawn(move || {
             //TODO get rid of spawn/sleep: https://github.com/housleyjk/ws-rs/issues/332
             sleep(Duration::from_millis(50));
-            control_copy.handle.read().unwrap().as_ref()
+            control_copy
+                .handle
+                .read()
+                .unwrap()
+                .as_ref()
                 .expect("could not shut down server, the handle was not initialized at startup")
-                .shutdown().unwrap();
+                .shutdown()
+                .unwrap();
         });
     }
 }
 
-impl <'a> RespSender<'a> {
+impl<'a> RespSender<'a> {
     pub fn send(&self, data: Response) {
         self.connection.send_with_trace(self.trace, data);
     }
@@ -143,12 +141,16 @@ struct ServerHandler<H: Fn(Request, &RespSender) -> Result<Response, String>> {
     handler: H,
 }
 
-impl <H: Fn(Request, &RespSender) -> Result<Response, String>> ws::Handler for ServerHandler<H> {
+impl<H: Fn(Request, &RespSender) -> Result<Response, String>> ws::Handler for ServerHandler<H> {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
         //TODO @mark: too long path
         let connection = &self.connection;
         if connection.control.is_accepting_connections.load(Ordering::Acquire) {
-            connection.control.clients.write().unwrap()
+            connection
+                .control
+                .clients
+                .write()
+                .unwrap()
                 .insert(connection.token(), connection.clone());
         } else {
             debug!("rejecting connection because mangod is shutting down");
@@ -162,14 +164,12 @@ impl <H: Fn(Request, &RespSender) -> Result<Response, String>> ws::Handler for S
             Message::Text(req_data) => {
                 //TODO @mark: test this path
                 self.connection.use_json.store(true, Ordering::Release);
-                serde_json::from_str::<RequestEnvelope>(&req_data)
-                    .map_err(|err| format!("{}", err))
-            },
+                serde_json::from_str::<RequestEnvelope>(&req_data).map_err(|err| format!("{}", err))
+            }
             Message::Binary(req_data) => {
                 self.connection.use_json.store(false, Ordering::Release);
-                bincode::deserialize::<RequestEnvelope>(&req_data)
-                    .map_err(|err| format!("{}", err))
-            },
+                bincode::deserialize::<RequestEnvelope>(&req_data).map_err(|err| format!("{}", err))
+            }
         };
         match request_envelope {
             Ok(request_envelope) => {
@@ -183,15 +183,14 @@ impl <H: Fn(Request, &RespSender) -> Result<Response, String>> ws::Handler for S
             Err(err_msg) => {
                 warn!("failed to deserialize binary request: {}", &err_msg);
                 self.connection.send_err_untraced("could not understand binary request");
-            },
+            }
         }
         Ok(())
     }
 
     //TODO @mark: is on_close always called? also when timeout/dropped/crashed?
     fn on_close(&mut self, _: CloseCode, _: &str) {
-        self.connection.control.clients.write().unwrap()
-            .remove(&self.connection.token());
+        self.connection.control.clients.write().unwrap().remove(&self.connection.token());
     }
 }
 

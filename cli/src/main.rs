@@ -7,7 +7,6 @@
 // #[allow(unused_imports)]
 // use ::mangolib;
 
-
 use ::env_logger;
 
 use ::mango_cli_common::util::MangodStatus;

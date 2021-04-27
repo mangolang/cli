@@ -1,10 +1,10 @@
 use ::structopt::StructOpt;
 
+pub mod clean;
 pub mod compile;
+pub mod daemon;
 pub mod exec_test;
 pub mod run;
-pub mod clean;
-pub mod daemon;
 
 #[derive(StructOpt, Debug)]
 #[structopt(

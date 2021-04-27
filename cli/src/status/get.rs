@@ -1,7 +1,7 @@
 use ::std::process::exit;
 
-use ::mango_cli_common::util::MangodStatus;
 use crate::options::daemon::DaemonGetCmd;
+use ::mango_cli_common::util::MangodStatus;
 
 pub fn get_daemon_property(args: &DaemonGetCmd, status: &MangodStatus) -> Result<(), ()> {
     match args {
@@ -21,7 +21,7 @@ pub fn get_status(status: &MangodStatus) {
 
 pub fn get_address(status: &MangodStatus) {
     match status {
-        MangodStatus::Inactive => {},
+        MangodStatus::Inactive => {}
         MangodStatus::Unresponsive { address, .. } => println!("{}", address),
         MangodStatus::Ok { address, .. } => println!("{}", address),
     }

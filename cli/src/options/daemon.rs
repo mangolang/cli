@@ -1,5 +1,5 @@
-use ::structopt::StructOpt;
 use ::mango_cli_common::util::MangodArgs;
+use ::structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
 pub enum DaemonGetCmd {
@@ -18,23 +18,22 @@ pub struct DaemonStopCmd {
     #[structopt(
         short = "c",
         long = "clear-lock",
-        help = "If a lockfile for a daemon is found, but it is not responding, clear the lockfile and proceed. Useful if the previous daemon did not stop gracefully.",
+        help = "If a lockfile for a daemon is found, but it is not responding, clear the lockfile and proceed. Useful if the previous daemon did not stop gracefully."
     )]
     pub clear: bool,
 
     #[structopt(
         long = "quick",
-        help = "Stop all current tasks, just communicate the shutdown to clients and then stop.",
+        help = "Stop all current tasks, just communicate the shutdown to clients and then stop."
     )]
     pub quick: bool,
 
     #[structopt(
         long = "when-idle",
         conflicts_with = "quick",
-        help = "Keep accepting new tasks, but if there is ever no work left, stop.",
+        help = "Keep accepting new tasks, but if there is ever no work left, stop."
     )]
     pub when_idle: bool,
-
 }
 
 #[derive(StructOpt, Debug)]

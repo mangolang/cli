@@ -21,11 +21,7 @@ fn init() {
     // Assumes executables without extensions. Might have to be adapted to non-linux.
     INIT.call_once(|| {
         println!("starting building");
-        let result = Command::new("cargo")
-            .arg("build")
-            .arg("--workspace")
-            .output()
-            .unwrap();
+        let result = Command::new("cargo").arg("build").arg("--workspace").output().unwrap();
         assert!(result.status.success(), "build failed: {}", from_utf8(&result.stderr).unwrap());
         // let mut path = PathBuf::from(env!("CARGO_TARGET_DIR"));
         // path.push("release");
@@ -40,10 +36,7 @@ fn init() {
 }
 
 fn do_cli(args: &[&str]) -> Output {
-    Command::cargo_bin("mango").unwrap()
-        .args(args)
-        .output()
-        .unwrap()
+    Command::cargo_bin("mango").unwrap().args(args).output().unwrap()
 }
 
 #[test]

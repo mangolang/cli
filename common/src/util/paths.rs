@@ -15,20 +15,25 @@ pub fn mango_user_cache_dir() -> PathBuf {
     let pth = env::var("MANGO_USER_CACHE_PATH")
         .map(|env_pth| PathBuf::from(env_pth))
         .ok()
-        .or_else(|| cache_dir().map(|mut p| {
+        .or_else(|| {
+            cache_dir().map(|mut p| {
+                p.push("mango");
+                p
+            })
+        })
+        .or_else(|| {
+            home_dir().map(|mut p| {
+                p.push(".mango");
+                p.push("cache");
+                p
+            })
+        })
+        .unwrap_or_else(|| {
+            let mut p = temp_dir();
             p.push("mango");
             p
-        })).or_else(|| home_dir().map(|mut p| {
-        p.push(".mango");
-        p.push("cache");
-        p
-    })).unwrap_or_else(|| {
-        let mut p = temp_dir();
-        p.push("mango");
-        p
-    });
-    create_dir_all(&pth)
-        .expect("could not create mango cache directory");
+        });
+    create_dir_all(&pth).expect("could not create mango cache directory");
     pth
 }
 
@@ -38,26 +43,31 @@ pub fn mango_user_config_dir() -> PathBuf {
     let pth = env::var("MANGO_USER_CONFIG_PATH")
         .map(|env_pth| PathBuf::from(env_pth))
         .ok()
-        .or_else(|| config_dir().map(|mut p| {
-            p.push("mango");
-            p
-        })).or_else(|| home_dir().map(|mut p| {
-        p.push(".mango");
-        p.push("config");
-        p
-    })).expect("could not find any configuration directory; set MANGO_USER_CONFIG_PATH to provide one");
-    create_dir_all(&pth)
-        .expect("could not create mango config directory");
+        .or_else(|| {
+            config_dir().map(|mut p| {
+                p.push("mango");
+                p
+            })
+        })
+        .or_else(|| {
+            home_dir().map(|mut p| {
+                p.push(".mango");
+                p.push("config");
+                p
+            })
+        })
+        .expect("could not find any configuration directory; set MANGO_USER_CONFIG_PATH to provide one");
+    create_dir_all(&pth).expect("could not create mango config directory");
     pth
 }
 
 /// The root directory of the current Mango project.
 pub fn mango_project_root_dir() -> PathBuf {
-    panic!("start at current dir and go up until project file is found?");   //TODO @mark
-    //TODO @mark: also implement unit test, including for mango_project_build_dir
-    //let pth = env::current_dir();
-    //create_dir_all(&pth)
-    //    .expect("could not create mango config directory");
+    panic!("start at current dir and go up until project file is found?"); //TODO @mark
+                                                                           //TODO @mark: also implement unit test, including for mango_project_build_dir
+                                                                           //let pth = env::current_dir();
+                                                                           //create_dir_all(&pth)
+                                                                           //    .expect("could not create mango config directory");
 }
 
 /// Get project build output directory for Mango (single-user, single-project).
@@ -67,7 +77,7 @@ pub fn mango_project_build_dir() -> PathBuf {
         .map(|env_pth| PathBuf::from(env_pth))
         .ok()
         .unwrap_or_else(|| {
-            eprintln!("MANGO_TARGET_DIR is empty but alternative is not yet implemented");  //TODO @mark: TEMPORARY! REMOVE THIS!
+            eprintln!("MANGO_TARGET_DIR is empty but alternative is not yet implemented"); //TODO @mark: TEMPORARY! REMOVE THIS!
             let mut p = mango_project_root_dir();
             p.push("target");
             p

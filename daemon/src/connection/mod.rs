@@ -1,3 +1,2 @@
-
-pub mod server;
 pub mod control;
+pub mod server;
