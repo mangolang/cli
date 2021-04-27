@@ -2,8 +2,7 @@ use ::std::process::{Command, Stdio};
 use ::std::thread::sleep;
 use ::std::time::{Duration, SystemTime};
 
-#[cfg(debug_assertions)]
-use ::log::info;
+use ::log::debug;
 
 use ::mango_cli_common::api::{ControlRequest, Request, StopMode};
 use ::mango_cli_common::api::{ControlResponse, Response};
@@ -24,7 +23,7 @@ fn start_daemon_cmd(args: &[String]) -> Command {
         "--".to_owned(),
     ];
     all_args.extend_from_slice(args);
-    info!("start daemon (debug) cmd: cargo {}", all_args.join(" "));
+    debug!("start daemon (debug) cmd: cargo {}", all_args.join(" "));
     cmd.args(&all_args);
     cmd
 }
@@ -32,6 +31,7 @@ fn start_daemon_cmd(args: &[String]) -> Command {
 #[cfg(not(debug_assertions))]
 fn start_daemon_cmd(args: &[String]) -> Command {
     let mut cmd = Command::new("mango");
+    debug!("start daemon (release) cmd: mango {}", args.join(" "));
     cmd.args(&*args);
     cmd
 }
