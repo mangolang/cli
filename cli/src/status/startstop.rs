@@ -30,7 +30,7 @@ fn start_daemon_cmd(args: &[String]) -> Command {
 
 #[cfg(not(debug_assertions))]
 fn start_daemon_cmd(args: &[String]) -> Command {
-    let mut cmd = Command::new("mango");
+    let mut cmd = Command::new("mangod");
     debug!("start daemon (release) cmd: mango {}", args.join(" "));
     cmd.args(&*args);
     cmd

@@ -62,7 +62,8 @@ RUN find . -wholename '*/release/*' -name 'mango' -type f -executable -print -ex
 # Second stage image to decrease size
 FROM scratch AS executable
 
-ENV RUST_BACKTRACE=1,
+ENV PATH=/
+ENV RUST_BACKTRACE=1
 ENV RUST_LOG='debug,ws=warn,mio=warn'
 
 # It's really just the executable; other files are part of the Github release, but not Docker image.
@@ -71,9 +72,9 @@ COPY --from=build /mango_exe /mango
 COPY --from=build /mangod_exe /mangod
 
 # Smoke test
-RUN ["/mango", "--help"]
-RUN ["/mango", "daemon", "start"]
-RUN ["/mangod", "--help"]
+RUN ["mango", "--help"]
+RUN ["mango", "daemon", "start"]
+RUN ["mangod", "--help"]
 
-ENTRYPOINT ["/mango"]
+ENTRYPOINT ["mango"]
 
