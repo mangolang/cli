@@ -30,6 +30,7 @@ impl<'a> ReqSender<'a> {
         self.sender.send(req_data).expect("failed to send websocket request");
     }
 
+    #[allow(clippy::result_unit_err)]
     pub fn try_send(&self, data: Request) -> Result<(), ()> {
         let envelope = RequestEnvelope { trace: self.trace, data };
         trace!("(try-)sending: {:?}", envelope);
@@ -83,6 +84,7 @@ impl<T, S: Fn(&T, &ReqSender), H: Fn(&T, Response, &ReqSender) -> Result<(), Str
     }
 }
 
+#[allow(clippy::result_unit_err)]
 pub fn client<T: Clone>(
     addr: &str,
     scope: T,
@@ -97,7 +99,6 @@ pub fn client<T: Clone>(
     })
     .map_err(|err| {
         debug!("could not connect to daemon, reason: {}", err);
-        ()
     })
 }
 
@@ -105,7 +106,7 @@ pub fn single_msg_client(address: &str, request: Request, await_response: Option
     let (channel_sender, channel_receiver) = channel();
 
     // Send a message to the server.
-    if let Err(_) = client(
+    let msg_send_result = client(
         address,
         (channel_sender, request, await_response),
         move |scope, req_sender| {
@@ -130,7 +131,8 @@ pub fn single_msg_client(address: &str, request: Request, await_response: Option
             }
             Ok(())
         },
-    ) {
+    );
+    if msg_send_result.is_err() {
         debug!("failed to connect to {} to send single-message request", address);
         return false;
     };

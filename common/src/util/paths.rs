@@ -13,7 +13,7 @@ use ::dirs::home_dir;
 /// Documented at https://docs.mangocode.org/en/latest/setup_guide/paths.html
 pub fn mango_user_cache_dir() -> PathBuf {
     let pth = env::var("MANGO_USER_CACHE_PATH")
-        .map(|env_pth| PathBuf::from(env_pth))
+        .map(PathBuf::from)
         .ok()
         .or_else(|| {
             cache_dir().map(|mut p| {
@@ -41,7 +41,7 @@ pub fn mango_user_cache_dir() -> PathBuf {
 /// Documented at https://docs.mangocode.org/en/latest/setup_guide/paths.html
 pub fn mango_user_config_dir() -> PathBuf {
     let pth = env::var("MANGO_USER_CONFIG_PATH")
-        .map(|env_pth| PathBuf::from(env_pth))
+        .map(PathBuf::from)
         .ok()
         .or_else(|| {
             config_dir().map(|mut p| {
@@ -72,16 +72,14 @@ pub fn mango_project_root_dir() -> PathBuf {
 
 /// Get project build output directory for Mango (single-user, single-project).
 /// Documented at https://docs.mangocode.org/en/latest/setup_guide/paths.html
+#[allow(dead_code)] //TODO @mark: TEMPORARY! REMOVE THIS!
 pub fn mango_project_build_dir() -> PathBuf {
-    let pth = env::var("MANGO_TARGET_DIR")
-        .map(|env_pth| PathBuf::from(env_pth))
-        .ok()
-        .unwrap_or_else(|| {
-            eprintln!("MANGO_TARGET_DIR is empty but alternative is not yet implemented"); //TODO @mark: TEMPORARY! REMOVE THIS!
-            let mut p = mango_project_root_dir();
-            p.push("target");
-            p
-        });
+    let pth = env::var("MANGO_TARGET_DIR").map(PathBuf::from).ok().unwrap_or_else(|| {
+        eprintln!("MANGO_TARGET_DIR is empty but alternative is not yet implemented"); //TODO @mark: TEMPORARY! REMOVE THIS!
+        let mut p = mango_project_root_dir();
+        p.push("target");
+        p
+    });
     create_dir_all(&pth)
         .expect("could not create mango build directory for the project; you can change the location with MANGO_TARGET_DIR");
     pth

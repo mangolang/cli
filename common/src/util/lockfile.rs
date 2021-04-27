@@ -23,7 +23,7 @@ pub struct LockInfo {
 impl LockInfo {
     pub fn new(pid: u32, address: impl Into<String>) -> Self {
         let address = address.into();
-        assert!(address.contains(":"), "address must contain port");
+        assert!(address.contains(':'), "address must contain port");
         let update_ts = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
         LockInfo {
             pid: Some(pid),

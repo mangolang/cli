@@ -10,7 +10,6 @@ use ::assert_cmd::prelude::*;
 use ::serial_test::serial;
 use ::structopt::clap::ErrorKind;
 use ::structopt::StructOpt;
-
 use ::tempdir::TempDir;
 
 use super::*;

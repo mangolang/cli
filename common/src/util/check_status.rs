@@ -59,7 +59,7 @@ fn get_status() -> MangodStatus {
                 None
             }
         })
-        .unwrap_or_else(|| determine_status())
+        .unwrap_or_else(determine_status)
 }
 
 fn determine_status() -> MangodStatus {

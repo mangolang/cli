@@ -1,5 +1,6 @@
-use ::mango_cli_common::util::MangodArgs;
 use ::structopt::StructOpt;
+
+use ::mango_cli_common::util::MangodArgs;
 
 #[derive(StructOpt, Debug)]
 pub enum DaemonGetCmd {

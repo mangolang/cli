@@ -3,6 +3,8 @@ use ::std::sync::atomic::{AtomicBool, Ordering};
 use ::std::sync::Arc;
 use ::std::sync::RwLock;
 use ::std::thread;
+use ::std::thread::{sleep, spawn};
+use ::std::time::Duration;
 
 use ::bincode;
 use ::log::debug;
@@ -19,8 +21,6 @@ use ::ws::Sender;
 
 use crate::api::{Request, RequestEnvelope, Response, ResponseEnvelope};
 use crate::util::clear_lock;
-use std::thread::{sleep, spawn};
-use std::time::Duration;
 
 #[derive(Debug, Clone)]
 pub struct RespSender<'a> {

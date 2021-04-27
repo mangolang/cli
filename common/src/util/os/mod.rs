@@ -1,22 +1,20 @@
 //TODO @mark: remove this whole module
 
-#[cfg(target_os = "macos")]
-mod ps_macos;
+#[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux", target_os = "freebsd", target_os = "openbsd")))]
+pub use self::fallback::*;
+#[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd"))]
+pub use self::ps_linux::*;
 #[cfg(target_os = "macos")]
 pub use self::ps_macos::*;
-
-
-#[cfg(target_os = "windows")]
-mod ps_windows;
 #[cfg(target_os = "windows")]
 pub use self::ps_windows::*;
 
-
+#[cfg(target_os = "macos")]
+mod ps_macos;
+#[cfg(target_os = "windows")]
+mod ps_windows;
 #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd"))]
 mod ps_linux;
-#[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd"))]
-pub use self::ps_linux::*;
-
 
 #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux", target_os = "freebsd", target_os = "openbsd")))]
 mod fallback {
@@ -30,5 +28,3 @@ mod fallback {
         true
     }
 }
-#[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux", target_os = "freebsd", target_os = "openbsd")))]
-pub use self::fallback::*;

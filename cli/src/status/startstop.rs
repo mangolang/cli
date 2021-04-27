@@ -2,14 +2,16 @@ use ::std::process::{Command, Stdio};
 use ::std::thread::sleep;
 use ::std::time::{Duration, SystemTime};
 
+#[cfg(debug_assertions)]
 use ::log::info;
 
-use crate::options::daemon::DaemonStopCmd;
+use ::mango_cli_common::api::{ControlRequest, Request, StopMode};
+use ::mango_cli_common::api::{ControlResponse, Response};
 use ::mango_cli_common::util::can_ping;
+use ::mango_cli_common::util::{clear_lock, single_msg_client};
 use ::mango_cli_common::util::{MangodArgs, MangodStatus};
-use mango_cli_common::api::{ControlRequest, Request, StopMode};
-use mango_cli_common::api::{ControlResponse, Response};
-use mango_cli_common::util::{clear_lock, single_msg_client};
+
+use crate::options::daemon::DaemonStopCmd;
 
 #[cfg(debug_assertions)]
 fn start_daemon_cmd(args: &[String]) -> Command {

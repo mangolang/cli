@@ -41,19 +41,20 @@ pub struct MangodArgs {
 
 impl MangodArgs {
     pub fn address(&self) -> String {
-        assert!(!self.host.contains(":"));
-        assert!(!self.host.contains(" "));
+        assert!(!self.host.contains(':'));
+        assert!(!self.host.contains(' '));
         format!("{}:{}", &self.host, &self.port)
     }
 }
 
 impl MangodArgs {
     pub fn as_vec(&self) -> Vec<String> {
-        let mut args = vec![];
-        args.push("--hostname".to_owned());
-        args.push(self.host.clone());
-        args.push("--port".to_owned());
-        args.push(self.port.to_string());
+        let mut args = vec![
+            "--hostname".to_owned(),
+            self.host.clone(),
+            "--port".to_owned(),
+            self.port.to_string(),
+        ];
         if let Some(workers) = self.worker_count {
             args.push("--cpus".to_owned());
             args.push(workers.to_string());
