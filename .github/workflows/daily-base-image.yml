@@ -5,8 +5,8 @@
 name: 'Daily Mango base image'
 
 on:
-  schedule:
-    - cron: '0 3 * * 0'
+  #schedule:
+  #  - cron: '0 3 * * 0'
   workflow_dispatch:
 
 jobs:

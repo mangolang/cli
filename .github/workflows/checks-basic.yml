@@ -4,7 +4,8 @@
 name: 'Basic tests Mango CLI'
 
 on:
-  push:
+  #push:
+  workflow_dispatch:
 
 jobs:
   checks:

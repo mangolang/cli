@@ -1,6 +1,8 @@
 
 # Mango - continuous integration
 
+Note! Currently, a simplified, single-file Docker image is used. The smart caching etc was nice, but it was a hassle to manage multiple versions. 
+
 ## Principles
 
 * As much automatic validation as possible.
