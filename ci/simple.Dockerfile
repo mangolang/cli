@@ -72,6 +72,7 @@ COPY --from=build /mangod_exe /mangod
 
 # Smoke test
 RUN ["/mango", "--help"]
+RUN ["/mango", "daemon", "start"]
 RUN ["/mangod", "--help"]
 
 ENTRYPOINT ["/mango"]

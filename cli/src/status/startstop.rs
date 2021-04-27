@@ -31,10 +31,8 @@ fn start_daemon_cmd(args: &[String]) -> Command {
 
 #[cfg(not(debug_assertions))]
 fn start_daemon_cmd(args: &[String]) -> Command {
-    let mut cmd = Command::new("cargo run -p mango-cli-daemon");
-    let mut all_args = vec![];
-    all_args.extend_from_slice(args);
-    cmd.args(&all_args);
+    let mut cmd = Command::new("mango");
+    cmd.args(&*args);
     cmd
 }
 
