@@ -29,10 +29,9 @@ jobs:
           username: mangocode
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
       - name: Build and push
-        id: docker_build
         uses: docker/build-push-action@v2
         with:
-          dockerfile: ci/simple.Dockerfile
+          file: ./ci/simple.Dockerfile
           context: .
           push: true
           tags: latest,nightly-${{ steps.date.outputs.date }}
