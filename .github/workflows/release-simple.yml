@@ -34,5 +34,5 @@ jobs:
           file: ./ci/simple.Dockerfile
           context: .
           push: true
-          tags: latest,nightly-${{ steps.date.outputs.date }}
+          tags: mangocode/mango:latest,mangocode/mango:nightly-${{ steps.date.outputs.date }}
 
