@@ -14,9 +14,11 @@ use ::mango_cli_common::util::MangodStatus;
 use crate::options::MangoArgs;
 use crate::options::MangoCommand;
 use crate::status::handle_daemon_cmd;
+use crate::compile::handle_compile_cmd;
 
 mod options;
 mod status;
+mod compile;
 
 #[cfg(test)]
 mod e2e;
@@ -35,7 +37,7 @@ pub fn cli(args: MangoArgs) {
     // };
     let status = MangodStatus::determine();
     match args.cmd {
-        MangoCommand::Compile(_compile) => eprintln!("Run is not supported yet"),
+        MangoCommand::Compile(compile) => handle_compile_cmd(&compile, &status),
         //TODO @mark:
         // match compile.target {
         //     Target::Check {} => {

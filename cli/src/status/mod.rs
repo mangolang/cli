@@ -4,10 +4,13 @@ use ::mango_cli_common::util::MangodStatus;
 
 use crate::options::daemon::DaemonCmd;
 use crate::status::get::get_daemon_property;
-use crate::status::startstop::{start_daemon, stop_daemon};
+use crate::status::stop::stop_daemon;
+use crate::status::start::start_daemon;
 
 pub mod get;
-pub mod startstop;
+pub mod start;
+pub mod stop;
+pub mod running;
 
 //TODO @mark: TEMPORARY! REMOVE THIS!
 pub fn handle_daemon_cmd(args: &DaemonCmd, status: &MangodStatus) {
