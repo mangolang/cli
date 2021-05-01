@@ -1,4 +1,5 @@
 use ::serde::{Deserialize, Serialize};
+use crate::api::compression::Compression;
 
 //TODO: possible optimizations:
 //TODO: - single string with some delimiter to save allocations
@@ -17,15 +18,15 @@ pub struct SourceState {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum SourceRequest {
-    Need(Vec<SourceIdentifier>),
-    IfChanged(Vec<SourceState>),
+pub struct SourceRequests {
+    //TODO @mark: compression here?
+    requests: Vec<SourceRequest>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum SourceCompressionKind {
-    None,
-    Brotli,
+pub enum SourceRequest {
+    Need(SourceIdentifier),
+    IfChanged(SourceState),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -33,7 +34,11 @@ pub struct SourceContent {
     identifier: SourceIdentifier,
     ts_changed_ms: u64,
     content: Vec<u8>,
-    compression: SourceCompressionKind,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SourceResponses {
+    responses: Compression<Vec<SourceResponse>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
