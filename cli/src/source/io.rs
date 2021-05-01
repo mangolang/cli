@@ -17,3 +17,5 @@ pub async fn read_file(path: &Path, known_ts_ms: Option<u64>) -> Option<(u64, Ve
         Some((current_ts_ms as u64, data))
     }
 }
+
+//TODO @mark: unit test

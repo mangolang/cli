@@ -1,14 +1,17 @@
 use ::std::path::PathBuf;
-use ::std::sync::mpsc;
-use ::std::sync::mpsc::SyncSender;
 use ::std::thread;
 
+use ::async_std::channel::Sender;
+use ::async_std::channel::unbounded;
+use ::async_std::task::block_on;
 use ::lazy_static::lazy_static;
 use ::log::debug;
 use ::log::trace;
 
+use crate::source::io::read_file;
+
 lazy_static! {
-    static ref READER_SENDER: SyncSender<ReadRequest> = start_reader();
+    static ref READER_SENDER: Sender<ReadRequest> = start_reader();
 }
 
 #[derive(Debug)]
@@ -18,26 +21,27 @@ struct ReadRequest {
 }
 
 pub fn load_file(path: PathBuf) -> Result<(), String> {
-    READER_SENDER.send(ReadRequest {
+    block_on(READER_SENDER.send(ReadRequest {
         path,
         known_ts_ms: None,
-    }).map_err(|_| "Failed to send file read request to reader thread".to_owned())
+    })).map_err(|_| "Failed to send file read request to reader thread".to_owned())
 }
 
 pub fn load_file_if_changed(path: PathBuf, known_ts_ms: u64) -> Result<(), String> {
-    READER_SENDER.send(ReadRequest {
+    block_on(READER_SENDER.send(ReadRequest {
         path,
         known_ts_ms: Some(known_ts_ms),
-    }).map_err(|_| "Failed to send file read request to reader thread".to_owned())
+    })).map_err(|_| "Failed to send file read request to reader thread".to_owned())
 }
 
-fn start_reader() -> SyncSender<ReadRequest> {
-    let (sender, recver) = mpsc::sync_channel::<ReadRequest>(1024);
+fn start_reader() -> Sender<ReadRequest> {
+    let (sender, recver) = unbounded::<ReadRequest>();
     thread::spawn(move || {
         debug!("starting source reader channel");
         loop {
-            match recver.recv() {
+            match recver.recv().await {
                 Ok(request) => {
+                    //read_file()
                     trace!("source reader thread received request for '{}'", request.path.to_string_lossy());
                     unimplemented!()  //TODO @mark: TEMPORARY! REMOVE THIS!
                 }
