@@ -1,4 +1,5 @@
 use ::serde::{Deserialize, Serialize};
+
 use crate::api::compression::Compression;
 
 //TODO: possible optimizations:

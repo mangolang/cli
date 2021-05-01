@@ -4,7 +4,7 @@ use ::std::sync::mpsc::SyncSender;
 use ::std::thread;
 
 use ::lazy_static::lazy_static;
-use ::log::info;
+use ::log::debug;
 use ::log::trace;
 
 lazy_static! {
@@ -34,7 +34,7 @@ pub fn load_file_if_changed(path: PathBuf, known_ts_ms: u64) -> Result<(), Strin
 fn start_reader() -> SyncSender<ReadRequest> {
     let (sender, recver) = mpsc::sync_channel::<ReadRequest>(1024);
     thread::spawn(move || {
-        info!("starting source reader channel");
+        debug!("starting source reader channel");
         loop {
             match recver.recv() {
                 Ok(request) => {
@@ -46,7 +46,7 @@ fn start_reader() -> SyncSender<ReadRequest> {
                 }
             }
         }
-        info!("shutting down source reader channel");
+        debug!("shutting down source reader channel");
     });
     sender
 }

@@ -43,7 +43,7 @@ pub fn handle_compile_cmd(_args: &CompileCmd, status: &MangodStatus) -> Result<(
                            sender.close()
                        }
                    }
-                   Downstream::Task(response) => unimplemented!(),
+                   Downstream::Task(_response) => unimplemented!(),
                    Downstream::Source(request) => handle_source_request(request)
                }
                Ok(())
