@@ -462,6 +462,7 @@ version = "0.6.0"
 dependencies = [
  "assert_cmd",
  "env_logger",
+ "lazy_static",
  "log",
  "mango-cli-common",
  "paw",
