@@ -26,27 +26,15 @@ then
     exit 1
 fi
 
-img_date="$(docker inspect -f '{{ .Created }}' "$MANGO_DOCKER_IMAGE" 2> /dev/null)"
-if [ $? -ne 0 ] || [ -z "$img_date" ]
-then
-    printf 'pulling docker image %s\n' "$MANGO_DOCKER_IMAGE"
-    docker pull "$MANGO_DOCKER_IMAGE"
-fi
-img_ts="$(date +%s -d $img_date)"
-age_s="$(expr "$(date +%s)" - "$img_ts")"
-echo "age is $age_s s"
-if [ $age_s -gt 43200 ]
-then
-    printf 'updating docker image %s\n' "$MANGO_DOCKER_IMAGE"
-    docker pull "$MANGO_DOCKER_IMAGE"
-fi
-
 # Mango daemon
 
 set -eu
 
+#TODO @mark: port might collide with other projects
 docker run \
     --name "mangod-$PROJECT_NAME" \
     --rm \
     --entrypoint /mangod \
-    "$MANGO_DOCKER_IMAGE"
+    -p 47558:47558 \
+    "$MANGO_DOCKER_IMAGE" \
+        --hostname 127.0.0.1 --port 47558
