@@ -12,6 +12,7 @@ pub struct UpstreamEnvelope {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Upstream {
     Control(ControlRequest),
+    Task(TaskRequest),
     Source(SourceResponse),
 }
 
@@ -26,6 +27,7 @@ pub enum Downstream {
     Ok,
     DaemonError(String),
     Control(ControlResponse),
+    Task(TaskResponse),
     Source(SourceRequest),
     //CompileError(),
 }

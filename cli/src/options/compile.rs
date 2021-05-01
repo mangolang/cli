@@ -2,8 +2,8 @@ use ::structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
 pub struct CompileCmd {
-    #[structopt(subcommand)]
-    pub target: Target,
+    //#[structopt(subcommand)]
+    //pub target: Target,
 
     //TODO @mark: change this name if the entrypoint keyword is changed
     #[structopt(

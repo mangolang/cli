@@ -11,7 +11,6 @@ use ::env_logger;
 
 use ::mango_cli_common::util::MangodStatus;
 
-use crate::options::compile::Target;
 use crate::options::MangoArgs;
 use crate::options::MangoCommand;
 use crate::status::handle_daemon_cmd;
@@ -36,22 +35,24 @@ pub fn cli(args: MangoArgs) {
     // };
     let status = MangodStatus::determine();
     match args.cmd {
-        MangoCommand::Compile(compile) => match compile.target {
-            Target::Check {} => {
-                println!("Checking code...");
-                todo!()
-            }
-            Target::IR { json, packed } => {
-                match (json, packed) {
-                    (true, true) => println!("Creating json & packed IR..."),
-                    (true, false) => println!("Creating json IR..."),
-                    (false, true) => println!("Creating packed IR..."),
-                    (false, false) => println!("Creating packed IR..."),
-                };
-                eprintln!("This operation is not supported yet");
-            }
-            _ => eprintln!("This operation is not supported yet"),
-        },
+        MangoCommand::Compile(_compile) => eprintln!("Run is not supported yet"),
+        //TODO @mark:
+        // match compile.target {
+        //     Target::Check {} => {
+        //         println!("Checking code...");
+        //         todo!()
+        //     }
+        //     Target::IR { json, packed } => {
+        //         match (json, packed) {
+        //             (true, true) => println!("Creating json & packed IR..."),
+        //             (true, false) => println!("Creating json IR..."),
+        //             (false, true) => println!("Creating packed IR..."),
+        //             (false, false) => println!("Creating json IR..."),
+        //         };
+        //         eprintln!("This operation is not supported yet");
+        //     }
+        //     _ => eprintln!("This operation is not supported yet"),
+        // },
         MangoCommand::Run(_) => eprintln!("Run is not supported yet"),
         MangoCommand::Test(_) => eprintln!("Test is not supported yet"),
         MangoCommand::Clean(_) => eprintln!("Cleaning output is not supported yet"),

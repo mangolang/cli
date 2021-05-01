@@ -7,7 +7,7 @@ use crate::api::compression::Compression;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SourceIdentifier {
-    // The Mango-style dot-separated path
+    // The Mango-style dot-separated path, including project name.
     path: String,
 }
 
