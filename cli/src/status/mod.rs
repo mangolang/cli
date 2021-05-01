@@ -12,8 +12,7 @@ pub mod start;
 pub mod stop;
 pub mod running;
 
-//TODO @mark: TEMPORARY! REMOVE THIS!
-pub fn handle_daemon_cmd(args: &DaemonCmd, status: &MangodStatus) {
+pub fn handle_daemon_cmd(args: &DaemonCmd, status: &MangodStatus) -> Result<(), String> {
     match match args {
         DaemonCmd::Start(start_args) => start_daemon(start_args),
         DaemonCmd::Stop(stop_args) => stop_daemon(stop_args, status),

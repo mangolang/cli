@@ -4,13 +4,8 @@ use ::std::time::{Duration, SystemTime};
 
 use ::log::debug;
 
-use ::mango_cli_common::api::{ControlRequest, Upstream, StopMode};
-use ::mango_cli_common::api::{ControlResponse, Downstream};
 use ::mango_cli_common::util::can_ping;
-use ::mango_cli_common::util::{clear_lock, single_msg_client};
-use ::mango_cli_common::util::{MangodArgs, MangodStatus};
-
-use crate::options::daemon::DaemonStopCmd;
+use mango_cli_common::util::MangodArgs;
 
 #[cfg(debug_assertions)]
 fn start_daemon_cmd(args: &[String]) -> Command {

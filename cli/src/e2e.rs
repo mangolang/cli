@@ -55,7 +55,7 @@ fn show_help() {
 fn compile_ir() {
     init();
     let args = MangoArgs::from_iter_safe(&["mango", "compile"]).unwrap();
-    cli(args)
+    cli(args).unwrap()
 }
 
 #[serial]

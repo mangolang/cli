@@ -7,14 +7,16 @@
 // #[allow(unused_imports)]
 // use ::mangolib;
 
+use ::std::process::exit;
+
 use ::env_logger;
 
 use ::mango_cli_common::util::MangodStatus;
 
+use crate::compile::handle_compile_cmd;
 use crate::options::MangoArgs;
 use crate::options::MangoCommand;
 use crate::status::handle_daemon_cmd;
-use crate::compile::handle_compile_cmd;
 
 mod options;
 mod status;
@@ -26,10 +28,16 @@ mod e2e;
 #[paw::main]
 fn main(args: MangoArgs) {
     env_logger::init();
-    cli(args)
+    match cli(args) {
+        Ok(_) => {}
+        Err(err_msg) => {
+            eprintln!("{}", err_msg);
+            exit(1)
+        }
+    }
 }
 
-pub fn cli(args: MangoArgs) {
+pub fn cli(args: MangoArgs) -> Result<(), String> {
     // let lockfile = load_lock();
     // let status = match &lockfile {
     //     Some(info) => determine_status(info.pid()),
@@ -55,9 +63,9 @@ pub fn cli(args: MangoArgs) {
         //     }
         //     _ => eprintln!("This operation is not supported yet"),
         // },
-        MangoCommand::Run(_) => eprintln!("Run is not supported yet"),
-        MangoCommand::Test(_) => eprintln!("Test is not supported yet"),
-        MangoCommand::Clean(_) => eprintln!("Cleaning output is not supported yet"),
+        MangoCommand::Run(_) => Err("Run is not supported yet".to_owned()),
+        MangoCommand::Test(_) => Err("Test is not supported yet".to_owned()),
+        MangoCommand::Clean(_) => Err("Cleaning output is not supported yet".to_owned()),
         MangoCommand::Daemon(cmd) => handle_daemon_cmd(&cmd, &status),
-    };
+    }
 }

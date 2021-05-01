@@ -1,16 +1,10 @@
-use ::std::process::{Command, Stdio};
-use ::std::thread::sleep;
-use ::std::time::{Duration, SystemTime};
-
-use ::log::debug;
-
 use ::mango_cli_common::api::{ControlRequest, StopMode, Upstream};
 use ::mango_cli_common::api::{ControlResponse, Downstream};
 use ::mango_cli_common::util::{clear_lock, single_msg_client};
-use ::mango_cli_common::util::{MangodArgs, MangodStatus};
-use ::mango_cli_common::util::can_ping;
+use ::mango_cli_common::util::MangodStatus;
 
 use crate::options::daemon::DaemonStopCmd;
+use std::time::Duration;
 
 pub fn stop_daemon(args: &DaemonStopCmd, status: &MangodStatus) -> Result<(), ()> {
     let mode = match (args.quick, args.when_idle) {
