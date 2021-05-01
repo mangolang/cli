@@ -21,6 +21,7 @@ use crate::status::handle_daemon_cmd;
 mod options;
 mod status;
 mod compile;
+mod source;
 
 #[cfg(test)]
 mod e2e;

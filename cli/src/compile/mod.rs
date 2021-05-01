@@ -3,10 +3,10 @@ use ::log::error;
 use ::log::trace;
 
 use ::mango_cli_common::api::{TaskRequest, Upstream};
-use ::mango_cli_common::api::{SourceRequest, StopMode};
 use ::mango_cli_common::api::CompileTarget;
 use ::mango_cli_common::api::ControlResponse;
 use ::mango_cli_common::api::Downstream;
+use ::mango_cli_common::api::StopMode;
 use ::mango_cli_common::util::client;
 use ::mango_cli_common::util::MangodArgs;
 use ::mango_cli_common::util::MangodStatus;
@@ -43,10 +43,7 @@ pub fn handle_compile_cmd(_args: &CompileCmd, status: &MangodStatus) -> Result<(
                        }
                    }
                    Downstream::Task(response) => unimplemented!(),
-                   Downstream::Source(request) => match request {
-                       SourceRequest::Need(source) => {}
-                       SourceRequest::IfChanged(state) => {}
-                   }
+                   Downstream::Source(request) => handle_source_request(request),
                }
                Ok(())
            })
