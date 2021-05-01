@@ -82,6 +82,12 @@ impl<T, S: Fn(&T, &ReqSender), H: Fn(&T, Downstream, &ReqSender) -> Result<(), S
         }
         Ok(())
     }
+
+    fn on_close(&mut self, code: CloseCode, reason: &str) {
+        if ! matches!(&code, CloseCode::Normal) {
+            error!("connection to mangod closed unexpectedly; code: {:?}, reason: '{}'", code, reason);
+        }
+    }
 }
 
 #[allow(clippy::result_unit_err)]
@@ -90,7 +96,8 @@ pub fn client<T: Clone>(
     scope: T,
     on_start: impl Fn(&T, &ReqSender) + Copy,
     handler: impl Fn(&T, Downstream, &ReqSender) -> Result<(), String> + Copy,
-) -> Result<(), ()> {
+) -> Result<(), String> {
+    debug!("connecting to {}", addr);
     connect(format!("ws://{}", addr), move |sender| ClientHandler {
         sender,
         scope: scope.clone(),
@@ -99,6 +106,7 @@ pub fn client<T: Clone>(
     })
     .map_err(|err| {
         debug!("could not connect to daemon, reason: {}", err);
+        "could not connect to daemon".to_owned()
     })
 }
 
