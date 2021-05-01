@@ -11,10 +11,16 @@ pub struct SourceIdentifier {
     path: String,
 }
 
+impl SourceIdentifier {
+    pub fn as_str(&self) -> &str {
+        &self.path
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SourceState {
-    identifier: SourceIdentifier,
-    ts_changed_ms: u64,
+    pub identifier: SourceIdentifier,
+    pub ts_changed_ms: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

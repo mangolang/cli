@@ -12,7 +12,7 @@ lazy_static! {
 }
 
 #[derive(Debug)]
-pub struct ReadRequest {
+struct ReadRequest {
     path: PathBuf,
     known_ts_ms: Option<u64>,
 }

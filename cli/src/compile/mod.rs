@@ -12,6 +12,7 @@ use ::mango_cli_common::util::MangodArgs;
 use ::mango_cli_common::util::MangodStatus;
 
 use crate::options::compile::CompileCmd;
+use crate::source::handler::handle_source_request;
 use crate::status::running::ensure_running;
 
 pub fn handle_compile_cmd(_args: &CompileCmd, status: &MangodStatus) -> Result<(), String> {
@@ -43,7 +44,7 @@ pub fn handle_compile_cmd(_args: &CompileCmd, status: &MangodStatus) -> Result<(
                        }
                    }
                    Downstream::Task(response) => unimplemented!(),
-                   Downstream::Source(request) => handle_source_request(request),
+                   Downstream::Source(request) => handle_source_request(request)
                }
                Ok(())
            })
