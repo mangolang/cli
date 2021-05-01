@@ -8,28 +8,28 @@ mod control;
 mod source;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RequestEnvelope {
+pub struct UpstreamEnvelope {
     pub trace: u64,
-    pub data: Request,
+    pub data: Upstream,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum Request {
+pub enum Upstream {
     Control(ControlRequest),
-    Source(SourceRequest),
+    Source(SourceResponse),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ResponseEnvelope {
+pub struct DownstreamEnvelope {
     pub trace: u64,
-    pub data: Response,
+    pub data: Downstream,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum Response {
+pub enum Downstream {
     Ok,
     DaemonError(String),
     Control(ControlResponse),
-    Source(SourceResponse),
+    Source(SourceRequest),
     //CompileError(),
 }

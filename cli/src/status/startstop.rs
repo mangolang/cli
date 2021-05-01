@@ -4,8 +4,8 @@ use ::std::time::{Duration, SystemTime};
 
 use ::log::debug;
 
-use ::mango_cli_common::api::{ControlRequest, Request, StopMode};
-use ::mango_cli_common::api::{ControlResponse, Response};
+use ::mango_cli_common::api::{ControlRequest, Upstream, StopMode};
+use ::mango_cli_common::api::{ControlResponse, Downstream};
 use ::mango_cli_common::util::can_ping;
 use ::mango_cli_common::util::{clear_lock, single_msg_client};
 use ::mango_cli_common::util::{MangodArgs, MangodStatus};
@@ -94,8 +94,8 @@ pub fn stop_daemon(args: &DaemonStopCmd, status: &MangodStatus) -> Result<(), ()
         MangodStatus::Ok { address } => {
             if single_msg_client(
                 address,
-                Request::Control(ControlRequest::Stop(mode)),
-                Some(|resp| matches!(resp, Response::Control(ControlResponse::Stopped))),
+                Upstream::Control(ControlRequest::Stop(mode)),
+                Some(|resp| matches!(resp, Downstream::Control(ControlResponse::Stopped))),
                 Duration::from_secs(30),
             ) {
                 println!("shutdown complete");
