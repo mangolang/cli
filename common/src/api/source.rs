@@ -23,10 +23,22 @@ pub enum SourceRequest {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum SourceCompressionKind {
+    None,
+    Brotli,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SourceContent {
+    identifier: SourceIdentifier,
+    ts_changed_ms: u64,
+    content: Vec<u8>,
+    compression: SourceCompressionKind,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum SourceResponse {
-    //TODO @mark:
-    RawSources(),
-    CompressedSources(),
-    Unchanged(),
-    SourceNotFound(),
+    Source(Vec<SourceContent>),
+    Unchanged(Vec<SourceIdentifier>),
+    SourceNotFound(SourceIdentifier),
 }
