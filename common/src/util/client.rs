@@ -4,22 +4,22 @@ use ::std::time::Duration;
 use ::log::debug;
 use ::log::error;
 use ::log::trace;
+use ::ws::{CloseCode, Handshake};
 use ::ws::connect;
 use ::ws::Message;
 use ::ws::Sender;
-use ::ws::{CloseCode, Handshake};
 
+use crate::api::{DownstreamEnvelope, Upstream, UpstreamEnvelope};
 use crate::api::Downstream;
-use crate::api::{Upstream, UpstreamEnvelope, DownstreamEnvelope};
 
-#[derive(Debug)]
-pub struct ReqSender<'a> {
+#[derive(Debug, Clone)]
+pub struct ReqSender {
     trace: u64,
-    sender: &'a Sender,
+    sender: Sender,
 }
 
-impl<'a> ReqSender<'a> {
-    pub fn new(sender: &'a Sender) -> Self {
+impl ReqSender {
+    pub fn new(sender: Sender) -> Self {
         ReqSender { trace: 0, sender }
     }
 
@@ -56,13 +56,13 @@ struct ClientHandler<T, S: Fn(&T, &ReqSender), H: Fn(&T, Downstream, &ReqSender)
 
 impl<T, S: Fn(&T, &ReqSender), H: Fn(&T, Downstream, &ReqSender) -> Result<(), String>> ws::Handler for ClientHandler<T, S, H> {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
-        let sender = ReqSender::new(&self.sender);
+        let sender = ReqSender::new(self.sender.clone());
         (self.on_start)(&self.scope, &sender);
         Ok(())
     }
 
     fn on_message(&mut self, req_msg: Message) -> ws::Result<()> {
-        let mut sender = ReqSender::new(&self.sender);
+        let mut sender = ReqSender::new(self.sender.clone());
         match req_msg {
             Message::Text(_) => error!("got text message, but all messages should be binary"),
             Message::Binary(resp_data) => match bincode::deserialize::<DownstreamEnvelope>(&resp_data) {
