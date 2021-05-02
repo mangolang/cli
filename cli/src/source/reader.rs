@@ -1,3 +1,4 @@
+use ::std::path::PathBuf;
 use ::std::thread;
 
 use ::async_std::channel::Sender;
@@ -8,10 +9,10 @@ use ::lazy_static::lazy_static;
 use ::log::debug;
 use ::log::trace;
 
+use ::mango_cli_common::api::SourceIdentifier;
+
 use crate::source::io::read_file;
-use mango_cli_common::api::SourceIdentifier;
 use crate::source::lookup::identifier_to_file;
-use std::path::PathBuf;
 
 lazy_static! {
     static ref READER_SENDER: Sender<ReadRequest> = start_reader();
@@ -53,8 +54,8 @@ fn start_reader() -> Sender<ReadRequest> {
                             Ok(path) => path,
                             Err(_) => todo!("tell the server that the file was not found, so it can stop"),
                         };
-                        spawn_async(async {
-                            trace!("source reader starting to read '{}'", path.to_string_lossy());
+                        spawn_async(async move {
+                            trace!("source reader reading '{}'", path.to_string_lossy());
                             match read_file(path.as_path(), known_ts_ms).await {
                                 Some((current_ts_ms, data)) => todo!("send the file data to server"),
                                 None => todo!("tell the server that the file was up-to-date"),
