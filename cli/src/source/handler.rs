@@ -7,12 +7,12 @@ pub fn handle_source_request(request: SourceRequest) {
     match request {
         SourceRequest::Need(identifier) => {
             load_file(
-                identifier_to_file(identifier.as_str())
+                identifier
             ).unwrap();
         }
         SourceRequest::IfChanged(state) => {
             load_file_if_changed(
-                identifier_to_file(state.identifier.as_str()),
+                state.identifier,
                 state.ts_changed_ms,
             ).unwrap()
         }
