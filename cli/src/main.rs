@@ -18,10 +18,10 @@ use crate::options::MangoArgs;
 use crate::options::MangoCommand;
 use crate::status::handle_daemon_cmd;
 
-mod options;
-mod status;
 mod compile;
+mod options;
 mod source;
+mod status;
 
 #[cfg(test)]
 mod e2e;

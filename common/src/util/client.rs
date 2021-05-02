@@ -4,13 +4,13 @@ use ::std::time::Duration;
 use ::log::debug;
 use ::log::error;
 use ::log::trace;
-use ::ws::{CloseCode, Handshake};
 use ::ws::connect;
 use ::ws::Message;
 use ::ws::Sender;
+use ::ws::{CloseCode, Handshake};
 
-use crate::api::{DownstreamEnvelope, Upstream, UpstreamEnvelope};
 use crate::api::Downstream;
+use crate::api::{DownstreamEnvelope, Upstream, UpstreamEnvelope};
 
 #[derive(Debug, Clone)]
 pub struct ReqSender {
@@ -84,7 +84,7 @@ impl<T, S: Fn(&T, &ReqSender), H: Fn(&T, Downstream, &ReqSender) -> Result<(), S
     }
 
     fn on_close(&mut self, code: CloseCode, reason: &str) {
-        if ! matches!(&code, CloseCode::Normal) {
+        if !matches!(&code, CloseCode::Normal) {
             error!("connection to mangod closed unexpectedly; code: {:?}, reason: '{}'", code, reason);
         }
     }

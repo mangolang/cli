@@ -19,5 +19,4 @@ pub enum TaskRequest {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum TaskResponse {
-}
+pub enum TaskResponse {}

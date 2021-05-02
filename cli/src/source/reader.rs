@@ -1,7 +1,7 @@
 use ::std::thread;
 
-use ::async_std::channel::Sender as ChannelSender;
 use ::async_std::channel::unbounded;
+use ::async_std::channel::Sender as ChannelSender;
 use ::async_std::task::block_on;
 use ::async_std::task::spawn as spawn_async;
 use ::lazy_static::lazy_static;
@@ -10,11 +10,11 @@ use ::log::trace;
 
 use ::mango_cli_common::api::SourceIdentifier;
 use ::mango_cli_common::api::Upstream;
+use ::mango_cli_common::api::{SourceContent, SourceResponse};
 use ::mango_cli_common::util::ReqSender;
 
 use crate::source::io::read_file;
 use crate::source::lookup::identifier_to_file;
-use mango_cli_common::api::{SourceResponse, SourceContent};
 
 lazy_static! {
     static ref READER_SENDER: ChannelSender<ReadRequest> = start_reader();
@@ -32,7 +32,8 @@ pub fn load_file(identifier: SourceIdentifier, sender: ReqSender) -> Result<(), 
         identifier,
         known_ts_ms: None,
         sender,
-    })).map_err(|_| "Failed to send file read request to reader thread".to_owned())
+    }))
+    .map_err(|_| "Failed to send file read request to reader thread".to_owned())
 }
 
 pub fn load_file_if_changed(identifier: SourceIdentifier, known_ts_ms: u64, sender: ReqSender) -> Result<(), String> {
@@ -40,7 +41,8 @@ pub fn load_file_if_changed(identifier: SourceIdentifier, known_ts_ms: u64, send
         identifier,
         known_ts_ms: Some(known_ts_ms),
         sender,
-    })).map_err(|_| "Failed to send file read request to reader thread".to_owned())
+    }))
+    .map_err(|_| "Failed to send file read request to reader thread".to_owned())
 }
 
 fn start_reader() -> ChannelSender<ReadRequest> {
@@ -53,14 +55,17 @@ fn start_reader() -> ChannelSender<ReadRequest> {
                 handle_read_request(request);
             }
         });
-        unimplemented!("is this reachable? remove if so");  //TODO @mark
         debug!("shutting down source reader channel");
     });
     sender
 }
 
 fn handle_read_request(request: ReadRequest) {
-    let ReadRequest { identifier, known_ts_ms, sender, } = request;
+    let ReadRequest {
+        identifier,
+        known_ts_ms,
+        sender,
+    } = request;
     trace!("source reader thread received request for '{}'", identifier.as_str());
     let path = match identifier_to_file(identifier.as_str()) {
         Ok(path) => path,
@@ -68,21 +73,33 @@ fn handle_read_request(request: ReadRequest) {
             debug!("did not find source '{}'; {}", identifier.as_str(), err_msg);
             sender.send(Upstream::Source(SourceResponse::SourceNotFound(identifier)));
             return;
-        },
+        }
     };
     spawn_async(async move {
         //TODO @mark: buffer these messages and send a veco f them so they can be compressed together
         trace!("source reader reading '{}'", path.to_string_lossy());
         match read_file(path.as_path(), known_ts_ms).await {
             Some((current_ts_ms, data)) => {
-                trace!("sending source content for '{}' at '{}' (ts: {}, length: {})", identifier.as_str(),
-                       path.as_path().to_string_lossy(), current_ts_ms, data.len());
-                sender.send(Upstream::Source(SourceResponse::Source(vec![
-                    SourceContent::new(identifier, current_ts_ms, data)])));
-            },
+                trace!(
+                    "sending source content for '{}' at '{}' (ts: {}, length: {})",
+                    identifier.as_str(),
+                    path.as_path().to_string_lossy(),
+                    current_ts_ms,
+                    data.len()
+                );
+                sender.send(Upstream::Source(SourceResponse::Source(vec![SourceContent::new(
+                    identifier,
+                    current_ts_ms,
+                    data,
+                )])));
+            }
             None => {
-                trace!("source has not changed for '{}' at '{}', because ts for both is {}", identifier.as_str(),
-                       path.as_path().to_string_lossy(), known_ts_ms.unwrap());
+                trace!(
+                    "source has not changed for '{}' at '{}', because ts for both is {}",
+                    identifier.as_str(),
+                    path.as_path().to_string_lossy(),
+                    known_ts_ms.unwrap()
+                );
                 sender.send(Upstream::Source(SourceResponse::Unchanged(vec![identifier])));
             }
         }

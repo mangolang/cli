@@ -10,7 +10,7 @@ pub async fn read_file(path: &Path, known_ts_ms: Option<u64>) -> Option<(u64, Ve
     } else {
         false
     };
-    if ! is_up_to_date {
+    if !is_up_to_date {
         None
     } else {
         let data = fs::read(path).await.unwrap();

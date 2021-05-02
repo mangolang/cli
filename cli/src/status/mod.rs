@@ -4,13 +4,13 @@ use ::mango_cli_common::util::MangodStatus;
 
 use crate::options::daemon::DaemonCmd;
 use crate::status::get::get_daemon_property;
-use crate::status::stop::stop_daemon;
 use crate::status::start::start_daemon;
+use crate::status::stop::stop_daemon;
 
 pub mod get;
+pub mod running;
 pub mod start;
 pub mod stop;
-pub mod running;
 
 pub fn handle_daemon_cmd(args: &DaemonCmd, status: &MangodStatus) -> Result<(), String> {
     match match args {

@@ -15,7 +15,7 @@ pub fn ensure_running(status: &MangodStatus) -> Result<(), String> {
         MangodStatus::Ok { .. } => {
             debug!("mangod is already running");
             Ok(())
-        },
+        }
         MangodStatus::Inactive => {
             debug!("mangod is is not running; starting it");
             start_daemon(&MangodArgs::default())

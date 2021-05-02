@@ -4,8 +4,8 @@ pub use self::envelopes::{Downstream, DownstreamEnvelope, Upstream, UpstreamEnve
 pub use self::source::{SourceContent, SourceIdentifier, SourceRequest, SourceRequests, SourceResponse, SourceResponses, SourceState};
 pub use self::task::{CompileTarget, EntrypointIdentifier, TaskRequest, TaskResponse};
 
-mod envelopes;
-mod control;
-mod source;
 mod compression;
+mod control;
+mod envelopes;
+mod source;
 mod task;
