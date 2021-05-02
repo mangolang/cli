@@ -43,6 +43,16 @@ pub struct SourceContent {
     content: Vec<u8>,
 }
 
+impl SourceContent {
+    pub fn new(identifier: SourceIdentifier, ts_changed_ms: u64, content: Vec<u8>) -> Self {
+        SourceContent {
+            identifier,
+            ts_changed_ms,
+            content,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SourceResponses {
     responses: Compression<Vec<SourceResponse>>,

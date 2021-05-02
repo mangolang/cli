@@ -9,10 +9,12 @@ use ::log::debug;
 use ::log::trace;
 
 use ::mango_cli_common::api::SourceIdentifier;
+use ::mango_cli_common::api::Upstream;
 use ::mango_cli_common::util::ReqSender;
 
 use crate::source::io::read_file;
 use crate::source::lookup::identifier_to_file;
+use mango_cli_common::api::{SourceResponse, SourceContent};
 
 lazy_static! {
     static ref READER_SENDER: ChannelSender<ReadRequest> = start_reader();
@@ -62,13 +64,27 @@ fn handle_read_request(request: ReadRequest) {
     trace!("source reader thread received request for '{}'", identifier.as_str());
     let path = match identifier_to_file(identifier.as_str()) {
         Ok(path) => path,
-        Err(_) => todo!("tell the server that the file was not found, so it can stop"),
+        Err(err_msg) => {
+            debug!("did not find source '{}'; {}", identifier.as_str(), err_msg);
+            sender.send(Upstream::Source(SourceResponse::SourceNotFound(identifier)));
+            return;
+        },
     };
     spawn_async(async move {
+        //TODO @mark: buffer these messages and send a veco f them so they can be compressed together
         trace!("source reader reading '{}'", path.to_string_lossy());
         match read_file(path.as_path(), known_ts_ms).await {
-            Some((current_ts_ms, data)) => todo!("send the file data to server"),
-            None => todo!("tell the server that the file was up-to-date"),
+            Some((current_ts_ms, data)) => {
+                trace!("sending source content for '{}' at '{}' (ts: {}, length: {})", identifier.as_str(),
+                       path.as_path().to_string_lossy(), current_ts_ms, data.len());
+                sender.send(Upstream::Source(SourceResponse::Source(vec![
+                    SourceContent::new(identifier, current_ts_ms, data)])));
+            },
+            None => {
+                trace!("source has not changed for '{}' at '{}', because ts for both is {}", identifier.as_str(),
+                       path.as_path().to_string_lossy(), known_ts_ms.unwrap());
+                sender.send(Upstream::Source(SourceResponse::Unchanged(vec![identifier])));
+            }
         }
     });
 }
