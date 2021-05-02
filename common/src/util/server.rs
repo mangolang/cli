@@ -19,7 +19,7 @@ use ::ws::Handshake;
 use ::ws::Message;
 use ::ws::Sender;
 
-use crate::api::{Request, RequestEnvelope, Response, ResponseEnvelope};
+use crate::api::{Downstream, DownstreamEnvelope, Upstream, UpstreamEnvelope};
 use crate::util::clear_lock;
 
 #[derive(Debug, Clone)]
@@ -58,25 +58,25 @@ impl ConnectionData {
         self.sender.token()
     }
 
-    fn send_with_trace(&self, trace: u64, data: Response) {
-        let envelope = ResponseEnvelope { trace, data };
+    fn send_with_trace(&self, trace: u64, data: Downstream) {
+        let envelope = DownstreamEnvelope { trace, data };
         trace!("sending {:?}", envelope);
         assert!(!self.use_json.load(Ordering::Acquire), "to implement: json"); //TODO @mark:
         let resp_data = bincode::serialize(&envelope).expect("could not encode Response");
         self.sender.send(resp_data).expect("failed to send websocket response");
     }
 
-    pub fn send_untraced(&self, data: Response) {
+    pub fn send_untraced(&self, data: Downstream) {
         self.send_with_trace(0, data)
     }
 
     pub fn send_err_untraced(&self, msg: impl Into<String>) {
         let msg = msg.into();
         warn!("sending error response: {}", &msg);
-        self.send_untraced(Response::DaemonError(msg))
+        self.send_untraced(Downstream::DaemonError(msg))
     }
 
-    pub fn broadcast(&self, response: Response) {
+    pub fn broadcast(&self, response: Downstream) {
         self.control
             .clients
             .read()
@@ -108,14 +108,14 @@ impl ConnectionData {
 }
 
 impl<'a> RespSender<'a> {
-    pub fn send(&self, data: Response) {
+    pub fn send(&self, data: Downstream) {
         self.connection.send_with_trace(self.trace, data);
     }
 
     pub fn send_err(&self, msg: impl Into<String>) {
         let msg = msg.into();
         warn!("sending error response: {}", &msg);
-        self.send(Response::DaemonError(msg))
+        self.send(Downstream::DaemonError(msg))
     }
 }
 
@@ -136,12 +136,12 @@ impl ServerControl {
     }
 }
 
-struct ServerHandler<H: Fn(Request, &RespSender) -> Result<Response, String>> {
+struct ServerHandler<H: Fn(Upstream, &RespSender) -> Result<Downstream, String>> {
     connection: Arc<ConnectionData>,
     handler: H,
 }
 
-impl<H: Fn(Request, &RespSender) -> Result<Response, String>> ws::Handler for ServerHandler<H> {
+impl<H: Fn(Upstream, &RespSender) -> Result<Downstream, String>> ws::Handler for ServerHandler<H> {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
         //TODO @mark: too long path
         let connection = &self.connection;
@@ -164,16 +164,16 @@ impl<H: Fn(Request, &RespSender) -> Result<Response, String>> ws::Handler for Se
             Message::Text(req_data) => {
                 //TODO @mark: test this path
                 self.connection.use_json.store(true, Ordering::Release);
-                serde_json::from_str::<RequestEnvelope>(&req_data).map_err(|err| format!("{}", err))
+                serde_json::from_str::<UpstreamEnvelope>(&req_data).map_err(|err| format!("{}", err))
             }
             Message::Binary(req_data) => {
                 self.connection.use_json.store(false, Ordering::Release);
-                bincode::deserialize::<RequestEnvelope>(&req_data).map_err(|err| format!("{}", err))
+                bincode::deserialize::<UpstreamEnvelope>(&req_data).map_err(|err| format!("{}", err))
             }
         };
         match request_envelope {
             Ok(request_envelope) => {
-                let RequestEnvelope { trace: id, data } = request_envelope;
+                let UpstreamEnvelope { trace: id, data } = request_envelope;
                 let sender = RespSender::new(id, &self.connection);
                 match (self.handler)(data, &sender) {
                     Ok(resp) => sender.send(resp),
@@ -195,7 +195,7 @@ impl<H: Fn(Request, &RespSender) -> Result<Response, String>> ws::Handler for Se
 }
 
 //TODO @mark: check all Arc and RwLock to make sure it's not excessive
-pub fn server(addr: &str, handler: impl Fn(Request, &RespSender) -> Result<Response, String> + Clone + Send + 'static) {
+pub fn server(addr: &str, handler: impl Fn(Upstream, &RespSender) -> Result<Downstream, String> + Clone + Send + 'static) {
     info!("starting server at {}", addr);
     let control = ServerControl::new();
     let control_ref = control.clone();

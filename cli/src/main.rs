@@ -7,16 +7,20 @@
 // #[allow(unused_imports)]
 // use ::mangolib;
 
+use ::std::process::exit;
+
 use ::env_logger;
 
 use ::mango_cli_common::util::MangodStatus;
 
-use crate::options::compile::Target;
+use crate::compile::handle_compile_cmd;
 use crate::options::MangoArgs;
 use crate::options::MangoCommand;
 use crate::status::handle_daemon_cmd;
 
+mod compile;
 mod options;
+mod source;
 mod status;
 
 #[cfg(test)]
@@ -25,10 +29,16 @@ mod e2e;
 #[paw::main]
 fn main(args: MangoArgs) {
     env_logger::init();
-    cli(args)
+    match cli(args) {
+        Ok(_) => {}
+        Err(err_msg) => {
+            eprintln!("{}", err_msg);
+            exit(1)
+        }
+    }
 }
 
-pub fn cli(args: MangoArgs) {
+pub fn cli(args: MangoArgs) -> Result<(), String> {
     // let lockfile = load_lock();
     // let status = match &lockfile {
     //     Some(info) => determine_status(info.pid()),
@@ -36,25 +46,27 @@ pub fn cli(args: MangoArgs) {
     // };
     let status = MangodStatus::determine();
     match args.cmd {
-        MangoCommand::Compile(compile) => match compile.target {
-            Target::Check {} => {
-                println!("Checking code...");
-                todo!()
-            }
-            Target::IR { json, packed } => {
-                match (json, packed) {
-                    (true, true) => println!("Creating json & packed IR..."),
-                    (true, false) => println!("Creating json IR..."),
-                    (false, true) => println!("Creating packed IR..."),
-                    (false, false) => println!("Creating packed IR..."),
-                };
-                eprintln!("This operation is not supported yet");
-            }
-            _ => eprintln!("This operation is not supported yet"),
-        },
-        MangoCommand::Run(_) => eprintln!("Run is not supported yet"),
-        MangoCommand::Test(_) => eprintln!("Test is not supported yet"),
-        MangoCommand::Clean(_) => eprintln!("Cleaning output is not supported yet"),
+        MangoCommand::Compile(compile) => handle_compile_cmd(&compile, &status),
+        //TODO @mark:
+        // match compile.target {
+        //     Target::Check {} => {
+        //         println!("Checking code...");
+        //         todo!()
+        //     }
+        //     Target::IR { json, packed } => {
+        //         match (json, packed) {
+        //             (true, true) => println!("Creating json & packed IR..."),
+        //             (true, false) => println!("Creating json IR..."),
+        //             (false, true) => println!("Creating packed IR..."),
+        //             (false, false) => println!("Creating json IR..."),
+        //         };
+        //         eprintln!("This operation is not supported yet");
+        //     }
+        //     _ => eprintln!("This operation is not supported yet"),
+        // },
+        MangoCommand::Run(_) => Err("Run is not supported yet".to_owned()),
+        MangoCommand::Test(_) => Err("Test is not supported yet".to_owned()),
+        MangoCommand::Clean(_) => Err("Cleaning output is not supported yet".to_owned()),
         MangoCommand::Daemon(cmd) => handle_daemon_cmd(&cmd, &status),
-    };
+    }
 }

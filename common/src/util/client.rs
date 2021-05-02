@@ -9,30 +9,30 @@ use ::ws::Message;
 use ::ws::Sender;
 use ::ws::{CloseCode, Handshake};
 
-use crate::api::Response;
-use crate::api::{Request, RequestEnvelope, ResponseEnvelope};
+use crate::api::Downstream;
+use crate::api::{DownstreamEnvelope, Upstream, UpstreamEnvelope};
 
-#[derive(Debug)]
-pub struct ReqSender<'a> {
+#[derive(Debug, Clone)]
+pub struct ReqSender {
     trace: u64,
-    sender: &'a Sender,
+    sender: Sender,
 }
 
-impl<'a> ReqSender<'a> {
-    pub fn new(sender: &'a Sender) -> Self {
+impl ReqSender {
+    pub fn new(sender: Sender) -> Self {
         ReqSender { trace: 0, sender }
     }
 
-    pub fn send(&self, data: Request) {
-        let envelope = RequestEnvelope { trace: self.trace, data };
+    pub fn send(&self, data: Upstream) {
+        let envelope = UpstreamEnvelope { trace: self.trace, data };
         trace!("sending: {:?}", envelope);
         let req_data = bincode::serialize(&envelope).expect("could not encode Request");
         self.sender.send(req_data).expect("failed to send websocket request");
     }
 
     #[allow(clippy::result_unit_err)]
-    pub fn try_send(&self, data: Request) -> Result<(), ()> {
-        let envelope = RequestEnvelope { trace: self.trace, data };
+    pub fn try_send(&self, data: Upstream) -> Result<(), ()> {
+        let envelope = UpstreamEnvelope { trace: self.trace, data };
         trace!("(try-)sending: {:?}", envelope);
         let req_data = match bincode::serialize(&envelope) {
             Ok(data) => data,
@@ -47,28 +47,28 @@ impl<'a> ReqSender<'a> {
     }
 }
 
-struct ClientHandler<T, S: Fn(&T, &ReqSender), H: Fn(&T, Response, &ReqSender) -> Result<(), String>> {
+struct ClientHandler<T, S: Fn(&T, &ReqSender), H: Fn(&T, Downstream, &ReqSender) -> Result<(), String>> {
     sender: Sender,
     scope: T,
     on_start: S,
     handler: H,
 }
 
-impl<T, S: Fn(&T, &ReqSender), H: Fn(&T, Response, &ReqSender) -> Result<(), String>> ws::Handler for ClientHandler<T, S, H> {
+impl<T, S: Fn(&T, &ReqSender), H: Fn(&T, Downstream, &ReqSender) -> Result<(), String>> ws::Handler for ClientHandler<T, S, H> {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
-        let sender = ReqSender::new(&self.sender);
+        let sender = ReqSender::new(self.sender.clone());
         (self.on_start)(&self.scope, &sender);
         Ok(())
     }
 
     fn on_message(&mut self, req_msg: Message) -> ws::Result<()> {
-        let mut sender = ReqSender::new(&self.sender);
+        let mut sender = ReqSender::new(self.sender.clone());
         match req_msg {
             Message::Text(_) => error!("got text message, but all messages should be binary"),
-            Message::Binary(resp_data) => match bincode::deserialize::<ResponseEnvelope>(&resp_data) {
+            Message::Binary(resp_data) => match bincode::deserialize::<DownstreamEnvelope>(&resp_data) {
                 Ok(response_envelope) => {
                     trace!("received: {:?}", response_envelope);
-                    let ResponseEnvelope { trace: id, data } = response_envelope;
+                    let DownstreamEnvelope { trace: id, data } = response_envelope;
                     sender.trace = id;
                     match (self.handler)(&self.scope, data, &sender) {
                         Ok(()) => {}
@@ -82,6 +82,12 @@ impl<T, S: Fn(&T, &ReqSender), H: Fn(&T, Response, &ReqSender) -> Result<(), Str
         }
         Ok(())
     }
+
+    fn on_close(&mut self, code: CloseCode, reason: &str) {
+        if !matches!(&code, CloseCode::Normal) {
+            error!("connection to mangod closed unexpectedly; code: {:?}, reason: '{}'", code, reason);
+        }
+    }
 }
 
 #[allow(clippy::result_unit_err)]
@@ -89,8 +95,9 @@ pub fn client<T: Clone>(
     addr: &str,
     scope: T,
     on_start: impl Fn(&T, &ReqSender) + Copy,
-    handler: impl Fn(&T, Response, &ReqSender) -> Result<(), String> + Copy,
-) -> Result<(), ()> {
+    handler: impl Fn(&T, Downstream, &ReqSender) -> Result<(), String> + Copy,
+) -> Result<(), String> {
+    debug!("connecting to {}", addr);
     connect(format!("ws://{}", addr), move |sender| ClientHandler {
         sender,
         scope: scope.clone(),
@@ -99,10 +106,11 @@ pub fn client<T: Clone>(
     })
     .map_err(|err| {
         debug!("could not connect to daemon, reason: {}", err);
+        "could not connect to daemon".to_owned()
     })
 }
 
-pub fn single_msg_client(address: &str, request: Request, await_response: Option<fn(&Response) -> bool>, timeout: Duration) -> bool {
+pub fn single_msg_client(address: &str, request: Upstream, await_response: Option<fn(&Downstream) -> bool>, timeout: Duration) -> bool {
     let (channel_sender, channel_receiver) = channel();
 
     // Send a message to the server.
@@ -125,7 +133,7 @@ pub fn single_msg_client(address: &str, request: Request, await_response: Option
                     debug!("received the expected response from {} to single-message request", address);
                     scope.0.send(true).unwrap();
                     req_sender.close();
-                } else if let Response::DaemonError(err_msg) = actual_response {
+                } else if let Downstream::DaemonError(err_msg) = actual_response {
                     error!("daemon error: {}", err_msg);
                 }
             }

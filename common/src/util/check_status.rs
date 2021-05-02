@@ -4,8 +4,7 @@ use ::std::time::{SystemTime, UNIX_EPOCH};
 
 use ::lazy_static::lazy_static;
 
-use crate::api::{ControlRequest, Request};
-use crate::api::{ControlResponse, Response};
+use crate::api::{ControlRequest, ControlResponse, Downstream, Upstream};
 use crate::util::{load_lock, single_msg_client};
 
 lazy_static! {
@@ -80,8 +79,8 @@ fn determine_status() -> MangodStatus {
 pub fn can_ping(address: &str) -> bool {
     single_msg_client(
         address,
-        Request::Control(ControlRequest::Ping),
-        Some(|resp| matches!(resp, Response::Control(ControlResponse::Pong))),
+        Upstream::Control(ControlRequest::Ping),
+        Some(|resp| matches!(resp, Downstream::Control(ControlResponse::Pong))),
         Duration::from_secs(1),
     )
 }
