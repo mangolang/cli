@@ -44,33 +44,28 @@ fn start_reader() -> Sender<ReadRequest> {
         debug!("starting source reader channel");
         //TODO @mark: there is a threaded one, https://docs.rs/tokio-async-std/1.5.3/async_std/runtime/index.html
         block_on(async {
-            loop {
-                match recver.recv().await {
-                    //TODO @mark: separate function at this point:
-                    Ok(request) => {
-                        let ReadRequest { identifier, known_ts_ms } = request;
-                        trace!("source reader thread received request for '{}'", identifier.as_str());
-                        let path = match identifier_to_file(identifier.as_str()) {
-                            Ok(path) => path,
-                            Err(_) => todo!("tell the server that the file was not found, so it can stop"),
-                        };
-                        spawn_async(async move {
-                            trace!("source reader reading '{}'", path.to_string_lossy());
-                            match read_file(path.as_path(), known_ts_ms).await {
-                                Some((current_ts_ms, data)) => todo!("send the file data to server"),
-                                None => todo!("tell the server that the file was up-to-date"),
-                            }
-                        });
-                        unimplemented!()  //TODO @mark: TEMPORARY! REMOVE THIS!
-                    }
-                    Err(_) => {
-                        break;
-                    }
-                }
+            while let Ok(request) = recver.recv().await {
+                handle_read_request(request);
             }
         });
         unimplemented!("is this reachable? remove if so");  //TODO @mark
         debug!("shutting down source reader channel");
     });
     sender
+}
+
+fn handle_read_request(request: ReadRequest) {
+    let ReadRequest { identifier, known_ts_ms } = request;
+    trace!("source reader thread received request for '{}'", identifier.as_str());
+    let path = match identifier_to_file(identifier.as_str()) {
+        Ok(path) => path,
+        Err(_) => todo!("tell the server that the file was not found, so it can stop"),
+    };
+    spawn_async(async move {
+        trace!("source reader reading '{}'", path.to_string_lossy());
+        match read_file(path.as_path(), known_ts_ms).await {
+            Some((current_ts_ms, data)) => todo!("send the file data to server"),
+            None => todo!("tell the server that the file was up-to-date"),
+        }
+    });
 }
