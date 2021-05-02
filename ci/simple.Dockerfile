@@ -65,6 +65,9 @@ FROM scratch AS executable
 ENV PATH=/
 ENV RUST_BACKTRACE=1
 ENV RUST_LOG='debug,ws=warn,mio=warn'
+ENV MANGO_USER_CACHE_PATH='/cache'
+ENV MANGO_USER_CONFIG_PATH='/conf'
+WORKDIR /code
 
 # It's really just the executable; other files are part of the Github release, but not Docker image.
 #COPY README.rst LICENSE.txt ./

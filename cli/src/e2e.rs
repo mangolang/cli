@@ -51,8 +51,11 @@ fn show_help() {
     );
 }
 
+#[serial]
 #[test]
 fn compile_ir() {
+    let dir = TempDir::new().unwrap();
+    env::set_var("MANGO_USER_CACHE_PATH", &dir.path().to_string_lossy().into_owned());
     init();
     let args = MangoArgs::from_iter_safe(&["mango", "compile"]).unwrap();
     cli(args).unwrap()
