@@ -8,8 +8,8 @@
 !Cargo.lock
 !rustfmt.toml
 !deny.toml
-!common/
-!daemon/
-!cli/
+!src/common/
+!src/daemon/
+!src/cli/
 !README.rst
 !LICENSE.txt

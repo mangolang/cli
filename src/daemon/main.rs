@@ -6,6 +6,8 @@ use ::mango_cli_common::util::{MangodArgs, MangodStatus};
 
 use crate::connection::server::launch;
 
+//TODO @mark: get rid of this file
+
 mod connection;
 
 //TODO @mark: stop gracefully and remove lockfile on shutdown hook
