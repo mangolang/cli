@@ -8,13 +8,13 @@ use ::lazy_static::lazy_static;
 use ::log::debug;
 use ::log::trace;
 
-use ::mango_cli_common::api::SourceIdentifier;
-use ::mango_cli_common::api::Upstream;
-use ::mango_cli_common::api::{SourceContent, SourceResponse};
-use ::mango_cli_common::util::ReqSender;
+use crate::common::api::SourceIdentifier;
+use crate::common::api::Upstream;
+use crate::common::api::{SourceContent, SourceResponse};
+use crate::common::util::ReqSender;
 
-use crate::source::io::read_file;
-use crate::source::lookup::identifier_to_file;
+use crate::cli::source::io::read_file;
+use crate::cli::source::lookup::identifier_to_file;
 
 lazy_static! {
     static ref READER_SENDER: ChannelSender<ReadRequest> = start_reader();

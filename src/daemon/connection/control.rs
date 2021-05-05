@@ -1,7 +1,7 @@
 use ::log::info;
 
-use ::mango_cli_common::api::{ControlRequest, ControlResponse, Downstream, StopMode};
-use ::mango_cli_common::util::RespSender;
+use crate::common::api::{ControlRequest, ControlResponse, Downstream, StopMode};
+use crate::common::util::RespSender;
 
 pub fn handle_control(request: &ControlRequest, sender: &RespSender) -> Result<Downstream, String> {
     match request {

@@ -12,7 +12,8 @@ use ::structopt::clap::ErrorKind;
 use ::structopt::StructOpt;
 use ::tempfile::TempDir;
 
-use super::*;
+use crate::cli;
+use crate::cli::options::MangoArgs;
 
 static INIT: Once = Once::new();
 

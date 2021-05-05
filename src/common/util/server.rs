@@ -19,8 +19,8 @@ use ::ws::Handshake;
 use ::ws::Message;
 use ::ws::Sender;
 
-use crate::api::{Downstream, DownstreamEnvelope, Upstream, UpstreamEnvelope};
-use crate::util::clear_lock;
+use crate::common::api::{Downstream, DownstreamEnvelope, Upstream, UpstreamEnvelope};
+use crate::common::util::clear_lock;
 
 #[derive(Debug, Clone)]
 pub struct RespSender<'a> {

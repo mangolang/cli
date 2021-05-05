@@ -2,7 +2,7 @@ use ::std::process::exit;
 
 use ::env_logger;
 
-use ::mango_cli_common::util::{MangodArgs, MangodStatus};
+use crate::common::util::{MangodArgs, MangodStatus};
 
 use crate::connection::server::launch;
 

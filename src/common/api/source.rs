@@ -1,6 +1,6 @@
 use ::serde::{Deserialize, Serialize};
 
-use crate::api::compression::Compression;
+use crate::common::api::compression::Compression;
 
 //TODO: possible optimizations:
 //TODO: - single string with some delimiter to save allocations

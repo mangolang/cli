@@ -1,8 +1,8 @@
 use ::std::process::exit;
 
-use ::mango_cli_common::util::MangodStatus;
+use crate::common::util::MangodStatus;
 
-use crate::options::daemon::DaemonGetCmd;
+use crate::cli::options::daemon::DaemonGetCmd;
 
 pub fn get_daemon_property(args: &DaemonGetCmd, status: &MangodStatus) -> Result<(), ()> {
     match args {

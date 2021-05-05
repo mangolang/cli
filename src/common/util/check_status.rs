@@ -4,8 +4,8 @@ use ::std::time::{SystemTime, UNIX_EPOCH};
 
 use ::lazy_static::lazy_static;
 
-use crate::api::{ControlRequest, ControlResponse, Downstream, Upstream};
-use crate::util::{load_lock, single_msg_client};
+use crate::common::api::{ControlRequest, ControlResponse, Downstream, Upstream};
+use crate::common::util::{load_lock, single_msg_client};
 
 lazy_static! {
     static ref LAST_STATUS: RwLock<Option<(u128, MangodStatus)>> = RwLock::new(None);

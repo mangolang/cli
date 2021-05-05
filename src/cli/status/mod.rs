@@ -1,11 +1,11 @@
 use ::std::process::exit;
 
-use ::mango_cli_common::util::MangodStatus;
+use crate::common::util::MangodStatus;
 
-use crate::options::daemon::DaemonCmd;
-use crate::status::get::get_daemon_property;
-use crate::status::start::start_daemon;
-use crate::status::stop::stop_daemon;
+use crate::cli::options::daemon::DaemonCmd;
+use crate::cli::status::get::get_daemon_property;
+use crate::cli::status::start::start_daemon;
+use crate::cli::status::stop::stop_daemon;
 
 pub mod get;
 pub mod running;

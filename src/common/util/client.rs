@@ -9,8 +9,8 @@ use ::ws::Message;
 use ::ws::Sender;
 use ::ws::{CloseCode, Handshake};
 
-use crate::api::Downstream;
-use crate::api::{DownstreamEnvelope, Upstream, UpstreamEnvelope};
+use crate::common::api::Downstream;
+use crate::common::api::{DownstreamEnvelope, Upstream, UpstreamEnvelope};
 
 #[derive(Debug, Clone)]
 pub struct ReqSender {

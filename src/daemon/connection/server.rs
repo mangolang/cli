@@ -1,12 +1,11 @@
 use ::std::process;
 
-use ::mango_cli_common::api::Upstream;
-use ::mango_cli_common::util::server;
-use ::mango_cli_common::util::{store_lock, LockInfo, MangodArgs};
-use mango_cli_common::api::CompileTarget;
-use mango_cli_common::api::TaskRequest;
+use crate::common::api::{Upstream, TaskRequest};
+use crate::common::util::server;
+use crate::common::util::{store_lock, LockInfo, MangodArgs};
+use crate::common::api::CompileTarget;
 
-use crate::connection::control::handle_control;
+use crate::daemon::connection::control::handle_control;
 
 pub fn launch(args: &MangodArgs) {
     let addr = args.address();

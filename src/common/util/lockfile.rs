@@ -9,7 +9,7 @@ use ::log::trace;
 use ::serde::{Deserialize, Serialize};
 use ::whoami;
 
-use crate::util::paths::mangod_lock_file_path;
+use crate::common::util::paths::mangod_lock_file_path;
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct LockInfo {

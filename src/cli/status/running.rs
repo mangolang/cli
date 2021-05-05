@@ -1,9 +1,9 @@
 use ::log::debug;
 
-use ::mango_cli_common::util::MangodArgs;
-use ::mango_cli_common::util::MangodStatus;
+use crate::common::util::MangodArgs;
+use crate::common::util::MangodStatus;
 
-use crate::status::start::start_daemon;
+use crate::cli::status::start::start_daemon;
 
 pub fn ensure_running(status: &MangodStatus) -> Result<(), String> {
     match status {

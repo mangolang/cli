@@ -4,8 +4,7 @@ use ::std::time::{Duration, SystemTime};
 
 use ::log::debug;
 
-use ::mango_cli_common::util::can_ping;
-use mango_cli_common::util::MangodArgs;
+use crate::common::util::{can_ping, MangodArgs};
 
 #[cfg(debug_assertions)]
 fn start_daemon_cmd(args: &[String]) -> Command {

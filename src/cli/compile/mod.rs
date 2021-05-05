@@ -2,18 +2,18 @@ use ::log::debug;
 use ::log::error;
 use ::log::trace;
 
-use ::mango_cli_common::api::CompileTarget;
-use ::mango_cli_common::api::ControlResponse;
-use ::mango_cli_common::api::Downstream;
-use ::mango_cli_common::api::StopMode;
-use ::mango_cli_common::api::{TaskRequest, Upstream};
-use ::mango_cli_common::util::client;
-use ::mango_cli_common::util::MangodArgs;
-use ::mango_cli_common::util::MangodStatus;
+use crate::common::api::CompileTarget;
+use crate::common::api::ControlResponse;
+use crate::common::api::Downstream;
+use crate::common::api::StopMode;
+use crate::common::api::{TaskRequest, Upstream};
+use crate::common::util::client;
+use crate::common::util::MangodArgs;
+use crate::common::util::MangodStatus;
 
-use crate::options::compile::CompileCmd;
-use crate::source::handler::handle_source_request;
-use crate::status::running::ensure_running;
+use crate::cli::options::compile::CompileCmd;
+use crate::cli::source::handler::handle_source_request;
+use crate::cli::status::running::ensure_running;
 
 pub fn handle_compile_cmd(_args: &CompileCmd, status: &MangodStatus) -> Result<(), String> {
     ensure_running(status)?;

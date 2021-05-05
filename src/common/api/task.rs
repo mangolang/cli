@@ -1,6 +1,6 @@
 use ::serde::{Deserialize, Serialize};
 
-use crate::api::SourceContent;
+use crate::common::api::SourceContent;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CompileTarget {
