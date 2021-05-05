@@ -43,6 +43,10 @@ RUN cargo --offline clippy --workspace --all-targets --all-features --tests -- -
 # Style
 RUN cargo --offline fmt --all -- --check
 
+# Custom checks
+COPY ./ci/extra_checks.sh ./extra_checks.sh
+RUN sh extra_checks.sh && rm extra_checks.sh
+
 # Dependencies
 RUN cargo --offline tree --workspace --all-features > dep.tree
 #TODO @mark: re-enable dependency checks
