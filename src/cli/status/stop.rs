@@ -1,10 +1,10 @@
-use crate::common::api::{ControlRequest, StopMode, Upstream};
-use crate::common::api::{ControlResponse, Downstream};
-use crate::common::util::MangodStatus;
-use crate::common::util::{clear_lock, single_msg_client};
+use ::std::time::Duration;
 
 use crate::cli::options::daemon::DaemonStopCmd;
-use std::time::Duration;
+use crate::common::api::{ControlRequest, StopMode, Upstream};
+use crate::common::api::{ControlResponse, Downstream};
+use crate::common::util::{clear_lock, single_msg_client};
+use crate::common::util::MangodStatus;
 
 pub fn stop_daemon(args: &DaemonStopCmd, status: &MangodStatus) -> Result<(), ()> {
     let mode = match (args.quick, args.when_idle) {

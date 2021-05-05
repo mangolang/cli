@@ -13,21 +13,16 @@ RUN cargo install cargo-tree
 # Add the files needed to compile dependencies.
 COPY ./Cargo.toml Cargo.lock ./
 RUN mkdir -p src common/src daemon/src cli/src && \
-    printf '\nfn main() {\n\tprintln!("placeholder for compiling dependencies")\n}\n' | tee common/src/lib.rs | tee daemon/src/main.rs | tee cli/src/main.rs
-COPY common/Cargo.toml ./common/
-COPY daemon/Cargo.toml ./daemon/
-COPY cli/Cargo.toml ./cli/
+    printf '\nfn main() {\n\tprintln!("placeholder for compiling dependencies")\n}\n' | tee src/main.rs
 
 # Build the dependencies, remove Cargo files so they have to be re-added.
 RUN cargo build --workspace --tests &&\
     cargo build --workspace --release &&\
-    rm -rf Cargo.toml Cargo.lock common/ daemon/ cli/
+    rm -rf Cargo.toml Cargo.lock src/
 
 # Copy the actual code.
 COPY ./Cargo.toml ./Cargo.lock ./deny.toml ./rustfmt.toml ./
-COPY ./common/ ./common
-COPY ./daemon/ ./daemon
-COPY ./cli/ ./cli
+COPY ./src/ ./src
 
 # Build (for test)
 RUN find . -name target -prune -o -type f &&\
