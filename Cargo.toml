@@ -14,7 +14,7 @@ include = [
 
 [[bin]]
 name = "mango"
-path = "src/cli/main.rs"
+path = "src/main.rs"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }

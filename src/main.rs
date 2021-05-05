@@ -13,18 +13,17 @@ use ::env_logger;
 
 use ::mango_cli_common::util::MangodStatus;
 
+use crate::cli::options::{MangoArgs, MangoCommand};
 use crate::compile::handle_compile_cmd;
 use crate::options::MangoArgs;
 use crate::options::MangoCommand;
 use crate::status::handle_daemon_cmd;
+use crate::common::util::MangodStatus;
+use crate::cli::compile::handle_compile_cmd;
 
-mod compile;
-mod options;
-mod source;
-mod status;
-
-#[cfg(test)]
-mod e2e;
+mod common;
+mod cli;
+mod daemon;
 
 #[paw::main]
 fn main(args: MangoArgs) {
