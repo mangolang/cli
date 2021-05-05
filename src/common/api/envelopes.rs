@@ -2,7 +2,7 @@ use ::serde::{Deserialize, Serialize};
 
 use crate::common::api::source::{SourceRequest, SourceResponse};
 use crate::common::api::task::{TaskRequest, TaskResponse};
-use crate::common::api::{ControlResponse, ControlRequest};
+use crate::common::api::{ControlRequest, ControlResponse};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UpstreamEnvelope {

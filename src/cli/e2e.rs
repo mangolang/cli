@@ -66,6 +66,7 @@ fn compile_ir() {
 #[test]
 fn daemon_start_stop() {
     let dir = TempDir::new().unwrap();
+    use crate::cli;
     env::set_var("MANGO_USER_CACHE_PATH", &dir.path().to_string_lossy().into_owned());
     init();
 

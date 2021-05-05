@@ -17,8 +17,8 @@ use crate::cli::options::MangoCommand;
 use crate::cli::status::handle_daemon_cmd;
 use crate::common::util::MangodStatus;
 
-mod common;
 mod cli;
+mod common;
 mod daemon;
 
 #[paw::main]

@@ -1,9 +1,9 @@
 use ::std::process;
 
-use crate::common::api::{Upstream, TaskRequest};
+use crate::common::api::CompileTarget;
+use crate::common::api::{TaskRequest, Upstream};
 use crate::common::util::server;
 use crate::common::util::{store_lock, LockInfo, MangodArgs};
-use crate::common::api::CompileTarget;
 
 use crate::daemon::connection::control::handle_control;
 
