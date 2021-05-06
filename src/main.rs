@@ -16,6 +16,7 @@ use crate::cli::options::MangoArgs;
 use crate::cli::options::MangoCommand;
 use crate::cli::status::handle_daemon_cmd;
 use crate::common::util::MangodStatus;
+use crate::daemon::run_mango_daemon;
 
 mod cli;
 mod common;
@@ -63,5 +64,6 @@ pub fn cli(args: MangoArgs) -> Result<(), String> {
         MangoCommand::Test(_) => Err("Test is not supported yet".to_owned()),
         MangoCommand::Clean(_) => Err("Cleaning output is not supported yet".to_owned()),
         MangoCommand::Daemon(cmd) => handle_daemon_cmd(&cmd, &status),
+        MangoCommand::RunAsDaemon(args) => run_mango_daemon(args),
     }
 }

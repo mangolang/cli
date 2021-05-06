@@ -1,5 +1,7 @@
 use ::structopt::StructOpt;
 
+use crate::common::util::MangodArgs;
+
 pub mod clean;
 pub mod compile;
 pub mod daemon;
@@ -58,4 +60,7 @@ pub enum MangoCommand {
 
     #[structopt(about = "Control the Mango daemon (for all projects)")]
     Daemon(daemon::DaemonCmd),
+
+    #[structopt(about = "Run as a blocking mango daemon. Can be controlled using the other cli commands, like 'daemon'.")]
+    RunAsDaemon(MangodArgs),
 }
