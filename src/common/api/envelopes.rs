@@ -32,3 +32,15 @@ pub enum Downstream {
     Source(SourceRequest),
     //CompileError(),
 }
+
+impl Downstream {
+    pub fn type_name(&self) -> &str {
+        match self {
+            Downstream::Ok => "Ok",
+            Downstream::DaemonError(_) => "DaemonError",
+            Downstream::Control(arg) => arg.type_name(),
+            Downstream::Task(arg) => arg.type_name(),
+            Downstream::Source(arg) => arg.type_name(),
+        }
+    }
+}

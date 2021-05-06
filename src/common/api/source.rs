@@ -36,6 +36,15 @@ pub enum SourceRequest {
     IfChanged(SourceState),
 }
 
+impl SourceRequest {
+    pub fn type_name(&self) -> &str {
+        match self {
+            SourceRequest::Need(_) => "Need",
+            SourceRequest::IfChanged(_) => "IfChanged",
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SourceContent {
     identifier: SourceIdentifier,

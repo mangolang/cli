@@ -19,3 +19,13 @@ pub enum ControlResponse {
     Stopping(StopMode),
     Stopped,
 }
+
+impl ControlResponse {
+    pub fn type_name(&self) -> &str {
+        match self {
+            ControlResponse::Pong => "Pong",
+            ControlResponse::Stopping(_) => "Stopping",
+            ControlResponse::Stopped => "Stopped",
+        }
+    }
+}
