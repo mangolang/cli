@@ -32,10 +32,6 @@ impl<'a> RespSender<'a> {
     pub fn new(trace: u64, connection: &'a ConnectionData) -> Self {
         RespSender { trace, connection }
     }
-
-    pub fn untraced(connection: &'a ConnectionData) -> Self {
-        RespSender { trace: 0, connection }
-    }
 }
 
 #[derive(Debug)]

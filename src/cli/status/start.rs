@@ -1,3 +1,4 @@
+use ::std::env;
 use ::std::process::{Command, Stdio};
 use ::std::thread::sleep;
 use ::std::time::{Duration, SystemTime};
@@ -6,27 +7,13 @@ use ::log::debug;
 
 use crate::common::util::{can_ping, MangodArgs};
 
-#[cfg(debug_assertions)]
 fn start_daemon_cmd(args: &[String]) -> Command {
-    let mut cmd = Command::new("cargo");
-    let mut all_args = vec![
-        "run".to_owned(),
-        "-q".to_owned(),
-        "-p".to_owned(),
-        "mango-cli-daemon".to_owned(),
-        "--".to_owned(),
-    ];
-    all_args.extend_from_slice(args);
-    debug!("start daemon (debug) cmd: cargo {}", all_args.join(" "));
-    cmd.args(&all_args);
-    cmd
-}
-
-#[cfg(not(debug_assertions))]
-fn start_daemon_cmd(args: &[String]) -> Command {
-    let mut cmd = Command::new("mangod");
-    debug!("start daemon (release) cmd: mango {}", args.join(" "));
-    cmd.args(&*args);
+    let exe_path = env::args().nth(0)
+        .expect("could not find executable name, no arguments");
+    debug!("start daemon (debug) cmd: {} run-as-daemon {}", &exe_path, args.join(" "));
+    let mut cmd = Command::new(exe_path);
+    cmd.arg("run-as-daemon");
+    cmd.args(args);
     cmd
 }
 
