@@ -23,7 +23,7 @@ pub fn launch(args: &MangodArgs) {
             TaskRequest::Compile(compile) => {
                 assert!(matches!(compile, CompileTarget::IR));
                 eprintln!("got compile task {:?}", compile); //TODO @mark
-                unimplemented!("compile IR"); //TODO @mark: TEMPORARY! REMOVE THIS!
+                //TODO @mark: implement
             }
         },
     });
