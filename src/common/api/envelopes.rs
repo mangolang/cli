@@ -17,6 +17,17 @@ pub enum Upstream {
     Source(SourceResponse),
 }
 
+impl Upstream {
+    #[allow(unused)]
+    pub fn type_name(&self) -> &str {
+        match self {
+            Upstream::Control(arg) => arg.type_name(),
+            Upstream::Task(arg) => arg.type_name(),
+            Upstream::Source(arg) => arg.type_name(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DownstreamEnvelope {
     pub trace: u64,

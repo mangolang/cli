@@ -73,3 +73,13 @@ pub enum SourceResponse {
     Unchanged(Vec<SourceIdentifier>),
     SourceNotFound(SourceIdentifier),
 }
+
+impl SourceResponse {
+    pub fn type_name(&self) -> &str {
+        match self {
+            SourceResponse::Source(_) => "Source",
+            SourceResponse::Unchanged(_) => "Unchanged",
+            SourceResponse::SourceNotFound(_) => "SourceNotFound",
+        }
+    }
+}

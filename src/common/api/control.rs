@@ -13,6 +13,15 @@ pub enum ControlRequest {
     Stop(StopMode),
 }
 
+impl ControlRequest {
+    pub fn type_name(&self) -> &str {
+        match self {
+            ControlRequest::Ping => "Ping",
+            ControlRequest::Stop(_) => "Stop",
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ControlResponse {
     Pong,

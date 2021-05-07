@@ -172,7 +172,8 @@ impl<H: Fn(Upstream, &RespSender) -> Result<(), String>> ws::Handler for ServerH
                 let UpstreamEnvelope { trace: id, data } = request_envelope;
                 let sender = RespSender::new(id, &self.connection);
                 match (self.handler)(data, &sender) {
-                    Ok(()) => trace!("successfully handled {}", data.type_name()),
+                    //TODO @mark: remove trace?
+                    Ok(()) => {},  //trace!("successfully handled {}", data.type_name()),
                     Err(err_msg) => sender.send_err(err_msg),
                 }
             }

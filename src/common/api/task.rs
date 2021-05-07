@@ -18,6 +18,14 @@ pub enum TaskRequest {
     Compile(CompileTarget),
 }
 
+impl TaskRequest {
+    pub fn type_name(&self) -> &str {
+        match self {
+            TaskRequest::Compile(_) => "Compile",
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TaskResponse {}
 
