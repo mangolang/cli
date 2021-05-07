@@ -1,21 +1,20 @@
 use ::std::collections::HashSet;
 use ::std::env;
+use ::std::path::Path;
 use ::std::path::PathBuf;
 use ::std::process::Command;
 use ::std::process::Output;
 use ::std::str::from_utf8;
 use ::std::str::FromStr;
 use ::std::sync::RwLock;
-use ::std::thread::sleep;
-use ::std::time::Duration;
 
 use ::lazy_static::lazy_static;
+use ::serde::__private::from_utf8_lossy;
 use ::serde_json::Map;
 use ::serde_json::Value;
 use ::tempfile::TempDir;
-
-use serde::__private::from_utf8_lossy;
-use std::path::Path;
+use std::thread::sleep;
+use std::time::Duration;
 
 lazy_static! {
     static ref MANGO_EXE: RwLock<Option<PathBuf>> = RwLock::new(None);
@@ -49,19 +48,22 @@ fn compile_exe() {
     });
 }
 
-fn run_cli(exe_path: &Path, args: &[&str]) -> Output {
-    //TODO @mark: does this cause double locking?
-    let exe_read = MANGO_EXE.read().unwrap();
-    let dir = TempDir::new().unwrap();
-    env::set_var("MANGO_USER_CACHE_PATH", &dir.path().to_string_lossy().into_owned());
-    let output = Command::new(exe_path)
+fn run_cli(args: &[&str]) -> (i32, String, String) {
+    MANGO_EXE.read().unwrap().as_ref().map(|exe_pth| {
+        let output = run_cli_with(&exe_pth, args);
+        (
+            output.status.code().unwrap(),
+            from_utf8_lossy(&output.stdout).into_owned(),
+            from_utf8_lossy(&output.stderr).into_owned(),
+        )
+    }).unwrap()
+}
+
+fn run_cli_with(exe_path: &Path, args: &[&str]) -> Output {
+    Command::new(exe_path)
         .args(args)
         .output()
-        .unwrap();
-    // Explicitly drop to make sure the lock is held until here.
-    drop(exe_read);
-    drop(dir);
-    output
+        .unwrap()
 }
 
 fn run_with_daemon(args: &[&str], test: impl FnOnce(Output)) {
@@ -69,13 +71,13 @@ fn run_with_daemon(args: &[&str], test: impl FnOnce(Output)) {
 
     let dir = TempDir::new().unwrap();
     env::set_var("MANGO_USER_CACHE_PATH", &dir.path().to_string_lossy().into_owned());
-    MANGO_EXE.read().unwrap().map(|exe_pth| {
+    MANGO_EXE.read().unwrap().as_ref().map(|exe_pth| {
         let mut child = Command::new(&exe_pth)
             .arg("run-as-daemon")
             .spawn()
             .unwrap();
-        test(run_cli(&exe_pth, args));
-        child.wait();
+        test(run_cli_with(&exe_pth, args));
+        child.wait().unwrap();
     });
     drop(dir);
 }
@@ -106,26 +108,23 @@ fn daemon_start_stop() {
     compile_exe();
 
     // Start
-    let res = run_cli(&["daemon", "start", "-p", "47559"]);
-    let start_txt = from_utf8(&res.stderr).unwrap();
-    println!("starting:\n{}/starting", start_txt);
-    assert!(res.status.success(), "{}", start_txt);
+    let (code, _, err) = run_cli(&["daemon", "start", "-p", "47559"]);
+    assert_eq!(code, 0);
+    println!("starting:\n{}/starting", err);
 
-    let res = run_cli(&["daemon", "get", "status"]);
-    let out = from_utf8(&res.stdout).unwrap().trim();
+    let (code, out, _) = run_cli(&["daemon", "get", "status"]);
+    assert_eq!(code, 0);
     assert_eq!(out, "running");
 
     // Stop
-    let res = run_cli(&["daemon", "stop"]);
-    let stop_txt = from_utf8(&res.stderr).unwrap();
-    println!("stopping:\n{}/stopped", stop_txt);
-    assert!(res.status.success(), "{}", from_utf8(&res.stderr).unwrap());
+    let (code, _, err) = run_cli(&["daemon", "stop"]);
+    assert_eq!(code, 0);
+    println!("stopping:\n{}/stopping", err);
 
-    // Sleep here because the server sleept 50ms before shutting down
     //TODO get rid of sleep when the server no longer sleeps
     sleep(Duration::from_millis(75));
 
-    let res = run_cli(&["daemon", "get", "status"]);
-    let out = from_utf8(&res.stdout).unwrap().trim();
+    let (code, out, _) = run_cli(&["daemon", "get", "status"]);
+    assert_eq!(code, 0);
     assert_eq!(out, "not-started");
 }
