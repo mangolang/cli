@@ -1,14 +1,17 @@
+use ::std::collections::HashSet;
 use ::std::env;
+use ::std::path::PathBuf;
 use ::std::process::Command;
 use ::std::process::Output;
 use ::std::str::from_utf8;
+use ::std::str::FromStr;
+use ::std::sync::RwLock;
 use ::std::thread::sleep;
 use ::std::time::Duration;
 
-use ::assert_cmd::prelude::*;
+use ::lazy_static::lazy_static;
 use ::serde_json::Map;
 use ::serde_json::Value;
-use ::serial_test::serial;
 use ::structopt::clap::ErrorKind;
 use ::structopt::StructOpt;
 use ::tempfile::TempDir;
@@ -16,49 +19,56 @@ use ::tempfile::TempDir;
 use crate::cli;
 use crate::cli::options::MangoArgs;
 
-<<<<<<< HEAD
-=======
-static INIT: Once = Once::new();
+lazy_static! {
+    static ref MANGO_EXE: RwLock<Option<PathBuf>> = RwLock::new(None);
+}
 
-fn init() {
-    // Assumes executables without extensions. Might have to be adapted to non-linux.
-    INIT.call_once(|| {
-        println!("starting building");
+fn run_daemon(args: &[&str], test: impl FnOnce(Output)) {
+    MANGO_EXE.write().unwrap().get_or_insert_with(|| {
+        println!("starting building executable");
         let result = Command::new("cargo").arg("build").arg("--message-format=json").output().unwrap();
         assert!(result.status.success(), "build failed: {}", from_utf8(&result.stderr).unwrap());
+        println!("finished building executable");
+
         let build_infos = from_utf8(&result.stdout)
             .expect("could not parse json output of cargo build");
+        let mut exes = HashSet::with_capacity(1);
         for line in build_infos.lines() {
             let json = serde_json::from_str::<Map<String, Value>>(line)
                 .expect("output of cargo build was not valid json despite --message-format=json");
             match json.get("executable") {
-                Some(Value::String(exe_path)) => todo!("here! {}", exe_path),
+                Some(Value::String(exe_path)) => {
+                    exes.insert(PathBuf::from_str(exe_path).unwrap());
+                },
                 Some(Value::Null) => continue,
                 None => continue,
                 Some(_) => panic!("unexpected value for 'executable' in cargo output"),
             }
         }
-
-        unimplemented!(); //TODO @mark: TEMPORARY! REMOVE THIS!
-        // let mut path = PathBuf::from(env!("CARGO_TARGET_DIR"));
-        // path.push("release");
-        // let mut mango = path.clone();
-        // mango.push("mango");
-        // assert!(mango.is_file(), "mango cli executable not found at {}", &mango.to_string_lossy());
-        // let mut mangod = path;
-        // mangod.push("mangod");
-        // assert!(mangod.is_file(), "mango daemon executable not found at {}", &mangod.to_string_lossy());
-        println!("finished building");
+        assert!(exes.len() <= 1, "found multiple executables! {:?}", exes);
+        assert!(exes.len() > 0, "could not find executable in cargo output");
+        exes.into_iter().next().unwrap()
     });
-}
 
->>>>>>> 7663480... Parse executable path in cargo output
-fn do_cli(args: &[&str]) -> Output {
-    Command::cargo_bin("mango").unwrap().args(args).output().unwrap()
+    let mut cmd = vec![];
+    cmd.push(MANGO_EXE.read().unwrap().unwrap().to_string_lossy().into_owned());
+    cmd.push("run-as-daemon".to_owned());
+    for arg in args {
+        cmd.push((*arg).to_owned());
+    }
+    let out = Command::new(MANGO_EXE.read().unwrap().unwrap())
+        .arg("run-as-daemon")
+        .args(args)
+        .spawn()
+        .unwrap();
+    test(out);
+    child.join();
+    todo!("keep locked until here to make tests single-threaded")
 }
 
 #[test]
 fn show_help() {
+    run_daemon(&["-h"]);
     assert_eq!(
         ErrorKind::HelpDisplayed,
         MangoArgs::from_iter_safe(&["mango", "-h"]).unwrap_err().kind
@@ -69,20 +79,20 @@ fn show_help() {
     );
 }
 
-#[serial]
 #[test]
 fn compile_ir() {
     let dir = TempDir::new().unwrap();
     env::set_var("MANGO_USER_CACHE_PATH", &dir.path().to_string_lossy().into_owned());
+    run_daemon();
     let args = MangoArgs::from_iter_safe(&["mango", "compile"]).unwrap();
     cli(args).unwrap()
 }
 
-#[serial]
 #[test]
 fn daemon_start_stop() {
     let dir = TempDir::new().unwrap();
     env::set_var("MANGO_USER_CACHE_PATH", &dir.path().to_string_lossy().into_owned());
+    run_daemon();
 
     // Start
     let res = do_cli(&["daemon", "start", "-p", "47559"]);

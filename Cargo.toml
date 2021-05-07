@@ -33,6 +33,5 @@ paw = "^1.0.0"
 [dev-dependencies]
 serial_test = "0.5.1"
 tempfile = "3.2.0"
-assert_cmd = "1.0.3"
 
 
