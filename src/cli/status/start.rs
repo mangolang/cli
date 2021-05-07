@@ -8,8 +8,7 @@ use ::log::debug;
 use crate::common::util::{can_ping, MangodArgs};
 
 fn start_daemon_cmd(args: &[String]) -> Command {
-    let exe_path = env::args().nth(0)
-        .expect("could not find executable name, no arguments");
+    let exe_path = env::args().next().expect("could not find executable name, no arguments");
     debug!("start daemon (debug) cmd: {} run-as-daemon {}", &exe_path, args.join(" "));
     let mut cmd = Command::new(exe_path);
     cmd.arg("run-as-daemon");

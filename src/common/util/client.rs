@@ -130,8 +130,11 @@ pub fn single_msg_client(address: &str, request: Upstream, await_response: Optio
         move |scope, actual_response, req_sender| {
             if let Some(is_expected_response) = scope.2 {
                 if is_expected_response(&actual_response) {
-                    debug!("received the expected {} response from {} to single-message request",
-                           actual_response.type_name(), address);
+                    debug!(
+                        "received the expected {} response from {} to single-message request",
+                        actual_response.type_name(),
+                        address
+                    );
                     scope.0.send(true).unwrap();
                     req_sender.close();
                 } else if let Downstream::DaemonError(err_msg) = actual_response {

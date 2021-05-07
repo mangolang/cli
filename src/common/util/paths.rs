@@ -39,6 +39,7 @@ pub fn mango_user_cache_dir() -> PathBuf {
 
 /// Get user configuration directory for Mango (multi-project).
 /// Documented at https://docs.mangocode.org/en/latest/setup_guide/paths.html
+#[allow(unused)]  //TODO @mark
 pub fn mango_user_config_dir() -> PathBuf {
     let pth = env::var("MANGO_USER_CONFIG_PATH")
         .map(PathBuf::from)
@@ -63,11 +64,12 @@ pub fn mango_user_config_dir() -> PathBuf {
 
 /// The root directory of the current Mango project.
 pub fn mango_project_root_dir() -> PathBuf {
-    panic!("start at current dir and go up until project file is found?"); //TODO @mark
-                                                                           //TODO @mark: also implement unit test, including for mango_project_build_dir
-                                                                           //let pth = env::current_dir();
-                                                                           //create_dir_all(&pth)
-                                                                           //    .expect("could not create mango config directory");
+    panic!("start at current dir and go up until project file is found?");
+    //TODO @mark
+    //TODO @mark: also implement unit test, including for mango_project_build_dir
+    //let pth = env::current_dir();
+    //create_dir_all(&pth)
+    //    .expect("could not create mango config directory");
 }
 
 /// Get project build output directory for Mango (single-user, single-project).

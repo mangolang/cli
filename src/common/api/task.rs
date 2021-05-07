@@ -23,6 +23,6 @@ pub enum TaskResponse {}
 
 impl TaskResponse {
     pub fn type_name(&self) -> &str {
-        return "Task"
+        "Task"
     }
 }
