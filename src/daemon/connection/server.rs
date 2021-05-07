@@ -13,17 +13,18 @@ pub fn launch(args: &MangodArgs) {
     let lock = LockInfo::new(process::id(), &addr);
     store_lock(&lock);
     server(&addr, |upstream, sender| match upstream {
-        Upstream::Control(request) => handle_control(&request, sender),
+        Upstream::Control(request) => handle_control(&request, sender)
+            .map(|resp| sender.send(resp)),
         Upstream::Source(response) => {
             eprintln!("got source {:?}", response); //TODO @mark
             unimplemented!("make server not always expect responses")
-            //TODO @mark:
+            //TODO @mark: implement
         }
         Upstream::Task(request) => match request {
             TaskRequest::Compile(compile) => {
                 assert!(matches!(compile, CompileTarget::IR));
                 eprintln!("got compile task {:?}", compile); //TODO @mark
-                //TODO @mark: implement
+                Ok(()) //TODO @mark: implement
             }
         },
     });

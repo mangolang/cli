@@ -132,12 +132,12 @@ impl ServerControl {
     }
 }
 
-struct ServerHandler<H: Fn(Upstream, &RespSender) -> Result<Downstream, String>> {
+struct ServerHandler<H: Fn(Upstream, &RespSender) -> Result<(), String>> {
     connection: Arc<ConnectionData>,
     handler: H,
 }
 
-impl<H: Fn(Upstream, &RespSender) -> Result<Downstream, String>> ws::Handler for ServerHandler<H> {
+impl<H: Fn(Upstream, &RespSender) -> Result<(), String>> ws::Handler for ServerHandler<H> {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
         //TODO @mark: too long path
         let connection = &self.connection;
@@ -172,7 +172,7 @@ impl<H: Fn(Upstream, &RespSender) -> Result<Downstream, String>> ws::Handler for
                 let UpstreamEnvelope { trace: id, data } = request_envelope;
                 let sender = RespSender::new(id, &self.connection);
                 match (self.handler)(data, &sender) {
-                    Ok(resp) => sender.send(resp),
+                    Ok(()) => trace!("successfully handled {}", data.type_name()),
                     Err(err_msg) => sender.send_err(err_msg),
                 }
             }
@@ -191,7 +191,7 @@ impl<H: Fn(Upstream, &RespSender) -> Result<Downstream, String>> ws::Handler for
 }
 
 //TODO @mark: check all Arc and RwLock to make sure it's not excessive
-pub fn server(addr: &str, handler: impl Fn(Upstream, &RespSender) -> Result<Downstream, String> + Clone + Send + 'static) {
+pub fn server(addr: &str, handler: impl Fn(Upstream, &RespSender) -> Result<(), String> + Clone + Send + 'static) {
     info!("starting server at {}", addr);
     let control = ServerControl::new();
     let control_ref = control.clone();
