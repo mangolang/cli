@@ -7,14 +7,15 @@ use ::std::process::Output;
 use ::std::str::from_utf8;
 use ::std::str::FromStr;
 use ::std::sync::RwLock;
+use ::std::thread::sleep;
+use ::std::time::Duration;
 
 use ::lazy_static::lazy_static;
+use ::log::debug;
 use ::serde::__private::from_utf8_lossy;
 use ::serde_json::Map;
 use ::serde_json::Value;
 use ::tempfile::TempDir;
-use std::thread::sleep;
-use std::time::Duration;
 
 lazy_static! {
     static ref MANGO_EXE: RwLock<Option<PathBuf>> = RwLock::new(None);
@@ -22,10 +23,10 @@ lazy_static! {
 
 fn compile_exe() {
     MANGO_EXE.write().unwrap().get_or_insert_with(|| {
-        println!("starting building executable");
+        debug!("starting building executable");
         let result = Command::new("cargo").arg("build").arg("--message-format=json").output().unwrap();
         assert!(result.status.success(), "build failed: {}", from_utf8(&result.stderr).unwrap());
-        println!("finished building executable");
+        debug!("finished building executable");
 
         let build_infos = from_utf8(&result.stdout)
             .expect("could not parse json output of cargo build");
@@ -44,7 +45,9 @@ fn compile_exe() {
         }
         assert!(exes.len() <= 1, "found multiple executables! {:?}", exes);
         assert!(exes.len() > 0, "could not find executable in cargo output");
-        exes.into_iter().next().unwrap()
+        let exe_pth = exes.into_iter().next().unwrap();
+        debug!("executable at: {}", &exe_pth.to_string_lossy());
+        exe_pth
     });
 }
 
@@ -74,11 +77,19 @@ fn run_with_daemon(args: &[&str], test: impl FnOnce(Output)) {
     MANGO_EXE.read().unwrap().as_ref().map(|exe_pth| {
         let mut child = Command::new(&exe_pth)
             .arg("run-as-daemon")
+            .arg("-p")
+            .arg("47559")
+            .env("RUST_LOG", "debug,ws=warn,mio=warn")
             .spawn()
             .unwrap();
+        let (_, out, _) = run_cli(&["daemon", "get", "status"]);
+        debug!("started mango daemon, status: {}", out);
         test(run_cli_with(&exe_pth, args));
+        debug!("going to stop mango daemon");
+        let (code, _, err) = run_cli(&["daemon", "stop"]);
+        assert_eq!(code, 0, "failed to stop {}", err);
         child.wait().unwrap();
-    });
+    }).unwrap();
     drop(dir);
 }
 
@@ -97,7 +108,11 @@ fn show_help() {
 fn compile_ir() {
     run_with_daemon(
         &["compile"],
-        |output| assert!(output.status.success()),
+        |output| {
+            assert!(output.status.success());
+            println!("out: {}\n/out", from_utf8_lossy(&output.stdout));  //TODO @mark: TEMPORARY! REMOVE THIS!
+            println!("err: {}\n/err", from_utf8_lossy(&output.stderr));  //TODO @mark: TEMPORARY! REMOVE THIS!
+        },
     );
 }
 
@@ -110,7 +125,7 @@ fn daemon_start_stop() {
     // Start
     let (code, _, err) = run_cli(&["daemon", "start", "-p", "47559"]);
     assert_eq!(code, 0);
-    println!("starting:\n{}/starting", err);
+    debug!("starting:\n{}/starting", err);
 
     let (code, out, _) = run_cli(&["daemon", "get", "status"]);
     assert_eq!(code, 0);
@@ -119,7 +134,7 @@ fn daemon_start_stop() {
     // Stop
     let (code, _, err) = run_cli(&["daemon", "stop"]);
     assert_eq!(code, 0);
-    println!("stopping:\n{}/stopping", err);
+    debug!("stopping:\n{}/stopping", err);
 
     //TODO get rid of sleep when the server no longer sleeps
     sleep(Duration::from_millis(75));
