@@ -89,7 +89,6 @@ fn run_with_daemon(args: &[&str], test: impl FnOnce(i32, &str, &str)) {
         let (status, out, err) = run_cli_with(&exe_pth, args);
         test(status, &out, &err);
         eprintln!("HELLO D");  //TODO @mark: TEMPORARY! REMOVE THIS!
-        panic!();  //TODO @mark: TEMPORARY! REMOVE THIS!
         debug!("going to stop mango daemon");
         sleep(Duration::from_millis(200));  //TODO @mark: TEMPORARY! REMOVE THIS!
         let (code, _, err) = run_cli(&["daemon", "stop"]);
@@ -109,7 +108,10 @@ fn show_help() {
     );
 }
 
-#[test]
+//TODO @mark: it seems this test tries to start another daemon, which it can't
+//TODO @mark: - failing to start second daemon should fail test
+//TODO @mark: - it should not start a daemon because one is running
+#[test] //TODO @mark: disabled
 fn compile_ir() {
     run_with_daemon(
         &["compile"],
@@ -146,5 +148,5 @@ fn daemon_start_stop() {
 
     let (code, out, _) = run_cli(&["daemon", "get", "status"]);
     assert_eq!(out.trim(), "not-started");
-    assert_eq!(code, 0);
+    assert_eq!(code, 1, "not-started should have status code 1 (not running = false)");
 }
