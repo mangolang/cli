@@ -7,6 +7,9 @@
 // #[allow(unused_imports)]
 // use ::mangolib;
 
+#[global_allocator]
+static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
+
 use ::std::process::exit;
 
 use ::env_logger;
