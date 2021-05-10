@@ -3,7 +3,6 @@ use ::std::env;
 use ::std::path::Path;
 use ::std::path::PathBuf;
 use ::std::process::Command;
-use ::std::process::Output;
 use ::std::str::from_utf8;
 use ::std::str::FromStr;
 use ::std::sync::RwLock;
@@ -53,28 +52,29 @@ fn compile_exe() {
 
 fn run_cli(args: &[&str]) -> (i32, String, String) {
     MANGO_EXE.read().unwrap().as_ref().map(|exe_pth| {
-        let output = run_cli_with(&exe_pth, args);
-        (
-            output.status.code().unwrap(),
-            from_utf8_lossy(&output.stdout).into_owned(),
-            from_utf8_lossy(&output.stderr).into_owned(),
-        )
+        run_cli_with(&exe_pth, args)
     }).unwrap()
 }
 
-fn run_cli_with(exe_path: &Path, args: &[&str]) -> Output {
-    Command::new(exe_path)
+fn run_cli_with(exe_path: &Path, args: &[&str]) -> (i32, String, String) {
+    let output = Command::new(exe_path)
         .args(args)
         .output()
-        .unwrap()
+        .unwrap();
+    (
+        output.status.code().unwrap(),
+        from_utf8_lossy(&output.stdout).into_owned(),
+        from_utf8_lossy(&output.stderr).into_owned(),
+    )
 }
 
-fn run_with_daemon(args: &[&str], test: impl FnOnce(Output)) {
+fn run_with_daemon(args: &[&str], test: impl FnOnce(i32, &str, &str)) {
     compile_exe();
 
     let dir = TempDir::new().unwrap();
     env::set_var("MANGO_USER_CACHE_PATH", &dir.path().to_string_lossy().into_owned());
     MANGO_EXE.read().unwrap().as_ref().map(|exe_pth| {
+        eprintln!("HELLO A");  //TODO @mark: TEMPORARY! REMOVE THIS!
         let mut child = Command::new(&exe_pth)
             .arg("run-as-daemon")
             .arg("-p")
@@ -82,10 +82,16 @@ fn run_with_daemon(args: &[&str], test: impl FnOnce(Output)) {
             .env("RUST_LOG", "debug,ws=warn,mio=warn")
             .spawn()
             .unwrap();
+        eprintln!("HELLO B");  //TODO @mark: TEMPORARY! REMOVE THIS!
         let (_, out, _) = run_cli(&["daemon", "get", "status"]);
+        eprintln!("HELLO C");  //TODO @mark: TEMPORARY! REMOVE THIS!
         debug!("started mango daemon, status: {}", out);
-        test(run_cli_with(&exe_pth, args));
+        let (status, out, err) = run_cli_with(&exe_pth, args);
+        test(status, &out, &err);
+        eprintln!("HELLO D");  //TODO @mark: TEMPORARY! REMOVE THIS!
+        panic!();  //TODO @mark: TEMPORARY! REMOVE THIS!
         debug!("going to stop mango daemon");
+        sleep(Duration::from_millis(200));  //TODO @mark: TEMPORARY! REMOVE THIS!
         let (code, _, err) = run_cli(&["daemon", "stop"]);
         assert_eq!(code, 0, "failed to stop {}", err);
         child.wait().unwrap();
@@ -97,8 +103,7 @@ fn run_with_daemon(args: &[&str], test: impl FnOnce(Output)) {
 fn show_help() {
     run_with_daemon(
         &["-h"],
-        |output| {
-            let out = from_utf8_lossy(&output.stdout);
+        |_, out, _| {
             assert!(out.contains("mango"));
         },
     );
@@ -108,10 +113,10 @@ fn show_help() {
 fn compile_ir() {
     run_with_daemon(
         &["compile"],
-        |output| {
-            assert!(output.status.success());
-            println!("out: {}\n/out", from_utf8_lossy(&output.stdout));  //TODO @mark: TEMPORARY! REMOVE THIS!
-            println!("err: {}\n/err", from_utf8_lossy(&output.stderr));  //TODO @mark: TEMPORARY! REMOVE THIS!
+        |status, out, err| {
+            assert!(status == 0);
+            println!("out: {}\n/out", out);  //TODO @mark: TEMPORARY! REMOVE THIS!
+            println!("err: {}\n/err", err);  //TODO @mark: TEMPORARY! REMOVE THIS!
         },
     );
 }
@@ -124,22 +129,22 @@ fn daemon_start_stop() {
 
     // Start
     let (code, _, err) = run_cli(&["daemon", "start", "-p", "47559"]);
-    assert_eq!(code, 0);
     debug!("starting:\n{}/starting", err);
+    assert_eq!(code, 0);
 
     let (code, out, _) = run_cli(&["daemon", "get", "status"]);
+    assert_eq!(out.trim(), "running");
     assert_eq!(code, 0);
-    assert_eq!(out, "running");
 
     // Stop
     let (code, _, err) = run_cli(&["daemon", "stop"]);
-    assert_eq!(code, 0);
     debug!("stopping:\n{}/stopping", err);
+    assert_eq!(code, 0);
 
     //TODO get rid of sleep when the server no longer sleeps
     sleep(Duration::from_millis(75));
 
     let (code, out, _) = run_cli(&["daemon", "get", "status"]);
+    assert_eq!(out.trim(), "not-started");
     assert_eq!(code, 0);
-    assert_eq!(out, "not-started");
 }

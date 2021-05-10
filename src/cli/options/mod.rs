@@ -8,6 +8,8 @@ pub mod daemon;
 pub mod exec_test;
 pub mod run;
 
+//TODO @mark: option to get all dependencies
+
 #[derive(StructOpt, Debug)]
 #[structopt(
     //author = "Mango programming language CLI",
