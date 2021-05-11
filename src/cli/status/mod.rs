@@ -1,7 +1,7 @@
 use ::std::process::exit;
 
-use ::log::trace;
 use ::log::debug;
+use ::log::trace;
 
 use crate::cli::options::daemon::DaemonCmd;
 use crate::cli::status::get::get_daemon_property;
@@ -23,10 +23,10 @@ pub fn handle_daemon_cmd(args: &DaemonCmd, status: &MangodStatus) -> Result<(), 
         Ok(()) => {
             trace!("status of daemon command was ok");
             exit(0)
-        },
+        }
         Err(()) => {
             debug!("status of daemon command was err");
             exit(1)
-        },
+        }
     }
 }

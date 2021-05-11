@@ -39,7 +39,7 @@ pub fn mango_user_cache_dir() -> PathBuf {
 
 /// Get user configuration directory for Mango (multi-project).
 /// Documented at https://docs.mangocode.org/en/latest/setup_guide/paths.html
-#[allow(unused)]  //TODO @mark
+#[allow(unused)] //TODO @mark
 pub fn mango_user_config_dir() -> PathBuf {
     let pth = env::var("MANGO_USER_CONFIG_PATH")
         .map(PathBuf::from)

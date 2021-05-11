@@ -26,12 +26,12 @@ impl MangodStatus {
         get_status()
     }
 
-    #[allow(unused)]  //TODO @mark
+    #[allow(unused)] //TODO @mark
     pub fn is_ok(&self) -> bool {
         matches!(self, MangodStatus::Ok { .. })
     }
 
-    #[allow(unused)]  //TODO @mark
+    #[allow(unused)] //TODO @mark
     pub fn as_str(&self) -> &str {
         self.as_code()
     }

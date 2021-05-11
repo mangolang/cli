@@ -173,7 +173,7 @@ impl<H: Fn(Upstream, &RespSender) -> Result<(), String>> ws::Handler for ServerH
                 let sender = RespSender::new(id, &self.connection);
                 match (self.handler)(data, &sender) {
                     //TODO @mark: remove trace?
-                    Ok(()) => {},  //trace!("successfully handled {}", data.type_name()),
+                    Ok(()) => {} //trace!("successfully handled {}", data.type_name()),
                     Err(err_msg) => sender.send_err(err_msg),
                 }
             }
