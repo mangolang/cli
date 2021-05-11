@@ -71,12 +71,11 @@ WORKDIR /code
 # It's really just the executable; other files are part of the Github release, but not Docker image.
 #COPY README.rst LICENSE.txt ./
 COPY --from=build /mango_exe /mango
-COPY --from=build /mangod_exe /mangod
 
 # Smoke test
 RUN ["mango", "--help"]
 RUN ["mango", "daemon", "start"]
-RUN ["mangod", "--help"]
+RUN ["mango", "run-as-daemon", "--help"]
 
 ENTRYPOINT ["mango"]
 
