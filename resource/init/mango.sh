@@ -29,6 +29,11 @@ fi
 
 #TODO @mark: check that this is the root dir of the Mango project
 
+# Docker network
+
+docker network inspect 'mangod-network' >/dev/null 2>/dev/null || \
+    docker network create --driver bridge 'mangod-network'
+
 # Mango daemon
 
 if [ -z "$(docker ps -q -f name=mangod)" ]
@@ -38,9 +43,10 @@ then
         --name "mangod" \
         --label started-by="$PROJECT_NAME" \
         -d --rm \
+        --network 'mangod-network' \
         -p 47558:47558 \
         "$MANGO_DOCKER_IMAGE" \
-            -- run-as-daemon \
+            run-as-daemon \
             --hostname 127.0.0.1 --port 47558
 fi
 
@@ -49,7 +55,8 @@ fi
 docker run \
     --name "mango-$PROJECT_NAME" \
     -it --rm \
+    --network 'mangod-network' \
     --mount type=bind,source="$(pwd)",target=/code \
     "$MANGO_DOCKER_IMAGE" \
-        -- "$@"
+        "$@"
 

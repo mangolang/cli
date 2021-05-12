@@ -47,7 +47,8 @@ FROM scratch AS executable
 
 ENV PATH=/
 ENV RUST_BACKTRACE=1
-ENV RUST_LOG='debug,ws=warn,mio=warn'
+#ENV RUST_LOG='debug,ws=warn,mio=warn'
+ENV RUST_LOG='warn'
 ENV MANGO_USER_CACHE_PATH='/cache'
 ENV MANGO_USER_CONFIG_PATH='/conf'
 WORKDIR /code
