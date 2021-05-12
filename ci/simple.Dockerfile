@@ -13,21 +13,16 @@ RUN cargo install cargo-tree
 # Add the files needed to compile dependencies.
 COPY ./Cargo.toml Cargo.lock ./
 RUN mkdir -p src common/src daemon/src cli/src && \
-    printf '\nfn main() {\n\tprintln!("placeholder for compiling dependencies")\n}\n' | tee common/src/lib.rs | tee daemon/src/main.rs | tee cli/src/main.rs
-COPY common/Cargo.toml ./common/
-COPY daemon/Cargo.toml ./daemon/
-COPY cli/Cargo.toml ./cli/
+    printf '\nfn main() {\n\tprintln!("placeholder for compiling dependencies")\n}\n' | tee src/main.rs
 
 # Build the dependencies, remove Cargo files so they have to be re-added.
 RUN cargo build --workspace --tests &&\
     cargo build --workspace --release &&\
-    rm -rf Cargo.toml Cargo.lock common/ daemon/ cli/
+    rm -rf Cargo.toml Cargo.lock src/
 
 # Copy the actual code.
 COPY ./Cargo.toml ./Cargo.lock ./deny.toml ./rustfmt.toml ./
-COPY ./common/ ./common
-COPY ./daemon/ ./daemon
-COPY ./cli/ ./cli
+COPY ./src/ ./src
 
 # Build (for test)
 RUN find . -name target -prune -o -type f &&\
@@ -42,6 +37,10 @@ RUN cargo --offline clippy --workspace --all-targets --all-features --tests -- -
 
 # Style
 RUN cargo --offline fmt --all -- --check
+
+# Custom checks
+COPY ./ci/extra_checks.sh ./extra_checks.sh
+RUN sh extra_checks.sh && rm extra_checks.sh
 
 # Dependencies
 RUN cargo --offline tree --workspace --all-features > dep.tree
@@ -72,12 +71,11 @@ WORKDIR /code
 # It's really just the executable; other files are part of the Github release, but not Docker image.
 #COPY README.rst LICENSE.txt ./
 COPY --from=build /mango_exe /mango
-COPY --from=build /mangod_exe /mangod
 
 # Smoke test
 RUN ["mango", "--help"]
 RUN ["mango", "daemon", "start"]
-RUN ["mangod", "--help"]
+RUN ["mango", "run-as-daemon", "--help"]
 
 ENTRYPOINT ["mango"]
 
