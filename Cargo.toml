@@ -36,4 +36,4 @@ tempfile = "3.2.0"
 
 [target.'cfg(not(target_env = "msvc"))'.dependencies]
 #TODO @mark: jemalloc hasn't been updated in a fair while, still usable?
-jemallocator = "0.3.0"
+jemallocator = "0.3.2"

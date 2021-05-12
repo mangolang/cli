@@ -12,8 +12,8 @@ RUN cargo install cargo-tree
 
 # Add the files needed to compile dependencies.
 COPY ./Cargo.toml Cargo.lock ./
-RUN mkdir -p src common/src daemon/src cli/src && \
-    printf '\nfn main() {\n\tprintln!("placeholder for compiling dependencies")\n}\n' | tee src/main.rs
+RUN mkdir -p src && \
+    printf '\nfn main() {\n\tprintln!("something went wrong while building the docker image")\n}\n' | tee src/main.rs
 
 # Build the dependencies, remove Cargo files so they have to be re-added.
 RUN cargo build --workspace --tests &&\
@@ -26,8 +26,8 @@ COPY ./src/ ./src
 
 # Build (for test)
 RUN find . -name target -prune -o -type f &&\
-    touch -c common/src/lib.rs daemon/src/main.rs cli/src/main.rs &&\
-    cargo --offline build --workspace --tests
+    touch -c src/main.rs &&\
+    cargo --offline build --tests
 
 # Test
 RUN cargo --offline test --workspace --all-targets --all-features
