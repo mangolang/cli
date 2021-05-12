@@ -55,8 +55,7 @@ RUN cat dep.tree && cargo --offline outdated --exit-code 1
 RUN cargo --offline build --workspace --release
 
 # A find is needed here for it to work with multiple platforms (musl uses different path)
-RUN find . -wholename '*/release/*' -name 'mango' -type f -executable -print -exec cp {} /mango_exe \; &&\
-    find . -wholename '*/release/*' -name 'mangod' -type f -executable -print -exec cp {} /mangod_exe \;
+RUN find . -wholename '*/release/*' -name 'mango' -type f -executable -print -exec cp {} /mango_exe \;
 
 # Second stage image to decrease size
 FROM scratch AS executable
