@@ -77,7 +77,6 @@ fn run_with_daemon(args: &[&str], test: impl FnOnce(i32, &str, &str)) {
         .unwrap()
         .as_ref()
         .map(|exe_pth| {
-            eprintln!("HELLO A"); //TODO @mark: TEMPORARY! REMOVE THIS!
             let mut child = Command::new(&exe_pth)
                 .arg("run-as-daemon")
                 .arg("-p")
@@ -85,13 +84,10 @@ fn run_with_daemon(args: &[&str], test: impl FnOnce(i32, &str, &str)) {
                 .env("RUST_LOG", "debug,ws=warn,mio=warn")
                 .spawn()
                 .unwrap();
-            eprintln!("HELLO B"); //TODO @mark: TEMPORARY! REMOVE THIS!
             let (_, out, _) = run_cli(&["daemon", "get", "status"]);
-            eprintln!("HELLO C"); //TODO @mark: TEMPORARY! REMOVE THIS!
             debug!("started mango daemon, status: {}", out);
             let (status, out, err) = run_cli_with(&exe_pth, args);
             test(status, &out, &err);
-            eprintln!("HELLO D"); //TODO @mark: TEMPORARY! REMOVE THIS!
             debug!("going to stop mango daemon");
             sleep(Duration::from_millis(200)); //TODO @mark: TEMPORARY! REMOVE THIS!
             let (code, _, err) = run_cli(&["daemon", "stop"]);
@@ -113,13 +109,13 @@ fn show_help() {
 //TODO @mark: - failing to start second daemon should fail test
 //TODO @mark: - it should not start a daemon because one is running
 //#[test] //TODO @mark: disabled
-// fn compile_ir() {
-//     run_with_daemon(&["compile"], |status, out, err| {
-//         assert!(status == 0);
-//         println!("out: {}\n/out", out); //TODO @mark: TEMPORARY! REMOVE THIS!
-//         println!("err: {}\n/err", err); //TODO @mark: TEMPORARY! REMOVE THIS!
-//     });
-// }
+//fn compile_ir() {
+//    run_with_daemon(&["compile"], |status, out, err| {
+//        assert!(status == 0);
+//        println!("out: {}\n/out", out); //TODO @mark: TEMPORARY! REMOVE THIS!
+//        println!("err: {}\n/err", err); //TODO @mark: TEMPORARY! REMOVE THIS!
+//    });
+//}
 
 #[test]
 fn daemon_start_stop() {
