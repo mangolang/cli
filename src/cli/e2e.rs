@@ -112,14 +112,14 @@ fn show_help() {
 //TODO @mark: it seems this test tries to start another daemon, which it can't
 //TODO @mark: - failing to start second daemon should fail test
 //TODO @mark: - it should not start a daemon because one is running
-#[test] //TODO @mark: disabled
-fn compile_ir() {
-    run_with_daemon(&["compile"], |status, out, err| {
-        assert!(status == 0);
-        println!("out: {}\n/out", out); //TODO @mark: TEMPORARY! REMOVE THIS!
-        println!("err: {}\n/err", err); //TODO @mark: TEMPORARY! REMOVE THIS!
-    });
-}
+//#[test] //TODO @mark: disabled
+// fn compile_ir() {
+//     run_with_daemon(&["compile"], |status, out, err| {
+//         assert!(status == 0);
+//         println!("out: {}\n/out", out); //TODO @mark: TEMPORARY! REMOVE THIS!
+//         println!("err: {}\n/err", err); //TODO @mark: TEMPORARY! REMOVE THIS!
+//     });
+// }
 
 #[test]
 fn daemon_start_stop() {
