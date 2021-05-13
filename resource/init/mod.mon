@@ -1,0 +1,14 @@
+
+package:
+    name = "$PROJECT_NAME$"
+    version = "0.1.0"
+
+targets:
+    $PROJECT_NAME$:
+        type: "executable"
+        path: "main.mns"
+
+dependencies:
+    test_dependency: "1.0.0"
+
+
