@@ -10,6 +10,7 @@
 use ::std::process::exit;
 
 use ::env_logger;
+use ::include_dir::{Dir, include_dir};
 
 use crate::cli::compile::handle_compile_cmd;
 use crate::cli::init::handle_init_cmd;
@@ -25,6 +26,8 @@ static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
 mod cli;
 mod common;
 mod daemon;
+
+pub(crate) const RESOURCES: Dir = include_dir!("resources");
 
 #[paw::main]
 fn main(args: MangoArgs) {

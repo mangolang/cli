@@ -29,6 +29,7 @@ log = "0.4.14"
 async-std = "1.9.0"
 env_logger = "0.8.3"
 paw = "1.0.0"
+include_dir = "0.6.0"
 
 [dev-dependencies]
 serial_test = "0.5.1"
