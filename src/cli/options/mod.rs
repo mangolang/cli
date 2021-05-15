@@ -2,6 +2,7 @@ use ::structopt::StructOpt;
 
 use crate::common::util::MangodArgs;
 
+pub mod init;
 pub mod clean;
 pub mod compile;
 pub mod daemon;
@@ -34,19 +35,15 @@ pub struct MangoArgs {
     )]
     pub quiet: bool,
 
-    #[structopt(
-        long = "daemon",
-        help = "Only show the most important output.",
-        hidden_short_help=true
-    )]
-    pub daemon: bool,
-
     #[structopt(subcommand)]
     pub cmd: MangoCommand,
 }
 
 #[derive(StructOpt, Debug)]
 pub enum MangoCommand {
+    #[structopt(about = "Initialize the current directory as a Mango project")]
+    Init(init::InitCmd),
+
     // Note: this particular about text is part of a Github Action to check the CLI
     #[structopt(about = "Compile the code in the current directory to one of various formats")]
     Compile(compile::CompileCmd),
