@@ -10,7 +10,7 @@ COPY ./src/ ./src
 # Build (for test)
 RUN find . -name target -prune -o -type f &&\
     touch -c src/main.rs &&\
-    cargo --offline build --tests
+    cargo build --tests
 
 #TODO @mark: move up^
 ENV RUST_LOG='debug,ws=warn,mio=warn'
