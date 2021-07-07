@@ -7,23 +7,27 @@
 // #[allow(unused_imports)]
 // use ::mangolib;
 
-#[global_allocator]
-static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
-
 use ::std::process::exit;
 
 use ::env_logger;
+use ::include_dir::{Dir, include_dir};
 
 use crate::cli::compile::handle_compile_cmd;
+use crate::cli::init::handle_init_cmd;
 use crate::cli::options::MangoArgs;
 use crate::cli::options::MangoCommand;
 use crate::cli::status::handle_daemon_cmd;
 use crate::common::util::MangodStatus;
 use crate::daemon::run_mango_daemon;
 
+#[global_allocator]
+static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
+
 mod cli;
 mod common;
 mod daemon;
+
+pub(crate) const RESOURCES: Dir = include_dir!("resources");
 
 #[paw::main]
 fn main(args: MangoArgs) {
@@ -45,6 +49,7 @@ pub fn cli(args: MangoArgs) -> Result<(), String> {
     // };
     let status = MangodStatus::determine();
     match args.cmd {
+        MangoCommand::Init(init) => handle_init_cmd(&init),
         MangoCommand::Compile(compile) => handle_compile_cmd(&compile, &status),
         //TODO @mark:
         // match compile.target {

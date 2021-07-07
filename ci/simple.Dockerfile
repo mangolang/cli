@@ -1,33 +1,16 @@
 
-FROM clux/muslrust:nightly-2021-04-24 AS build
-
-ENV RUST_BACKTRACE=1
-
-RUN rustup component add rustfmt
-RUN rustup component add clippy
-RUN cargo install cargo-outdated
-RUN cargo install cargo-audit
-RUN cargo install cargo-deny
-RUN cargo install cargo-tree
-
-# Add the files needed to compile dependencies.
-COPY ./Cargo.toml Cargo.lock ./
-RUN mkdir -p src && \
-    printf '\nfn main() {\n\tprintln!("something went wrong while building the docker image")\n}\n' | tee src/main.rs
-
-# Build the dependencies, remove Cargo files so they have to be re-added.
-RUN cargo build --tests &&\
-    cargo build --release &&\
-    rm -rf Cargo.toml Cargo.lock src/
+#TODO @mark: why compile still takes >1 min each despite pre-compiled dependencies?
+FROM mangocode/mango_daily_base:2021-06-27 AS build
 
 # Copy the actual code.
-COPY ./Cargo.toml ./Cargo.lock ./deny.toml ./rustfmt.toml ./
+# exclude .lock file for now as it slows down dependencies
+COPY ./Cargo.toml ./deny.toml ./rustfmt.toml ./
 COPY ./src/ ./src
 
 # Build (for test)
 RUN find . -name target -prune -o -type f &&\
     touch -c src/main.rs &&\
-    cargo --offline build --tests
+    cargo build --tests
 
 #TODO @mark: move up^
 ENV RUST_LOG='debug,ws=warn,mio=warn'
@@ -65,7 +48,8 @@ FROM scratch AS executable
 
 ENV PATH=/
 ENV RUST_BACKTRACE=1
-ENV RUST_LOG='debug,ws=warn,mio=warn'
+#ENV RUST_LOG='debug,ws=warn,mio=warn'
+ENV RUST_LOG='warn'
 ENV MANGO_USER_CACHE_PATH='/cache'
 ENV MANGO_USER_CONFIG_PATH='/conf'
 WORKDIR /code

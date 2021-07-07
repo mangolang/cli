@@ -1,0 +1,10 @@
+
+use sys.print
+
+main:
+    # add your own code here!
+    print('hello world!')
+
+test "make sure tests are run":
+    assert 1 + 1 == 2
+

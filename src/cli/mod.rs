@@ -1,3 +1,4 @@
+pub mod init;
 pub mod compile;
 pub mod options;
 pub mod source;
