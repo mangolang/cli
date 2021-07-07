@@ -1,9 +1,10 @@
 
 #TODO @mark: why compile still takes >1 min each despite pre-compiled dependencies?
-FROM mangocode/mango_daily_base:2021-05-02 AS build
+FROM mangocode/mango_daily_base:2021-06-27 AS build
 
 # Copy the actual code.
-COPY ./Cargo.toml ./Cargo.lock ./deny.toml ./rustfmt.toml ./
+# exclude .lock file for now as it slows down dependencies
+COPY ./Cargo.toml ./deny.toml ./rustfmt.toml ./
 COPY ./src/ ./src
 
 # Build (for test)
