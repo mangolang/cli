@@ -5,10 +5,10 @@
 
 # Now explicitly add the source code, Cargo files and readme:
 !Cargo.toml
-!Cargo.lock
 !rustfmt.toml
 !deny.toml
 !src/
+!resources/
 !README.rst
 !LICENSE.txt
 !ci/extra_checks.sh
